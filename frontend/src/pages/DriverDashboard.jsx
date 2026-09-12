@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Navigation, Wallet, AlertTriangle, CheckCircle, Clock, MapPin, Fuel, TrendingUp, Map } from 'lucide-react';
+import { Navigation, Wallet, AlertTriangle, CheckCircle, Clock, MapPin, Fuel, TrendingUp, Map, FileText, Download, Receipt, Loader2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import api from '../services/api';
 import { io } from 'socket.io-client';
@@ -22,6 +22,11 @@ const DriverDashboard = () => {
   const [isNavigating, setIsNavigating] = useState(false);
   const [activeRide, setActiveRide] = useState(null);
   const [driverPos, setDriverPos] = useState({ lat: 18.5204, lng: 73.8567 });
+
+  // Payslip State
+  const [payslipData, setPayslipData] = useState(null);
+  const [isGeneratingPayslip, setIsGeneratingPayslip] = useState(false);
+  const [payslipError, setPayslipError] = useState(null);
 
   const socketRef = useRef(null);
   const isOnlineRef = useRef(isOnline);
@@ -135,6 +140,24 @@ const DriverDashboard = () => {
 
   const handleFinishTrip = () => {
     setIsNavigating(false);
+  };
+
+  const handleGeneratePayslip = async () => {
+    setIsGeneratingPayslip(true);
+    setPayslipError(null);
+    try {
+      const res = await api.get('/api/drivers/1/payslip');
+      if (res.data && res.data.success && res.data.payslip) {
+        setPayslipData(res.data.payslip);
+      } else {
+        setPayslipError('Unable to load payslip data from server.');
+      }
+    } catch (err) {
+      console.error('Error fetching payslip:', err);
+      setPayslipError(err.response?.data?.message || 'Failed to fetch driver payslip from server.');
+    } finally {
+      setIsGeneratingPayslip(false);
+    }
   };
 
   useEffect(() => {
@@ -492,6 +515,118 @@ const DriverDashboard = () => {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
+              </div>
+
+              {/* Driver Payslip & Statements Section */}
+              <div className="card p-6 border border-copper-500/20 bg-loft-900/60 relative overflow-hidden">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b border-loft-800">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Receipt className="w-5 h-5 text-copper-400" />
+                      <h3 className="text-xl font-bold text-loft-50">Driver Weekly Payslip & Statements</h3>
+                    </div>
+                    <p className="text-sm text-loft-400">
+                      Generate your certified earnings statement, platform deductions, and tax compliance breakdown.
+                    </p>
+                  </div>
+                  
+                  <button
+                    onClick={handleGeneratePayslip}
+                    disabled={isGeneratingPayslip}
+                    className="btn-primary py-2.5 px-6 flex items-center gap-2 whitespace-nowrap shadow-[0_0_15px_rgba(232,99,49,0.3)] cursor-pointer disabled:opacity-50"
+                  >
+                    {isGeneratingPayslip ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Generating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="w-4 h-4" />
+                        <span>Generate &amp; Download Payslip</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {payslipError && (
+                  <div className="p-4 mb-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                    <span>{payslipError}</span>
+                  </div>
+                )}
+
+                {payslipData ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-loft-950/80 rounded-xl border border-loft-800 p-6 space-y-6"
+                  >
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-loft-800 pb-4">
+                      <div>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-copper-400 bg-copper-500/10 px-2.5 py-1 rounded-full">
+                          Driver Statement
+                        </span>
+                        <h4 className="text-lg font-bold text-loft-100 mt-2">{payslipData.driverName}</h4>
+                        <p className="text-xs text-loft-400">Week Ending: {payslipData.weekEnding}</p>
+                      </div>
+                      <div className="text-left sm:text-right">
+                        <p className="text-xs text-loft-400 uppercase tracking-wider font-semibold">Net Payout</p>
+                        <p className="text-3xl font-black text-moss-400">₹{payslipData.netPayout?.toLocaleString('en-IN')}</p>
+                      </div>
+                    </div>
+
+                    {/* Breakdown Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div className="bg-loft-900/60 p-4 rounded-lg border border-loft-800/60">
+                        <p className="text-xs text-loft-400 font-medium">Gross Earnings</p>
+                        <p className="text-xl font-bold text-loft-100 mt-1">₹{payslipData.grossEarnings?.toLocaleString('en-IN')}</p>
+                        <span className="text-[11px] text-loft-400">Total ride fares</span>
+                      </div>
+                      
+                      <div className="bg-loft-900/60 p-4 rounded-lg border border-loft-800/60">
+                        <p className="text-xs text-loft-400 font-medium">Platform Fee (15%)</p>
+                        <p className="text-xl font-bold text-amber-400 mt-1">-₹{payslipData.platformFee?.toLocaleString('en-IN')}</p>
+                        <span className="text-[11px] text-loft-400">Service commission</span>
+                      </div>
+
+                      <div className="bg-loft-900/60 p-4 rounded-lg border border-loft-800/60">
+                        <p className="text-xs text-loft-400 font-medium">TDS Tax (1%)</p>
+                        <p className="text-xl font-bold text-red-400 mt-1">-₹{payslipData.tdsTax?.toLocaleString('en-IN')}</p>
+                        <span className="text-[11px] text-loft-400">Statutory tax deducted</span>
+                      </div>
+
+                      <div className="bg-moss-500/10 p-4 rounded-lg border border-moss-500/30">
+                        <p className="text-xs text-moss-400 font-medium">Net Payout Amount</p>
+                        <p className="text-xl font-bold text-moss-300 mt-1">₹{payslipData.netPayout?.toLocaleString('en-IN')}</p>
+                        <span className="text-[11px] text-moss-400">Direct Bank Transfer</span>
+                      </div>
+                    </div>
+
+                    {/* Download Action */}
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-loft-800">
+                      <p className="text-xs text-loft-400">
+                        PDF statement ready for tax filings and record-keeping.
+                      </p>
+                      <a
+                        href={payslipData.pdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download={`payslip-driver-${payslipData.driverId || 1}.pdf`}
+                        className="btn-secondary py-2 px-5 text-sm flex items-center gap-2 border-copper-500/40 text-copper-300 hover:bg-copper-500/10 cursor-pointer"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>Download Official PDF</span>
+                      </a>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <div className="p-8 text-center rounded-xl bg-loft-950/40 border border-dashed border-loft-800/60 text-loft-400">
+                    <FileText className="w-10 h-10 mx-auto mb-2 text-loft-600 opacity-60" />
+                    <p className="text-sm">No payslip generated yet for this period.</p>
+                    <p className="text-xs text-loft-400 mt-1">Click &quot;Generate &amp; Download Payslip&quot; above to view your gross earnings, deductions, and download your statement.</p>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}

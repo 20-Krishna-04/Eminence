@@ -117,8 +117,8 @@
 ### TC-022 — Driver Payslip Generation
 | Field | Details |
 |-------|---------|
-| **Steps** | 1. Find a valid Driver ID from admin panel <br> 2. Call `GET http://localhost:5000/api/drivers/{driverId}/payslip` with a valid token |
-| **Expected Result** | ✅ JSON response with `grossEarnings: 15000`, `platformFee: 2250`, `tdsTax: 150`, `netPayout: 12600`. |
+| **Steps** | **Method A (UI)**:<br> 1. Log in as a Driver and open Driver Dashboard (`http://localhost:5173/driver/dashboard`) <br> 2. Navigate to "Earnings" tab <br> 3. Click "Generate & Download Payslip" <br> 4. Verify breakdown details and click "Download Official PDF" <br><br> **Method B (Authenticated API)**:<br> 1. Obtain Bearer JWT token from driver/customer login (`POST /api/auth/phone-verify`) <br> 2. Call `GET http://localhost:5000/api/drivers/1/payslip` with header `Authorization: Bearer <token>` <br> Example (PowerShell):<br> `Invoke-RestMethod -Uri "http://localhost:5000/api/drivers/1/payslip" -Headers @{ "Authorization" = "Bearer <token>" }` |
+| **Expected Result** | ✅ UI displays Driver Statement breakdown (`grossEarnings: ₹15,000`, `platformFee: ₹2,250`, `tdsTax: ₹150`, `netPayout: ₹12,600`) and provides downloadable PDF statement. API returns HTTP 200 with matching JSON breakdown and `pdfUrl`. |
 | **Status** | `[ ] Pass` `[ ] Fail` |
 
 ### TC-023 — WMS Barcode Scan (Simulation)

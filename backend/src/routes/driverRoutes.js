@@ -45,5 +45,6 @@ router.get('/', driverController.getAllDrivers);
 router.post('/', driverController.createDriver);
 router.patch('/:id/toggle', driverController.toggleAvailability);
 router.get('/:id/payslip', protect, driverController.generatePayslip);
+router.get('/:id/payslip/download', driverController.downloadPayslip);
 
 module.exports = router;
