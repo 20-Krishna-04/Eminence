@@ -590,6 +590,37 @@ CREATE INDEX idx_audit_user_action ON audit_logs (user_id, action, created_at);
 
 ---
 
+## 🚀 Active Feature Tracker & Completed Implementations (September 2026)
+
+### ✅ Completed Milestones
+1. **Neon Serverless PostgreSQL Migration & Hardening**
+   - Fixed `ECONNRESET` and SSL channel-binding connection timeout issues.
+   - Refactored `backend/config/database.js` connection pool (`max: 10`, `idle: 30000`, `acquire: 60000`).
+   - Removed blocking table locks caused by `sequelize.sync({ alter: true })`.
+2. **QA & Test Automation Suite Reorganization**
+   - Established `frontend/tests/manual_test_cases/` with 38 verified QA scenarios (TC-001 through TC-038).
+   - Built automated backend integration testing script (`backend/tests/automated_e2e_test.js`) testing Auth, Ride Bookings, Dynamic Surge Calculation, and Socket.io broadcasts.
+
+### 🔄 In-Progress: React Native (Expo) Mobile App Monorepo
+Building native iOS & Android apps inside `/mobile` to run alongside the web app:
+- **Phase 1: Foundation & Authentication (TC-001 - TC-004)** `[IN PROGRESS]`
+  - Expo Router, NativeWind styling, JWT SecureStore, OTP Phone login, Admin fallback, Route Guarding.
+- **Phase 2: Customer Mobile Experience (TC-010 - TC-016, TC-035)** `[QUEUED]`
+  - Mobile ride booking, multi-stop addresses, live map tracking via Socket.io, ESG Carbon saved badges, Address book & Wallet.
+- **Phase 3: Driver Companion & Operations (TC-020 - TC-024)** `[QUEUED]`
+  - Online/Offline toggle, real-time incoming ride alerts, step-by-step trip execution, native WMS barcode scanner (`expo-camera`), demand heatmap.
+- **Phase 4: Enterprise & Admin Fleet Hub (TC-030 - TC-034, TC-036 - TC-038)** `[QUEUED]`
+  - Live fleet monitoring map, automated & manual driver allocation, corporate bulk shipment management, enterprise invoicing.
+
+### 💡 Emerging Mobile Feature Ideas & Enhancements
+- **Native Biometrics:** FaceID / Fingerprint unlock for fast driver and customer sign-in.
+- **Offline Sync Engine:** Allow drivers in low-connectivity areas to complete delivery milestones offline and sync upon reconnecting.
+- **Background GPS Telemetry:** Continuous background geolocation broadcasting for active drivers with battery optimization.
+- **Push Notifications (FCM / APNs):** Instant native alerts for booking status updates, driver arrival, and dispatch broadcasts.
+
+---
+
 **Last Updated:** September 2026  
-**Status:** Ready for implementation  
-**Next Review:** After completing Phase 1 (Quick Wins)
+**Status:** In Active Execution (Phase 1 Mobile App)  
+**Next Review:** Upon completion of Mobile Phase 1 Verification
+

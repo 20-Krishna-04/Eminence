@@ -60,8 +60,39 @@ Inventory.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
 const { Client } = require('pg');
 
 const bootstrapDatabase = async () => {
-  return;
+  try {
+    const dialect = sequelize.getDialect();
+    if (dialect === 'postgres') {
+      await sequelize.query(`
+        DO $$ 
+        BEGIN 
+          IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_Customers_b2bStatus') THEN
+            CREATE TYPE "enum_Customers_b2bStatus" AS ENUM('none', 'pending_verification', 'approved', 'rejected');
+          END IF;
+          IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_Customers_billingMode') THEN
+            CREATE TYPE "enum_Customers_billingMode" AS ENUM('prepaid', 'postpaid');
+          END IF;
+        END $$;
+      `);
+
+      await sequelize.query(`
+        ALTER TABLE "Customers" 
+          ADD COLUMN IF NOT EXISTS "isPro" BOOLEAN DEFAULT false,
+          ADD COLUMN IF NOT EXISTS "totalTrips" INTEGER DEFAULT 0,
+          ADD COLUMN IF NOT EXISTS "isBusiness" BOOLEAN DEFAULT false,
+          ADD COLUMN IF NOT EXISTS "b2bStatus" "enum_Customers_b2bStatus" DEFAULT 'none',
+          ADD COLUMN IF NOT EXISTS "companyName" VARCHAR(255),
+          ADD COLUMN IF NOT EXISTS "gstNumber" VARCHAR(255),
+          ADD COLUMN IF NOT EXISTS "billingMode" "enum_Customers_billingMode" DEFAULT 'prepaid',
+          ADD COLUMN IF NOT EXISTS "creditLimit" DECIMAL(10,2) DEFAULT 0.00,
+          ADD COLUMN IF NOT EXISTS "creditUsed" DECIMAL(10,2) DEFAULT 0.00;
+      `);
+    }
+  } catch (e) {
+    console.warn('Bootstrap database note:', e.message);
+  }
 };
+
 
 
 // Function to sync models
