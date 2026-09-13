@@ -108,7 +108,7 @@ const createBooking = async (req, res) => {
 
     // 2. 3PL API Failover Logic
     // Check if any driver is available, if not, simulate API failover
-    const availableDrivers = await Driver.count({ where: { isAvailable: true } });
+    const availableDrivers = await Driver.count({ where: { status: 'active' } });
     if (availableDrivers === 0 && bookingData.status === 'pending') {
       console.log(`[3PL Failover] No internal drivers available. Outsourcing booking to Delhivery API...`);
       bookingData.is3plOutsourced = true;

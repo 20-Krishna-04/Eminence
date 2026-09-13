@@ -601,13 +601,13 @@ CREATE INDEX idx_audit_user_action ON audit_logs (user_id, action, created_at);
    - Established `frontend/tests/manual_test_cases/` with 38 verified QA scenarios (TC-001 through TC-038).
    - Built automated backend integration testing script (`backend/tests/automated_e2e_test.js`) testing Auth, Ride Bookings, Dynamic Surge Calculation, and Socket.io broadcasts.
 
-### 🔄 In-Progress: React Native (Expo) Mobile App Monorepo
+### 🔄 Active Mobile App Monorepo Migration
 Building native iOS & Android apps inside `/mobile` to run alongside the web app:
-- **Phase 1: Foundation & Authentication (TC-001 - TC-004)** `[IN PROGRESS]`
-  - Expo Router, NativeWind styling, JWT SecureStore, OTP Phone login, Admin fallback, Route Guarding.
-- **Phase 2: Customer Mobile Experience (TC-010 - TC-016, TC-035)** `[QUEUED]`
-  - Mobile ride booking, multi-stop addresses, live map tracking via Socket.io, ESG Carbon saved badges, Address book & Wallet.
-- **Phase 3: Driver Companion & Operations (TC-020 - TC-024)** `[QUEUED]`
+- **Phase 1: Foundation & Authentication (TC-001 - TC-004)** `[COMPLETED ✅]`
+  - Expo Router, JWT SecureStore, OTP Phone login, Admin fallback, Route Guarding. Verified with 100% test pass.
+- **Phase 2: Customer Mobile Experience (TC-010 - TC-016, TC-035)** `[COMPLETED ✅]`
+  - Native ride booking, multi-stop drop routes (+₹150 stop calculation), real-time driver tracking map with Socket.io, ESG Carbon badges, Address book & Wallet balance. Verified with 100% test pass.
+- **Phase 3: Driver Companion & Operations (TC-020 - TC-024)** `[IN PROGRESS 🔄]`
   - Online/Offline toggle, real-time incoming ride alerts, step-by-step trip execution, native WMS barcode scanner (`expo-camera`), demand heatmap.
 - **Phase 4: Enterprise & Admin Fleet Hub (TC-030 - TC-034, TC-036 - TC-038)** `[QUEUED]`
   - Live fleet monitoring map, automated & manual driver allocation, corporate bulk shipment management, enterprise invoicing.
@@ -621,6 +621,7 @@ Building native iOS & Android apps inside `/mobile` to run alongside the web app
 ---
 
 **Last Updated:** September 2026  
-**Status:** In Active Execution (Phase 1 Mobile App)  
-**Next Review:** Upon completion of Mobile Phase 1 Verification
+**Status:** In Active Execution (Phase 3 Driver Companion)  
+**Next Review:** Upon completion of Mobile Phase 3 Verification
+
 

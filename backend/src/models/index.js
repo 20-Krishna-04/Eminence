@@ -87,6 +87,28 @@ const bootstrapDatabase = async () => {
           ADD COLUMN IF NOT EXISTS "creditLimit" DECIMAL(10,2) DEFAULT 0.00,
           ADD COLUMN IF NOT EXISTS "creditUsed" DECIMAL(10,2) DEFAULT 0.00;
       `);
+
+      await sequelize.query(`
+        ALTER TABLE "Bookings" 
+          ADD COLUMN IF NOT EXISTS "stops" JSONB,
+          ADD COLUMN IF NOT EXISTS "totalDistance" DECIMAL(10,2),
+          ADD COLUMN IF NOT EXISTS "isRoundTrip" BOOLEAN DEFAULT false,
+          ADD COLUMN IF NOT EXISTS "waitingTimeHours" INTEGER,
+          ADD COLUMN IF NOT EXISTS "waitingFee" DECIMAL(10,2),
+          ADD COLUMN IF NOT EXISTS "insuranceFee" DECIMAL(10,2) DEFAULT 0,
+          ADD COLUMN IF NOT EXISTS "scheduledAt" TIMESTAMP WITH TIME ZONE,
+          ADD COLUMN IF NOT EXISTS "isB2B" BOOLEAN DEFAULT false,
+          ADD COLUMN IF NOT EXISTS "gstAmount" DECIMAL(10,2),
+          ADD COLUMN IF NOT EXISTS "esgEmissions" REAL,
+          ADD COLUMN IF NOT EXISTS "is3plOutsourced" BOOLEAN DEFAULT false,
+          ADD COLUMN IF NOT EXISTS "thirdPartyProvider" VARCHAR(255),
+          ADD COLUMN IF NOT EXISTS "podHash" VARCHAR(255);
+      `);
+
+      await sequelize.query(`
+        ALTER TABLE "Drivers"
+          ADD COLUMN IF NOT EXISTS "isAvailable" BOOLEAN DEFAULT true;
+      `);
     }
   } catch (e) {
     console.warn('Bootstrap database note:', e.message);

@@ -9,6 +9,8 @@ export default function CustomerLayout() {
       }}
     >
       <Stack.Screen name="dashboard" options={{ headerShown: false }} />
+      <Stack.Screen name="book" options={{ headerShown: false }} />
+      <Stack.Screen name="track" options={{ headerShown: false }} />
     </Stack>
   );
 }
