@@ -20,6 +20,7 @@ const aiBookingLimiter = rateLimit({
 
 router.post('/', bookingController.createBooking);
 router.get('/', bookingsLimiter, protect, bookingController.getAllBookings);
+router.put('/:id/status', bookingsLimiter, protect, bookingController.updateBookingStatus);
 router.post('/:id/complete', bookingsLimiter, protect, bookingController.completeBooking);
 router.post('/ai-booking', aiBookingLimiter, protect, bookingController.aiVoiceBooking);
 

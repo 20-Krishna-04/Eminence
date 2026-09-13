@@ -9,6 +9,8 @@ export default function DriverLayout() {
       }}
     >
       <Stack.Screen name="dashboard" options={{ headerShown: false }} />
+      <Stack.Screen name="scanner" options={{ headerShown: false }} />
+      <Stack.Screen name="heatmap" options={{ headerShown: false }} />
     </Stack>
   );
 }

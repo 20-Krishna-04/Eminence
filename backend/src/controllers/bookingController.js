@@ -2,6 +2,7 @@ const { Booking, Customer, Driver, Vehicle } = require('../models');
 const { optimizeRoute } = require('../services/routeOptimizer');
 const { findPoolMatch } = require('../services/poolingEngine');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 
 // Get all bookings
 const getAllBookings = async (req, res) => {
@@ -37,7 +38,14 @@ const getAllBookings = async (req, res) => {
 // Create a booking
 const createBooking = async (req, res) => {
   try {
-    const customerId = req.user?.id || req.body.customerId;
+    let customerId = req.user?.id || req.body.customerId;
+    if (!customerId && req.headers.authorization?.startsWith('Bearer ')) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+        customerId = decoded.id;
+      } catch (_jwtErr) {}
+    }
     const bookingData = { ...req.body, customerId };
 
     // 1. ESG Carbon Footprint Calculation
@@ -152,6 +160,26 @@ const completeBooking = async (req, res) => {
   }
 };
 
+// Update booking status (arrived, in_transit, driver_assigned)
+const updateBookingStatus = async (req, res) => {
+  try {
+    const booking = await Booking.findByPk(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ success: false, message: 'Booking not found' });
+    }
+
+    const { status, driverId } = req.body;
+    if (status) booking.status = status;
+    if (driverId) booking.driverId = driverId;
+
+    await booking.save();
+    res.status(200).json({ success: true, booking });
+  } catch (error) {
+    console.error('Error updating booking status:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 // AI Voice Agent Simulation (NLP Endpoint)
 const aiVoiceBooking = async (req, res) => {
   try {
@@ -195,5 +223,6 @@ module.exports = {
   getAllBookings,
   createBooking,
   completeBooking,
+  updateBookingStatus,
   aiVoiceBooking
 };

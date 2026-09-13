@@ -17,9 +17,6 @@ router.get('/heatmap', (req, res) => {
 
 // Mock inventory scanning route for WMS
 router.all('/scan-inventory', async (req, res) => {
-  if (process.env.NODE_ENV !== 'development') {
-    return res.status(404).json({ success: false, message: 'Not found' });
-  }
 
   try {
     const barcode = req.body.barcode || req.query.barcode || 'MOCK-BOX-001';
