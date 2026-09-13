@@ -87,7 +87,7 @@ describe('Admin & Analytics Integration Tests', () => {
       const res = await request(app)
         .post('/api/auth/phone-verify')
         .send({
-          phone: '9876543299',
+          phone: '9876543210',
           code: '1234',
           role: 'admin' // Attacker attempting privilege escalation
         });

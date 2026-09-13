@@ -1125,7 +1125,7 @@ const AdminDashboard = () => {
                               className="text-loft-400 hover:text-copper-400 transition-colors"
                               title="Edit Contract"
                             >
-                              <Edit className="w-4 h-4" />
+                              <Edit2 className="w-4 h-4" />
                             </button>
                           </td>
                         </tr>

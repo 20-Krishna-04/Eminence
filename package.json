@@ -1,0 +1,24 @@
+{
+  "name": "eminence-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Eminence Logistics & Fleet Management - Enterprise Monorepo",
+  "scripts": {
+    "test": "node run_all_tests.js",
+    "test:fast": "node run_all_tests.js --fast",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm run lint && npm run build",
+    "test:mobile": "cd mobile && npm test",
+    "typecheck:mobile": "cd mobile && npm run typecheck"
+  },
+  "keywords": [
+    "logistics",
+    "fleet-management",
+    "react-native",
+    "expo",
+    "nodejs",
+    "react"
+  ],
+  "author": "Eminence Engineering Team",
+  "license": "ISC"
+}
