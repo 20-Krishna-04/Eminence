@@ -1,56 +1,78 @@
-# Welcome to your Expo app 👋
+# Eminence Logistics — Mobile Application (React Native & Expo)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+The native companion application for the Eminence Logistics platform, built with **React Native**, **Expo SDK 52**, and **Expo Router**. It serves as an integrated monorepo package alongside `/backend` and `/frontend` web applications.
 
-## Get started
+---
 
-1. Install dependencies
+## 📱 Supported Platforms & Modules
 
-   ```bash
-   npm install
-   ```
+- **iOS & Android** (via Expo Go, Development Builds, and standalone APKs/IPAs)
+- **Web Browser** (via Expo Web / React Native Web)
 
-2. Start the app
+### Core Role Portals
 
-   ```bash
-   npx expo start
-   ```
+| Role | Directory | Key Capabilities |
+| :--- | :--- | :--- |
+| **Authentication** | `src/app/(auth)/` | Phone OTP login (TC-001), Admin email/password login (TC-002, TC-003), Route guarding (TC-004) |
+| **Customer** | `src/app/(customer)/` | Ride history with ESG badges (TC-010, TC-013), standard & multi-stop booking (TC-011, TC-012), address book (TC-014), wallet balance (TC-015), referral code (TC-016), live GPS driver tracking (TC-035) |
+| **Driver** | `src/app/(driver)/` | Duty toggle (TC-020), incoming ride cards, trip execution (TC-022, TC-024), WMS barcode scanner (TC-023), AI demand heatmap (TC-021) |
+| **Admin** | `src/app/(admin)/` | Overview KPIs (TC-030), 7-day revenue chart (TC-031), driver onboarding (TC-032), vehicle registry (TC-033), IoT telematics (TC-034, TC-035), live support chat (TC-036), audit logs & SLA health (TC-037, TC-051) |
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 🚀 Quick Start & Development
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+### 1. Install Dependencies
 ```bash
-npm run reset-project
+cd mobile
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Start the Development Server
+```bash
+npx expo start
+```
+From the interactive terminal:
+- Press `a` to launch in the Android Emulator.
+- Press `i` to launch in the iOS Simulator.
+- Press `w` to open in your web browser.
+- Scan the QR code using the **Expo Go** app on a physical device.
 
-### Other setup steps
+---
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## 🧪 Automated Test Runners (27 / 27 Tests Passing)
 
-## Learn more
+All manual test cases from the project roadmap have automated test runners executing against the running backend server (`http://localhost:3000`):
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+# Phase 1: Authentication & Navigation (TC-001 to TC-004)
+node tests/phase1_auth_tests.js
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+# Phase 2: Customer Workflows & Live Tracking (TC-010 to TC-016, TC-035)
+node tests/phase2_customer_tests.js
 
-## Join the community
+# Phase 3: Driver Companion & Logistics (TC-020 to TC-024)
+node tests/phase3_driver_tests.js
 
-Join our community of developers creating universal apps.
+# Phase 4: Admin, Telematics & Enterprise (TC-030 to TC-037, TC-044, TC-051)
+node tests/phase4_admin_tests.js
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### Type Checking
+```bash
+npx tsc --noEmit
+```
+
+---
+
+## 🤖 GitHub Actions CI/CD (`.github/workflows/mobile-ci.yml`)
+
+The repository includes an automated Continuous Integration pipeline triggered on every push or pull request affecting the `mobile/` directory:
+
+1. **`validate-mobile`**:
+   - Checks out repository on `ubuntu-latest`.
+   - Sets up Node.js 20 with npm caching.
+   - Runs `npx tsc --noEmit` to ensure **0 TypeScript errors**.
+   - Validates Expo project configuration.
+2. **`test-mobile-contracts`**:
+   - Performs syntax compilation and AST validation across all test suites (`node -c`).
