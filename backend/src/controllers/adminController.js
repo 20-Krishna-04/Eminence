@@ -584,7 +584,7 @@ const getSurgePricing = async (req, res) => {
     const cached = cache.get(cacheKey);
     if (cached) return res.status(200).json({ success: true, ...cached, fromCache: true });
 
-    const activeBookings = await Booking.count({ where: { status: ['pending', 'driver_assigned', 'on_trip'] } });
+    const activeBookings = await Booking.count({ where: { status: ['pending', 'driver_assigned', 'in_transit'] } });
     const availableDrivers = await Driver.count({ where: { status: 'active' } });
 
     let surgeMultiplier = 1.0;
