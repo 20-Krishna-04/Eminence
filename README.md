@@ -219,6 +219,16 @@ eminence/
 │   ├── docker-compose.yml
 │   └── .env.example
 │
+├── mobile/                            # React Native (Expo) Mobile App
+│   ├── src/
+│   │   ├── app/                       # Expo Router Screens (Auth, Customer, Driver, Admin)
+│   │   ├── context/                   # AuthContext & State
+│   │   ├── services/                  # Platform-aware Axios API Client
+│   │   └── components/                # Reusable Native Components
+│   ├── tests/                         # Mobile Automated Test Suites
+│   ├── app.json
+│   └── package.json
+│
 ├── docs/
 │   ├── API_DOCUMENTATION.md
 │   ├── DATABASE_SCHEMA.md
@@ -317,6 +327,20 @@ cp .env.example .env.local
 
 4. Configure environment variables (see [Configuration](#configuration) below)
 
+### **Mobile App Setup (React Native / Expo)**
+
+1. Navigate to mobile directory:
+
+```bash
+cd ../mobile
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
 ---
 
 ## ⚙️ Configuration
@@ -370,6 +394,13 @@ VITE_GOOGLE_MAPS_API_KEY=your_google_maps_key
 VITE_RAZORPAY_KEY_ID=your_key_id
 ```
 
+### **Mobile App Environment Variables** (`mobile/.env`) *(Optional)*
+
+```env
+# By default, mobile automatically detects localhost for iOS/Web and 10.0.2.2 for Android emulator
+EXPO_PUBLIC_API_URL=http://localhost:3000
+```
+
 ---
 
 ## ▶️ Running the Application
@@ -384,7 +415,7 @@ npm run dev
 # Server runs on http://localhost:3000
 ```
 
-**Terminal 2: Frontend**
+**Terminal 2: Frontend Web**
 
 ```bash
 cd frontend
@@ -392,7 +423,28 @@ npm run dev
 # App runs on http://localhost:5173
 ```
 
-**Terminal 3: Database (if using local PostgreSQL)**
+**Terminal 3: Mobile App (React Native / Expo)**
+
+```bash
+cd mobile
+npx expo start
+```
+
+*Inside the Expo interactive terminal:*
+- Press `a` — Open on connected **Android Emulator** or device
+- Press `i` — Open on **iOS Simulator** (macOS)
+- Press `w` — Open in **Web Browser**
+- Scan the printed QR code using the **Expo Go** app on your physical Android / iPhone
+
+**Running Mobile Test Suite:**
+
+```bash
+cd mobile
+node tests/phase1_auth_tests.js
+# Runs automated Phase 1 test cases (TC-001 through TC-004)
+```
+
+**Terminal 4: Database (if using local PostgreSQL)**
 
 ```bash
 cd backend
