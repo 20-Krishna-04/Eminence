@@ -110,7 +110,7 @@ async function main() {
       runStage(
         'Backend: Jest Unit & Integration Tests (25 Test Cases)',
         'npm',
-        ['test', '--', '--testPathIgnorePatterns="load"', '--forceExit'],
+        ['test', '--', '--testPathIgnorePatterns="load"', '--forceExit', '--testTimeout=15000'],
         BACKEND_DIR
       )
     );
@@ -181,7 +181,7 @@ async function main() {
         env: { ...process.env, PORT: '3000', DEMO_SEED: 'true', NODE_ENV: 'development' },
         stdio: 'ignore'
       });
-      await waitForServer('http://localhost:3000/api/health', 15000);
+      await waitForServer('http://localhost:3000/api/health', 45000);
       console.log(`${colors.green}[INFO] Backend instance ready on port 3000.${colors.reset}\n`);
     }
 

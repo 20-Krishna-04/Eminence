@@ -2,7 +2,7 @@ const http = require('http');
 const ioClient = require('socket.io-client');
 const jwt = require('jsonwebtoken');
 const app = require('../../src/app');
-const { initSocket } = require('../../src/socket');
+const { initSocket, closeSocket } = require('../../src/socket');
 const { Booking } = require('../../src/models');
 
 describe('Socket.io Authentication & Room Access Control Tests', () => {
@@ -98,10 +98,10 @@ describe('Socket.io Authentication & Room Access Control Tests', () => {
     });
   });
 
-  afterAll((done) => {
+  afterAll(async () => {
     jest.restoreAllMocks();
-    io.close();
-    server.close(done);
+    await closeSocket();
+    await new Promise(resolve => server.close(resolve));
   });
 
   it('should reject connection when no auth token is provided', (done) => {
