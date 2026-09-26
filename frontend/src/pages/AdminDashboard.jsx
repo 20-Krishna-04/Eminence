@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { getToken } from '../services/tokenService';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import api from '../services/api';
@@ -43,7 +44,7 @@ const CustomRouteTooltip = ({ active, payload }) => {
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const { user } = useSelector((state) => state.auth);
-  const token = user?.token;
+  const token = user?.token || getToken();
 
   // Overview stats & list state
   const [stats, setStats] = useState({

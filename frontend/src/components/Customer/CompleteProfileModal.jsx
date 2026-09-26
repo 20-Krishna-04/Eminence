@@ -6,6 +6,7 @@ import { updateProfileSuccess } from '../../redux/slices/authSlice';
 import { MapPin, Phone, Building2, Map, FileText, CheckCircle2, User, Mail } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TermsModal from '../Common/TermsModal';
+import { getToken } from '../../services/tokenService';
 
 const CompleteProfileModal = () => {
   const { user } = useSelector((state) => state.auth);
@@ -90,7 +91,12 @@ const CompleteProfileModal = () => {
     if (!internal) setLoading(true);
     setError('');
     try {
-      await api.post('/api/auth/send-otp', { type });
+      const token = getToken();
+      await axios.post(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/send-otp`,
+        { type },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setOtpType(type);
       setOtpCooldown(60);
       setMessage(`OTP sent to your ${type}. Check your backend console for the code.`);
@@ -119,7 +125,12 @@ const CompleteProfileModal = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await api.post('/api/auth/verify-otp', { type: otpType, code });
+      const token = getToken();
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/verify-otp`,
+        { type: otpType, code },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       dispatch(updateProfileSuccess(res.data.user));
       setOtpType(null);
       setOtpCode('');
