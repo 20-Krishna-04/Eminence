@@ -40,7 +40,7 @@ const getDrivers = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching drivers:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -55,7 +55,7 @@ const createDriver = async (req, res) => {
     res.status(201).json({ success: true, driver });
   } catch (error) {
     console.error('Error creating driver:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -72,7 +72,7 @@ const updateDriver = async (req, res) => {
     res.status(200).json({ success: true, driver });
   } catch (error) {
     console.error('Error updating driver:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -88,7 +88,7 @@ const deleteDriver = async (req, res) => {
     res.status(200).json({ success: true, message: 'Driver deleted successfully' });
   } catch (error) {
     console.error('Error deleting driver:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -128,7 +128,7 @@ const getCustomers = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching customers:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -152,7 +152,7 @@ const createCustomer = async (req, res) => {
     res.status(201).json({ success: true, customer });
   } catch (error) {
     console.error('Error creating customer:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -187,7 +187,7 @@ const updateCustomer = async (req, res) => {
     res.status(200).json({ success: true, customer });
   } catch (error) {
     console.error('Error updating customer:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -203,7 +203,7 @@ const deleteCustomer = async (req, res) => {
     res.status(200).json({ success: true, message: 'Customer deleted successfully' });
   } catch (error) {
     console.error('Error deleting customer:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -244,7 +244,7 @@ const getVehicles = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching vehicles:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -259,7 +259,7 @@ const createVehicle = async (req, res) => {
     res.status(201).json({ success: true, vehicle });
   } catch (error) {
     console.error('Error creating vehicle:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -276,7 +276,7 @@ const updateVehicle = async (req, res) => {
     res.status(200).json({ success: true, vehicle });
   } catch (error) {
     console.error('Error updating vehicle:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -292,7 +292,7 @@ const deleteVehicle = async (req, res) => {
     res.status(200).json({ success: true, message: 'Vehicle deleted successfully' });
   } catch (error) {
     console.error('Error deleting vehicle:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -322,7 +322,7 @@ const getOverviewStats = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching overview stats:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -375,7 +375,7 @@ const getRevenueAnalytics = async (req, res) => {
     res.status(200).json({ success: true, revenueData });
   } catch (error) {
     console.error('Error fetching revenue analytics:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -431,7 +431,7 @@ const getRouteAnalytics = async (req, res) => {
     res.status(200).json({ success: true, routeData });
   } catch (error) {
     console.error('Error fetching route analytics:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -463,7 +463,7 @@ const getDriverUtilization = async (req, res) => {
     res.status(200).json({ success: true, ...data });
   } catch (error) {
     console.error('Error fetching driver utilization:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -494,7 +494,7 @@ const getSlaStats = async (req, res) => {
     res.status(200).json({ success: true, sla });
   } catch (error) {
     console.error('Error fetching SLA stats:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -514,7 +514,7 @@ const getAuditLogs = async (req, res) => {
     res.status(200).json({ success: true, logs, total: count, page, totalPages: Math.ceil(count / limit) });
   } catch (error) {
     console.error('Error fetching audit logs:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -533,7 +533,7 @@ const getPlatformConfig = async (req, res) => {
     res.status(200).json({ success: true, config });
   } catch (error) {
     console.error('Error fetching platform config:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -553,7 +553,7 @@ const updatePlatformConfig = async (req, res) => {
     res.status(200).json({ success: true, config });
   } catch (error) {
     console.error('Error updating platform config:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -589,7 +589,7 @@ const exportBookings = async (req, res) => {
     res.status(200).json({ success: true, total: exportData.length, bookings: exportData });
   } catch (error) {
     console.error('Error exporting bookings:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
@@ -616,7 +616,7 @@ const getSurgePricing = async (req, res) => {
     res.status(200).json({ success: true, ...result });
   } catch (error) {
     console.error('Error calculating surge pricing:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 

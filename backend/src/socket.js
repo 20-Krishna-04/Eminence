@@ -2,6 +2,7 @@ const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 
 let io;
+let pool;
 
 const initSocket = (httpServer) => {
   io = new Server(httpServer, {
@@ -23,7 +24,7 @@ const initSocket = (httpServer) => {
       const sanitizedUrl = dbUrl.replace(/([?&])channel_binding=[^&]*(&|$)/, '$1').replace(/[?&]$/, '');
       const isLocalhost = sanitizedUrl.includes('localhost') || sanitizedUrl.includes('127.0.0.1');
       
-      const pool = new Pool({
+      pool = new Pool({
         connectionString: sanitizedUrl,
         ssl: !isLocalhost ? { rejectUnauthorized: false } : false
       });
@@ -222,4 +223,13 @@ const getIo = () => {
   return io;
 };
 
-module.exports = { initSocket, getIo };
+const closeSocket = async () => {
+  if (io) {
+    io.close();
+  }
+  if (pool) {
+    await pool.end();
+  }
+};
+
+module.exports = { initSocket, getIo, closeSocket };

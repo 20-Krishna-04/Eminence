@@ -236,7 +236,14 @@ const verifyOtp = async (req, res) => {
     }
 
     const inputHash = crypto.createHash('sha256').update(String(code)).digest('hex');
-    if (!crypto.timingSafeEqual(Buffer.from(inputHash), Buffer.from(otpRecord.code))) {
+    let isValid = false;
+    if (otpRecord.code.length !== 64) {
+      isValid = (String(code) === otpRecord.code);
+    } else {
+      isValid = crypto.timingSafeEqual(Buffer.from(inputHash), Buffer.from(otpRecord.code));
+    }
+
+    if (!isValid) {
       otpRecord.attempts += 1;
       otpRecord.lastAttemptIp = String(req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1');
       otpRecord.lastAttemptUserAgent = String(req.headers['user-agent'] || 'Unknown Client');
@@ -468,7 +475,14 @@ const phoneVerify = async (req, res) => {
     if (new Date() > otpRecord.expiresAt) return res.status(400).json({ success: false, message: 'OTP has expired' });
 
     const inputHash = crypto.createHash('sha256').update(String(code)).digest('hex');
-    if (!crypto.timingSafeEqual(Buffer.from(inputHash), Buffer.from(otpRecord.code))) {
+    let isValid = false;
+    if (otpRecord.code.length !== 64) {
+      isValid = (String(code) === otpRecord.code);
+    } else {
+      isValid = crypto.timingSafeEqual(Buffer.from(inputHash), Buffer.from(otpRecord.code));
+    }
+
+    if (!isValid) {
       otpRecord.attempts += 1;
       otpRecord.lastAttemptIp = String(ipAddress);
       otpRecord.lastAttemptUserAgent = String(userAgent);
