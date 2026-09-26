@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { ArrowRight, Mail, Lock, ShieldAlert } from 'lucide-react';
 import { loginSuccess } from '../redux/slices/authSlice';
 import { setToken } from '../services/tokenService';
+import api from '../services/api';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -22,13 +23,9 @@ const AdminLogin = () => {
     setError('');
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+      const response = await api.post('/api/admin/login', { email, password });
       
-      const data = await response.json();
+      const data = response.data;
       setIsLoading(false);
       
       if (data.success) {
@@ -48,7 +45,11 @@ const AdminLogin = () => {
     } catch (err) {
       console.error('Admin login error:', err);
       setIsLoading(false);
-      setError('Server error. Please try again later.');
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Server error. Please try again later.');
+      }
     }
   };
 

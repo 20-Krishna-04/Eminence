@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ArrowRight, Phone, Mail, Lock, ShieldAlert } from 'lucide-react';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../../config/firebase';
+import api from '../../services/api';
 import { loginSuccess } from '../../redux/slices/authSlice';
 import { setToken } from '../../services/tokenService';
 
@@ -43,11 +44,7 @@ const Login = () => {
     setIsLoading(true);
     setError('');
     try {
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/phone-login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone })
-      });
+      await api.post('/api/auth/phone-login', { phone });
       setIsLoading(false);
       navigate('/otp', { state: { phone } });
     } catch (err) {
@@ -64,12 +61,8 @@ const Login = () => {
     setError('');
     setFieldErrors({ email: '', password: '' });
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await response.json();
+      const response = await api.post('/api/admin/login', { email, password });
+      const data = response.data;
       setIsLoading(false);
       if (data.success) {
         setToken(data.token);
@@ -81,17 +74,20 @@ const Login = () => {
           token: data.token,
           isProfileComplete: true
         }));
-      } else {
+      }
+    } catch (err) {
+      console.error('Admin login error:', err);
+      setIsLoading(false);
+      if (err.response && err.response.data) {
+        const data = err.response.data;
         if (data.field) {
           setFieldErrors((prev) => ({ ...prev, [data.field]: data.message }));
         } else {
           setError(data.message || 'Invalid credentials');
         }
+      } else {
+        setError('Server error. Please try again later.');
       }
-    } catch (err) {
-      console.error('Admin login error:', err);
-      setIsLoading(false);
-      setError('Server error. Please try again later.');
     }
   };
 
@@ -99,11 +95,7 @@ const Login = () => {
     const demoPhone = import.meta.env.VITE_DEMO_PHONE || '9999999999';
     setIsLoading(true);
     try {
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/phone-login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: demoPhone, role: activeTab })
-      });
+      await api.post('/api/auth/phone-login', { phone: demoPhone, role: activeTab });
       setIsLoading(false);
       navigate('/otp', { state: { phone: demoPhone, autoSubmit: true, role: activeTab } });
     } catch (err) {
@@ -118,31 +110,31 @@ const Login = () => {
       setIsLoading(true);
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/google-login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken })
-      });
-      const data = await response.json();
+      const response = await api.post('/api/auth/google-login', { idToken });
+      const data = response.data;
       setIsLoading(false);
       if (data.success) {
         setToken(data.token);
         dispatch(loginSuccess({
           id: data.user.id,
-          phone: data.user.phone,
-          name: data.user.name,
           email: data.user.email,
-          role: data.user.role || 'customer',
+          name: data.user.name,
+          role: data.user.role,
           token: data.token,
           isProfileComplete: data.user.isProfileComplete
         }));
-      } else {
-        setError(data.message || 'Google Login failed on server');
+        if (!data.user.isProfileComplete) {
+          navigate('/complete-profile');
+        }
       }
     } catch (err) {
-      console.error('Google Sign-In Error', err);
+      console.error('Google sign in error:', err);
       setIsLoading(false);
-      setError("Google Sign-In failed. Please use phone login for local development.");
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Failed to sign in with Google. Please try again.');
+      }
     }
   };
 
