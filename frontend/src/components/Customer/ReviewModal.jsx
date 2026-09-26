@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, X } from 'lucide-react';
+import axios from 'axios';
+import { getToken } from '../../services/tokenService';
 import api from '../../services/api';
 
 const ReviewModal = ({ isOpen, onClose, bookingId, driverId, driverName = "Driver" }) => {
@@ -16,12 +18,20 @@ const ReviewModal = ({ isOpen, onClose, bookingId, driverId, driverName = "Drive
     
     setIsSubmitting(true);
     try {
-      await api.post('/api/reviews', {
-        bookingId,
-        driverId,
-        rating,
-        comment
-      });
+      // Mock customer ID for now
+      const token = getToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      await axios.post(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/reviews`,
+        {
+          bookingId,
+          driverId,
+          rating,
+          comment
+        },
+        { headers }
+      );
       
       setIsSuccess(true);
       setTimeout(() => {
