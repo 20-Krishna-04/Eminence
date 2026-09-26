@@ -7,23 +7,6 @@ const { z } = require('zod');
 
 const router = express.Router();
 
-const contactSchema = z.object({
-  name: z.string().trim().min(2).max(100),
-  email: z.string().email().max(254),
-  message: z.string().trim().min(10).max(5000),
-});
-
-function validateContactMessage(req, res, next) {
-  const result = contactSchema.safeParse(req.body);
-  if (!result.success) {
-    return res.status(400).json({
-      success: false,
-      message: 'Invalid contact message.',
-    });
-  }
-  req.body = result.data;
-  next();
-}
 
 // Razorpay Payment Endpoints with rate limiting
 router.post('/payment/create-order', authLimiter, createOrder);
@@ -81,7 +64,6 @@ const escapeHtml = (value) => String(value)
   .replace(/>/g, '&gt;')
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;');
-const { z } = require('zod');
 
 // Reject unexpected fields as well as malformed or oversized contact data.
 const contactSchema = z.strictObject({
