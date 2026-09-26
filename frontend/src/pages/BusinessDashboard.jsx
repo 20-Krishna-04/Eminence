@@ -36,7 +36,9 @@ const BusinessDashboard = () => {
       const fetchContracts = async () => {
         setLoadingContracts(true);
         try {
-          const res = await api.get('/api/b2b/contracts');
+          const res = await axios.get('http://localhost:5000/api/b2b/contracts', {
+            withCredentials: true
+          });
           if (res.data.success) {
             setContracts(res.data.contracts);
           }
@@ -51,7 +53,7 @@ const BusinessDashboard = () => {
       const fetchInvoices = async () => {
         setLoadingInvoices(true);
         try {
-          const res = await api.get('/api/b2b/invoices');
+          const res = await axios.get('http://localhost:5000/api/b2b/invoices');
           if (res.data.success) {
             setInvoices(res.data.invoices);
           }
@@ -69,7 +71,9 @@ const BusinessDashboard = () => {
     e.preventDefault();
     setRequestingContract(true);
     try {
-      const res = await api.post('/api/b2b/contracts', newContract);
+      const res = await axios.post('http://localhost:5000/api/b2b/contracts', newContract, {
+        withCredentials: true
+      });
       if (res.data.success) {
         setContracts([res.data.contract, ...contracts]);
         setNewContract({ vehicleType: '', vehicleCount: 1, startDate: '', endDate: '' });
@@ -90,7 +94,8 @@ const BusinessDashboard = () => {
     formData.append('file', file);
     
     try {
-      await api.post('/api/b2b/batch-bookings', formData, {
+      await axios.post('http://localhost:5000/api/b2b/batch-bookings', formData, {
+        withCredentials: true,
         headers: { 
           'Content-Type': 'multipart/form-data'
         }

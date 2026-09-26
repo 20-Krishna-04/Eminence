@@ -65,7 +65,6 @@ const Login = () => {
       const data = response.data;
       setIsLoading(false);
       if (data.success) {
-        setToken(data.token);
         dispatch(loginSuccess({
           id: data.user.id,
           email: data.user.email,
@@ -114,7 +113,6 @@ const Login = () => {
       const data = response.data;
       setIsLoading(false);
       if (data.success) {
-        setToken(data.token);
         dispatch(loginSuccess({
           id: data.user.id,
           email: data.user.email,

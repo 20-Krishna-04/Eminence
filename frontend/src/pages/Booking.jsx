@@ -101,8 +101,8 @@ const Booking = () => {
   const handleApplyPromo = async () => {
     if (!promoCode) return;
     try {
-      await api.post(
-        '/api/wallet/referral',
+      await axios.post(
+        'http://localhost:5000/api/wallet/referral',
         { referralCode: promoCode }
       );
       setDiscount(100); // 100 Rs discount applied immediately for UI purposes

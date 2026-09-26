@@ -103,7 +103,7 @@ const AdminDashboard = () => {
 
   // Fetch API headers
   const getHeaders = () => ({
-    headers: { Authorization: `Bearer ${token}` }
+    withCredentials: true
   });
 
   // Auto scroll in chat

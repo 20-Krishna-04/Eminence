@@ -19,7 +19,6 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    removeToken();
     navigate('/');
   };
 

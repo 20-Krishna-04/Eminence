@@ -52,23 +52,15 @@ const CompleteProfileModal = () => {
     setError('');
     setMessage('');
     try {
-      const token = getToken();
-      
       if (termsAccepted && !user?.termsAccepted) {
         try {
-          await api.post(
-            '/api/auth/accept-terms',
-            { version: 'v1.0' }
-          );
+          await api.post('/api/auth/accept-terms', { version: 'v1.0' });
         } catch (e) {
           console.warn('Accept terms in profile completion note:', e.message);
         }
       }
 
-      const res = await api.post(
-        '/api/auth/complete-profile',
-        formData
-      );
+      const res = await api.post('/api/auth/complete-profile', formData);
       
       const updatedUser = res.data.user;
       dispatch(updateProfileSuccess(updatedUser));

@@ -10,7 +10,15 @@ import api from '../../services/api';
 const OTPVerification = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
+  const [otpValue, setOtpValue] = useState('');
+  const [error, setError] = useState('');
   const inputRefs = useRef([]);
+  
+  const getCsrfToken = () => {
+    const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : '';
+  };
+
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -32,17 +40,24 @@ const OTPVerification = () => {
       const autoVerify = async () => {
         setIsLoading(true);
         try {
-          const response = await api.post('/api/auth/phone-verify', { 
-            phone, 
-            code: '123456', 
-            role: location.state?.role || 'customer',
-            acceptedTerms: !!location.state?.acceptedTerms 
+          const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/phone-verify`, {
+            method: 'POST',
+            body: JSON.stringify({ 
+              phone, 
+              code: '123456', 
+              role: location.state?.role || 'customer',
+              acceptedTerms: !!location.state?.acceptedTerms 
+            }),
+            headers: {
+              'Content-Type': 'application/json',
+              'x-xsrf-token': getCsrfToken()
+            },
+            credentials: 'include'
           });
           const data = response.data;
           setIsLoading(false);
           
           if (data.success) {
-            setToken(data.token);
             const userRole = data.user.role || 'customer';
             dispatch(loginSuccess({
               id: data.user.id,
@@ -91,19 +106,25 @@ const OTPVerification = () => {
     setIsLoading(true);
     
     try {
-      const response = await api.post('/api/auth/phone-verify', { 
-        phone, 
-        code: otpValue, 
-        role: location.state?.role || 'customer',
-        acceptedTerms: !!location.state?.acceptedTerms 
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/phone-verify`, {
+        method: 'POST',
+        body: JSON.stringify({ 
+          phone, 
+          code: otpValue, 
+          role: location.state?.role || 'customer',
+          acceptedTerms: !!location.state?.acceptedTerms 
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-xsrf-token': getCsrfToken()
+        },
+        credentials: 'include'
       });
       
       const data = response.data;
       setIsLoading(false);
       
       if (data.success) {
-        setToken(data.token);
-        
         // Handle saving name on registration if pending
         const pendingName = localStorage.getItem('pendingName') || location.state?.name;
         let displayName = data.user.name || pendingName || (isNewUser ? 'New User' : 'Existing Customer');
@@ -113,8 +134,11 @@ const OTPVerification = () => {
           try {
             const updateRes = await api.post('/api/auth/complete-profile', { name: pendingName }, {
               headers: { 
-                'Authorization': `Bearer ${data.token}`
-              }
+                'Content-Type': 'application/json',
+                'x-xsrf-token': getCsrfToken()
+              },
+              credentials: 'include',
+              body: JSON.stringify({ name: pendingName })
             });
             const updateData = updateRes.data;
             if (updateData.success) {
