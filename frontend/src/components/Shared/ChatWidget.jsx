@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
 import { MessageCircle, X, Send } from 'lucide-react';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import api from '../../services/api';
 
 const ChatWidget = () => {
   const { isAuthenticated, user, token } = useSelector((state) => state.auth);

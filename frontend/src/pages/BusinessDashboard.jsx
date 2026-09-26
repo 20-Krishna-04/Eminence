@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Truck, Users, CreditCard, HeadphonesIcon, Upload, CheckCircle } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 import { useSelector } from 'react-redux';
 
 const BusinessDashboard = () => {

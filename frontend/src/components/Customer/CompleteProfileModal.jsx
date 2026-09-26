@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
+import api from '../../services/api';
 import { updateProfileSuccess } from '../../redux/slices/authSlice';
 import { MapPin, Phone, Building2, Map, FileText, CheckCircle2, User, Mail } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

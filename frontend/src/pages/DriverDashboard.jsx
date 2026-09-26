@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux';
 import api from '../services/api';
 import { io } from 'socket.io-client';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const DriverDashboard = () => {
   const { user, token } = useSelector((state) => state.auth);
@@ -39,22 +38,36 @@ const DriverDashboard = () => {
   }, [isNavigating]);
 
   useEffect(() => {
-    const newSocket = io(API_BASE_URL.replace('/api', ''), {
+    const newSocket = io(api.defaults.baseURL.replace('/api', ''), {
       auth: { token }, // Pass JWT so server can verify identity in production
       withCredentials: true,
     });
     setSocket(newSocket);
     socketRef.current = newSocket;
-    
+    const isValidRideRequest = (data) => {
+      return (
+        data &&
+        typeof data.bookingId === 'string' &&
+        typeof data.pickupAddress === 'string' &&
+        typeof data.dropAddress === 'string' &&
+        Number.isFinite(Number(data.estimatedFare))
+      );
+    };
+
     newSocket.on('ride_request', (data) => {
+      if (!isValidRideRequest(data)) {
+        console.warn('Invalid ride request payload');
+        return;
+      }
+      
       if (isOnlineRef.current && !isNavigatingRef.current) {
         setActiveRide({
-          bookingId: data.bookingId || 'BKG-NEW',
-          fare: data.estimatedFare || 450,
-          distance: data.distance || '8.2 km',
-          duration: data.duration || '25 Mins',
-          pickup: data.pickupAddress || '123 Market Street, Viman Nagar',
-          dropoff: data.dropAddress || '456 Industrial Area, Hinjewadi'
+          bookingId: data.bookingId,
+          fare: Number(data.estimatedFare),
+          distance: data.distance,
+          duration: data.duration,
+          pickup: data.pickupAddress,
+          dropoff: data.dropAddress
         });
       }
     });
@@ -143,14 +156,18 @@ const DriverDashboard = () => {
   };
 
   const handleDeclineTrip = async () => {
+    if (!activeRide) return;
+    setIsLoading(true);
     try {
-      await api.put(`/api/bookings/${activeRide.bookingId}/status`, 
-        { status: 'rejected' } // Depending on your state machine
+      await api.put(`/api/bookings/${activeRide.bookingId}/status`,
+        { status: 'rejected' }
       );
+      setActiveRide(null);
     } catch (err) {
       console.error('Error declining trip:', err);
+    } finally {
+      setIsLoading(false);
     }
-    setActiveRide(null);
   };
 
   const handleFinishTrip = async () => {

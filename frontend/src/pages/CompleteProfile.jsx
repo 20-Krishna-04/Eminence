@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
+import api from '../services/api';
 import { updateProfileSuccess } from '../redux/slices/authSlice';
 import MapPicker from '../components/MapPicker';
 import { Upload, Scan, CheckCircle } from 'lucide-react';

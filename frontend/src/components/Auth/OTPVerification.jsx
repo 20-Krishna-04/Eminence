@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../redux/slices/authSlice';
+import api from '../../services/api';
 
 const OTPVerification = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -52,7 +53,7 @@ const OTPVerification = () => {
             },
             credentials: 'include'
           });
-          const data = await response.json();
+          const data = response.data;
           setIsLoading(false);
           
           if (data.success) {
@@ -78,15 +79,15 @@ const OTPVerification = () => {
   }, [autoSubmit]); // run only once when autoSubmit mounts
 
   const handleChange = (index, value) => {
-    if (isNaN(value)) return;
+    if (!/^\d?$/.test(value)) return;
     
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
+    const nextOtp = [...otp];
+    nextOtp[index] = value;
+    setOtp(nextOtp);
 
     // Auto-focus next input
-    if (value !== '' && index < 5) {
-      inputRefs.current[index + 1].focus();
+    if (value && index < otp.length - 1) {
+      inputRefs.current[index + 1]?.focus();
     }
   };
 
@@ -119,7 +120,7 @@ const OTPVerification = () => {
         credentials: 'include'
       });
       
-      const data = await response.json();
+      const data = response.data;
       setIsLoading(false);
       
       if (data.success) {
@@ -130,8 +131,7 @@ const OTPVerification = () => {
 
         if (pendingName && !data.user.name) {
           try {
-            const updateRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/complete-profile`, {
-              method: 'POST',
+            const updateRes = await api.post('/api/auth/complete-profile', { name: pendingName }, {
               headers: { 
                 'Content-Type': 'application/json',
                 'x-xsrf-token': getCsrfToken()
@@ -139,7 +139,7 @@ const OTPVerification = () => {
               credentials: 'include',
               body: JSON.stringify({ name: pendingName })
             });
-            const updateData = await updateRes.json();
+            const updateData = updateRes.data;
             if (updateData.success) {
               displayName = updateData.user.name;
               profileCompleteVal = updateData.user.isProfileComplete;
@@ -162,12 +162,15 @@ const OTPVerification = () => {
         const userRole = data.user.role || 'customer';
         navigate(`/${userRole}/dashboard`);
       } else {
-        alert(data.message || 'Invalid OTP');
       }
-    } catch (error) {
-      console.error('OTP verify error:', error);
+    } catch (err) {
+      console.error(err);
       setIsLoading(false);
-      alert('Error verifying OTP');
+      if (err.response && err.response.data && err.response.data.message) {
+        alert(err.response.data.message);
+      } else {
+        alert('Error verifying OTP. Please try again.');
+      }
     }
   };
 
@@ -203,6 +206,8 @@ const OTPVerification = () => {
                 key={index}
                 ref={(el) => (inputRefs.current[index] = el)}
                 type="text"
+                inputMode="numeric"
+                pattern="\d*"
                 maxLength={1}
                 className="w-16 h-16 text-center text-2xl font-bold bg-loft-950/80 border border-loft-800/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-copper-500/50 focus:border-copper-500/50 transition-all text-loft-50 shadow-inner"
                 value={digit}
