@@ -43,17 +43,54 @@ const scheduleDriverAllocation = () => {
           }
 
           // 2. Find Nearest Active Driver (Geospatial Radius Query using Haversine Formula)
-          const nearestDrivers = await sequelize.query(`
-            SELECT id, name, "currentLat", "currentLng",
-            ( 6371 * acos( cos( radians(:lat) ) * cos( radians( "currentLat" ) ) * cos( radians( "currentLng" ) - radians(:lng) ) + sin( radians(:lat) ) * sin( radians( "currentLat" ) ) ) ) AS distance 
-            FROM "Drivers" 
-            WHERE status = 'active' AND "currentLat" IS NOT NULL 
-            ORDER BY distance ASC 
-            LIMIT 1
-          `, {
-            replacements: { lat: pickupLat, lng: pickupLng },
-            type: sequelize.QueryTypes.SELECT
-          });
+          const isPostgres = sequelize.getDialect() === 'postgres';
+          let nearestDrivers = [];
+
+          if (isPostgres) {
+            nearestDrivers = await sequelize.query(`
+              SELECT id, name, "currentLat", "currentLng",
+              ( 6371 * acos( cos( radians(:lat) ) * cos( radians( "currentLat" ) ) * cos( radians( "currentLng" ) - radians(:lng) ) + sin( radians(:lat) ) * sin( radians( "currentLat" ) ) ) ) AS distance 
+              FROM "Drivers" 
+              WHERE status = 'active' AND "currentLat" IS NOT NULL 
+              ORDER BY distance ASC 
+              LIMIT 1
+            `, {
+              replacements: { lat: pickupLat, lng: pickupLng },
+              type: sequelize.QueryTypes.SELECT
+            });
+          } else {
+            // For SQLite and cross-dialect fallback without native trigonometric SQL math functions,
+            // query active drivers and compute the Haversine distance reliably in application memory.
+            const activeDrivers = await Driver.findAll({
+              where: {
+                status: 'active',
+                currentLat: { [Op.ne]: null },
+                currentLng: { [Op.ne]: null }
+              },
+              attributes: ['id', 'name', 'currentLat', 'currentLng']
+            });
+
+            const toRad = (val) => (val * Math.PI) / 180;
+            const driversWithDist = activeDrivers.map((d) => {
+              const dLat = toRad(d.currentLat - pickupLat);
+              const dLng = toRad(d.currentLng - pickupLng);
+              const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(toRad(pickupLat)) * Math.cos(toRad(d.currentLat)) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+              const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+              const distance = 6371 * c;
+              return {
+                id: d.id,
+                name: d.name,
+                currentLat: d.currentLat,
+                currentLng: d.currentLng,
+                distance
+              };
+            });
+            driversWithDist.sort((a, b) => a.distance - b.distance);
+            nearestDrivers = driversWithDist.slice(0, 1);
+          }
 
           if (nearestDrivers && nearestDrivers.length > 0) {
             const nearestDriverData = nearestDrivers[0];

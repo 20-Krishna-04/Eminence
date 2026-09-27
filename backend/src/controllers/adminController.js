@@ -687,13 +687,20 @@ const getPeakHoursAnalytics = async (req, res) => {
     if (isPostgres) {
       query = `SELECT EXTRACT(HOUR FROM "createdAt") AS hour, COUNT(id) AS count FROM "Bookings" GROUP BY EXTRACT(HOUR FROM "createdAt") ORDER BY hour ASC`;
     } else {
-      query = `SELECT strftime('%H', createdAt) AS hour, COUNT(id) AS count FROM Bookings GROUP BY strftime('%H', createdAt) ORDER BY hour ASC`;
+      query = `SELECT CAST(strftime('%H', createdAt) AS INTEGER) AS hour, COUNT(id) AS count FROM "Bookings" GROUP BY hour ORDER BY hour ASC`;
     }
 
-    const peakHoursData = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+    let peakHoursData = [];
+    try {
+      peakHoursData = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+    } catch (queryErr) {
+      // Graceful fallback for unquoted table identifiers in certain SQLite installations
+      const fallbackQuery = `SELECT CAST(strftime('%H', createdAt) AS INTEGER) AS hour, COUNT(id) AS count FROM Bookings GROUP BY hour ORDER BY hour ASC`;
+      peakHoursData = await sequelize.query(fallbackQuery, { type: sequelize.QueryTypes.SELECT });
+    }
     
     // Map hour strings to integers
-    const formattedData = peakHoursData.map(d => ({
+    const formattedData = (peakHoursData || []).map(d => ({
       hour: parseInt(d.hour, 10),
       count: parseInt(d.count, 10)
     }));
