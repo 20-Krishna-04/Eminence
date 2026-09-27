@@ -7,8 +7,10 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
+const helmet = require('helmet');
 
 const app = express();
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(cookieParser());
 
 // Middleware - Secure Origin-Restricted CORS
