@@ -15,6 +15,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import { startBackgroundLocation, stopBackgroundLocation } from '../../services/LocationTracking';
 
 export default function DriverDashboard() {
   const router = useRouter();
@@ -77,6 +78,11 @@ export default function DriverDashboard() {
     try {
       if (user?.id) {
         await api.patch(`/api/drivers/${user.id}/toggle`);
+      }
+      if (val) {
+        await startBackgroundLocation();
+      } else {
+        await stopBackgroundLocation();
       }
     } catch (err) {
       console.log('Error toggling driver status:', err);

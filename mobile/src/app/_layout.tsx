@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { View, ActivityIndicator, StatusBar } from 'react-native';
 import { AuthProvider, useAuth } from '../context/AuthContext';
+import '../services/LocationTracking'; // Initialize global task manager
 
 function RootNavigationLayout() {
   const { user, isLoading } = useAuth();

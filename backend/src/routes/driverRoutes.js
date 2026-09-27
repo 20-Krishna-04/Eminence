@@ -40,6 +40,7 @@ router.all('/scan-inventory', protect, authorize('driver', 'admin'), async (req,
 router.get('/', protect, authorize('driver', 'admin'), driverController.getAllDrivers);
 router.post('/', protect, authorize('admin'), driverController.createDriver);
 router.patch('/:id/toggle', protect, authorize('driver', 'admin'), driverController.toggleAvailability);
+router.post('/location', protect, authorize('driver'), driverController.updateLocation);
 router.get('/:id/payslip', protect, authorize('driver', 'admin'), driverController.generatePayslip);
 router.get('/:id/payslip/download', protect, authorize('driver', 'admin'), driverController.downloadPayslip);
 

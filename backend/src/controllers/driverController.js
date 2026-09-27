@@ -136,10 +136,27 @@ const downloadPayslip = async (req, res) => {
   }
 };
 
+const updateLocation = async (req, res) => {
+  try {
+    const { lat, lng } = req.body;
+    const driverId = req.user.id;
+    if (lat && lng) {
+      await Driver.update({ currentLat: lat, currentLng: lng }, { where: { id: driverId } });
+      // In a real scenario, we'd also emit a socket event here so customers tracking the driver get the update
+      // req.app.get('io').to(driverId).emit('trip:location_update', { lat, lng });
+    }
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error updating driver location:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 module.exports = {
   getAllDrivers,
   createDriver,
   toggleAvailability,
   generatePayslip,
-  downloadPayslip
+  downloadPayslip,
+  updateLocation
 };
