@@ -126,7 +126,7 @@ export default function WmsScannerScreen() {
             <TextInput
               style={styles.input}
               placeholder="e.g. EMN-BOX-001"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#748bac"
               value={barcodeInput}
               onChangeText={setBarcodeInput}
               autoCapitalize="characters"
@@ -182,7 +182,7 @@ export default function WmsScannerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
   },
   header: {
     flexDirection: 'row',
@@ -191,23 +191,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 52,
     paddingBottom: 16,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   backBtn: {
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: '#334155',
+    backgroundColor: '#2f3a4e',
   },
   backBtnText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontWeight: '600',
     fontSize: 13,
   },
   title: {
-    color: '#f8fafc',
+    color: '#f4f6f8',
     fontSize: 17,
     fontWeight: '700',
   },
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 8,
-    backgroundColor: '#334155',
+    backgroundColor: '#2f3a4e',
   },
   flashBtnActive: {
     backgroundColor: '#eab308',
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#020617',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
     position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     height: 24,
     borderTopWidth: 3,
     borderLeftWidth: 3,
-    borderColor: '#3b82f6',
+    borderColor: '#e86331',
   },
   cornerTR: {
     position: 'absolute',
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     height: 24,
     borderTopWidth: 3,
     borderRightWidth: 3,
-    borderColor: '#3b82f6',
+    borderColor: '#e86331',
   },
   cornerBL: {
     position: 'absolute',
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     height: 24,
     borderBottomWidth: 3,
     borderLeftWidth: 3,
-    borderColor: '#3b82f6',
+    borderColor: '#e86331',
   },
   cornerBR: {
     position: 'absolute',
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     height: 24,
     borderBottomWidth: 3,
     borderRightWidth: 3,
-    borderColor: '#3b82f6',
+    borderColor: '#e86331',
   },
   laserLine: {
     width: '80%',
@@ -290,13 +290,13 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
   },
   viewfinderText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginTop: 12,
     fontWeight: '500',
   },
   sectionTitle: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 1,
@@ -310,28 +310,28 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   presetChip: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderWidth: 1,
-    borderColor: '#3b82f6',
+    borderColor: '#e86331',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
   },
   presetChipText: {
-    color: '#60a5fa',
+    color: '#f08b65',
     fontSize: 12,
     fontWeight: '600',
   },
   inputCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
     marginBottom: 16,
   },
   inputLabel: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 13,
     fontWeight: '600',
     marginBottom: 8,
@@ -342,13 +342,13 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
     paddingHorizontal: 14,
     paddingVertical: 10,
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
   },
   scanBtn: {
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scanBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontWeight: '700',
     fontSize: 13,
   },
@@ -384,11 +384,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   resultTime: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
   },
   resultBarcode: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 18,
     fontWeight: '800',
   },
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   historyCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 12,
     padding: 14,
     marginBottom: 8,
@@ -412,18 +412,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   historyLeft: {
     flex: 1,
   },
   historyBarcode: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
   },
   historyDesc: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginTop: 2,
   },
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   historyTime: {
-    color: '#64748b',
+    color: '#748bac',
     fontSize: 10,
     marginTop: 4,
   },

@@ -145,7 +145,7 @@ export default function BookScreen() {
             value={pickup}
             onChangeText={setPickup}
             placeholder="e.g. Koregaon Park, Pune"
-            placeholderTextColor="#64748b"
+            placeholderTextColor="#748bac"
           />
 
           {drops.map((dropVal, idx) => (
@@ -165,7 +165,7 @@ export default function BookScreen() {
                 value={dropVal}
                 onChangeText={(val) => handleDropChange(idx, val)}
                 placeholder={idx === 0 ? 'e.g. Viman Nagar, Pune' : `Stop #${idx + 1} Address`}
-                placeholderTextColor="#64748b"
+                placeholderTextColor="#748bac"
               />
             </View>
           ))}
@@ -226,7 +226,7 @@ export default function BookScreen() {
                 onChangeText={setWeight}
                 keyboardType="numeric"
                 placeholder="150"
-                placeholderTextColor="#64748b"
+                placeholderTextColor="#748bac"
               />
             </View>
 
@@ -237,7 +237,7 @@ export default function BookScreen() {
                 value={goodsType}
                 onChangeText={setGoodsType}
                 placeholder="Electronics"
-                placeholderTextColor="#64748b"
+                placeholderTextColor="#748bac"
               />
             </View>
           </View>
@@ -250,7 +250,7 @@ export default function BookScreen() {
                 value={date}
                 onChangeText={setDate}
                 placeholder="YYYY-MM-DD"
-                placeholderTextColor="#64748b"
+                placeholderTextColor="#748bac"
               />
             </View>
 
@@ -261,7 +261,7 @@ export default function BookScreen() {
                 value={time}
                 onChangeText={setTime}
                 placeholder="14:00"
-                placeholderTextColor="#64748b"
+                placeholderTextColor="#748bac"
               />
             </View>
           </View>
@@ -315,7 +315,7 @@ export default function BookScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
   },
   header: {
     flexDirection: 'row',
@@ -324,23 +324,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 52,
     paddingBottom: 16,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   backBtn: {
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 8,
-    backgroundColor: '#334155',
+    backgroundColor: '#2f3a4e',
   },
   backBtnText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 13,
     fontWeight: '600',
   },
   headerTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 18,
     fontWeight: '700',
   },
@@ -361,21 +361,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   card: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   cardTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 12,
   },
   inputLabel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     fontWeight: '600',
     marginBottom: 6,
@@ -391,13 +391,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   input: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
     paddingVertical: 12,
     paddingHorizontal: 14,
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
   },
   addStopBtn: {
@@ -405,13 +405,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#3b82f6',
+    borderColor: '#e86331',
     borderStyle: 'dashed',
     alignItems: 'center',
-    backgroundColor: 'rgba(59, 130, 246, 0.05)',
+    backgroundColor: 'rgba(232, 99, 49, 0.05)',
   },
   addStopBtnText: {
-    color: '#60a5fa',
+    color: '#f08b65',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -421,33 +421,33 @@ const styles = StyleSheet.create({
   },
   tempoOption: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 12,
     padding: 12,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   tempoOptionActive: {
-    borderColor: '#3b82f6',
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderColor: '#e86331',
+    backgroundColor: 'rgba(232, 99, 49, 0.1)',
   },
   tempoIcon: {
     fontSize: 26,
     marginBottom: 4,
   },
   tempoName: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
   },
   tempoModel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
     marginTop: 2,
   },
   tempoWeight: {
-    color: '#60a5fa',
+    color: '#f08b65',
     fontSize: 10,
     fontWeight: '600',
     marginTop: 4,
@@ -456,11 +456,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   fareCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#3b82f6',
+    borderColor: '#e86331',
   },
   fareRow: {
     flexDirection: 'row',
@@ -468,11 +468,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   fareLabel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 13,
   },
   fareVal: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#334155',
+    backgroundColor: '#2f3a4e',
     marginVertical: 12,
   },
   totalRow: {
@@ -493,23 +493,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   totalLabel: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
     fontWeight: '700',
   },
   totalVal: {
-    color: '#3b82f6',
+    color: '#e86331',
     fontSize: 24,
     fontWeight: '800',
   },
   confirmBtn: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#e86331',
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
   },
   confirmBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
     fontWeight: '700',
   },

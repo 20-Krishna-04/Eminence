@@ -86,7 +86,7 @@ export default function AuditLogsScreen() {
       case 'CREATE':
         return { bg: 'rgba(34, 197, 94, 0.15)', text: '#22c55e' };
       case 'UPDATE':
-        return { bg: 'rgba(59, 130, 246, 0.15)', text: '#60a5fa' };
+        return { bg: 'rgba(232, 99, 49, 0.15)', text: '#f08b65' };
       case 'DELETE':
         return { bg: 'rgba(239, 68, 68, 0.15)', text: '#ef4444' };
       default:
@@ -128,7 +128,7 @@ export default function AuditLogsScreen() {
 
             <View style={styles.slaItem}>
               <Text style={styles.slaLabel}>PostgreSQL Latency</Text>
-              <Text style={[styles.slaValue, { color: '#60a5fa' }]}>
+              <Text style={[styles.slaValue, { color: '#f08b65' }]}>
                 {sla?.dbLatencyMs ?? 18} ms
               </Text>
               <Text style={styles.slaSub}>Neon Serverless Ping</Text>
@@ -189,7 +189,7 @@ export default function AuditLogsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
   },
   header: {
     flexDirection: 'row',
@@ -198,23 +198,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 52,
     paddingBottom: 16,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   backBtn: {
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: '#334155',
+    backgroundColor: '#2f3a4e',
   },
   backBtnText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontWeight: '600',
     fontSize: 13,
   },
   title: {
-    color: '#f8fafc',
+    color: '#f4f6f8',
     fontSize: 17,
     fontWeight: '700',
   },
@@ -229,18 +229,18 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   sectionTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 12,
     letterSpacing: 0.5,
   },
   slaCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   slaGrid: {
     flexDirection: 'row',
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   slaLabel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
     fontWeight: '500',
     textAlign: 'center',
@@ -262,17 +262,17 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   slaSub: {
-    color: '#64748b',
+    color: '#748bac',
     fontSize: 10,
     textAlign: 'center',
   },
   logCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 12,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   logHeader: {
     flexDirection: 'row',
@@ -290,25 +290,25 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   logEntity: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 13,
     fontWeight: '700',
     flex: 1,
   },
   logTime: {
-    color: '#64748b',
+    color: '#748bac',
     fontSize: 11,
   },
   logActor: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
   },
   logDetails: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 12,
     marginTop: 6,
     paddingTop: 6,
     borderTopWidth: 1,
-    borderTopColor: '#334155',
+    borderTopColor: '#2f3a4e',
   },
 });

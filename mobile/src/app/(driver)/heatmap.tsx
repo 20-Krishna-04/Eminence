@@ -100,7 +100,7 @@ export default function DriverHeatmapScreen() {
         style={styles.content}
         contentContainerStyle={{ paddingBottom: 40 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#3b82f6" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#e86331" />
         }
       >
         {/* AI Confidence & Forecast Banner */}
@@ -217,7 +217,7 @@ export default function DriverHeatmapScreen() {
         {/* All Hotspots List */}
         <Text style={styles.sectionTitle}>All Active High-Demand Zones</Text>
         {loading ? (
-          <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: 20 }} />
+          <ActivityIndicator size="large" color="#e86331" style={{ marginTop: 20 }} />
         ) : (
           heatmapData?.hotspots?.map((zone) => {
             const badge = getIntensityBadge(zone.intensity);
@@ -256,7 +256,7 @@ export default function DriverHeatmapScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
   },
   header: {
     flexDirection: 'row',
@@ -265,23 +265,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 52,
     paddingBottom: 16,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   backBtn: {
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: '#334155',
+    backgroundColor: '#2f3a4e',
   },
   backBtnText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontWeight: '600',
     fontSize: 13,
   },
   title: {
-    color: '#f8fafc',
+    color: '#f4f6f8',
     fontSize: 17,
     fontWeight: '700',
   },
@@ -296,11 +296,11 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   aiBanner: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#3b82f6',
+    borderColor: '#e86331',
     marginBottom: 16,
   },
   aiBannerTop: {
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   aiBannerTitle: {
-    color: '#60a5fa',
+    color: '#f08b65',
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 1,
@@ -329,11 +329,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   aiMetricLabel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
   },
   aiMetricValue: {
-    color: '#f8fafc',
+    color: '#f4f6f8',
     fontSize: 15,
     fontWeight: '700',
     marginTop: 2,
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#020617',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
     position: 'relative',
     marginBottom: 16,
     overflow: 'hidden',
@@ -351,13 +351,13 @@ const styles = StyleSheet.create({
   mapGridOverlay: {
     ...StyleSheet.absoluteFill,
     opacity: 0.15,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
   },
   mapCityTag: {
     position: 'absolute',
     top: 10,
     right: 12,
-    color: '#475569',
+    color: '#425576',
     fontSize: 10,
     fontWeight: '700',
     textTransform: 'uppercase',
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     backgroundColor: 'rgba(30, 41, 59, 0.9)',
     borderWidth: 1,
-    borderColor: '#3b82f6',
+    borderColor: '#e86331',
     borderRadius: 8,
     paddingVertical: 4,
     paddingHorizontal: 8,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   focusCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
@@ -402,12 +402,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   focusName: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
     fontWeight: '700',
   },
   focusCoords: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
     marginTop: 2,
   },
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
   focusStatsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 10,
     padding: 12,
     marginBottom: 14,
@@ -434,11 +434,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   focusStatLabel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
   },
   focusStatValue: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
     marginTop: 2,
@@ -450,12 +450,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   navigateBtnText: {
-    color: '#0f172a',
+    color: '#0f141f',
     fontSize: 14,
     fontWeight: '700',
   },
   sectionTitle: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 1,
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   zoneCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 12,
     padding: 14,
     marginBottom: 10,
@@ -471,22 +471,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   zoneCardActive: {
-    borderColor: '#3b82f6',
+    borderColor: '#e86331',
     backgroundColor: '#233248',
   },
   zoneLeft: {
     flex: 1,
   },
   zoneName: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '600',
   },
   zoneSub: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
     marginTop: 2,
   },

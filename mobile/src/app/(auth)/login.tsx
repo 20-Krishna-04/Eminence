@@ -161,7 +161,7 @@ export default function LoginScreen() {
                 <TextInput
                   style={styles.phoneInput}
                   placeholder="10-digit number"
-                  placeholderTextColor="#94a3b8"
+                  placeholderTextColor="#a2b2c7"
                   keyboardType="phone-pad"
                   maxLength={10}
                   value={phone}
@@ -218,7 +218,7 @@ export default function LoginScreen() {
               <TextInput
                 style={styles.otpInput}
                 placeholder="• • • • • •"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor="#a2b2c7"
                 keyboardType="number-pad"
                 maxLength={6}
                 value={otp}
@@ -285,7 +285,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
   },
   scrollContent: {
     flexGrow: 1,
@@ -300,11 +300,11 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#e86331',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
-    shadowColor: '#3b82f6',
+    shadowColor: '#e86331',
     shadowOpacity: 0.4,
     shadowRadius: 10,
     elevation: 8,
@@ -315,35 +315,35 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '800',
-    color: '#ffffff',
+    color: '#f4f6f8',
     letterSpacing: 2,
   },
   subtitle: {
     fontSize: 14,
-    color: '#94a3b8',
+    color: '#a2b2c7',
     marginTop: 4,
   },
   card: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 20,
     padding: 24,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   cardTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#f8fafc',
+    color: '#f4f6f8',
   },
   cardSubtitle: {
     fontSize: 13,
-    color: '#94a3b8',
+    color: '#a2b2c7',
     marginTop: 4,
     marginBottom: 20,
   },
   roleSelector: {
     flexDirection: 'row',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 12,
     padding: 4,
     marginBottom: 18,
@@ -355,15 +355,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   roleBtnActive: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#e86331',
   },
   roleBtnText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#94a3b8',
+    color: '#a2b2c7',
   },
   roleBtnTextActive: {
-    color: '#ffffff',
+    color: '#f4f6f8',
   },
   errorBox: {
     backgroundColor: 'rgba(239, 68, 68, 0.15)',
@@ -397,27 +397,27 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#cbd5e1',
+    color: '#c9d3df',
     marginBottom: 8,
   },
   phoneInputRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
     overflow: 'hidden',
   },
   countryCode: {
     paddingHorizontal: 14,
     paddingVertical: 14,
     borderRightWidth: 1,
-    borderRightColor: '#334155',
-    backgroundColor: '#1e293b',
+    borderRightColor: '#2f3a4e',
+    backgroundColor: '#293243',
   },
   countryCodeText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 15,
     fontWeight: '600',
   },
@@ -425,17 +425,17 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
   },
   otpInput: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
     paddingVertical: 14,
     paddingHorizontal: 16,
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 22,
     fontWeight: '700',
     letterSpacing: 8,
@@ -448,26 +448,26 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 6,
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    backgroundColor: 'rgba(232, 99, 49, 0.1)',
   },
   demoFillText: {
-    color: '#60a5fa',
+    color: '#f08b65',
     fontSize: 12,
     fontWeight: '600',
   },
   primaryBtn: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#e86331',
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#3b82f6',
+    shadowColor: '#e86331',
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
   },
   primaryBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
     fontWeight: '700',
   },
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   backBtnText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 14,
     fontWeight: '500',
   },
@@ -489,23 +489,23 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#334155',
+    backgroundColor: '#2f3a4e',
   },
   dividerText: {
-    color: '#64748b',
+    color: '#748bac',
     paddingHorizontal: 12,
     fontSize: 12,
     fontWeight: '600',
   },
   adminLinkBtn: {
     borderWidth: 1,
-    borderColor: '#475569',
+    borderColor: '#425576',
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: 'center',
   },
   adminLinkText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -520,17 +520,17 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: '#475569',
-    backgroundColor: '#0f172a',
+    borderColor: '#425576',
+    backgroundColor: '#0f141f',
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: '#3b82f6',
-    borderColor: '#3b82f6',
+    backgroundColor: '#e86331',
+    borderColor: '#e86331',
   },
   checkmark: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 12,
     fontWeight: 'bold',
   },
@@ -538,12 +538,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   termsText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     lineHeight: 18,
   },
   termsLink: {
-    color: '#3b82f6',
+    color: '#e86331',
     fontWeight: '600',
     textDecorationLine: 'underline',
   },

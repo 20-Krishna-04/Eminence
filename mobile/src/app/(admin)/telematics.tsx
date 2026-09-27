@@ -151,7 +151,7 @@ export default function TelematicsScreen() {
             <Text style={styles.gaugeLabel}>Speed (km/h)</Text>
             <Text style={styles.gaugeValue}>{telemetry.speed}</Text>
             <View style={styles.gaugeMeter}>
-              <View style={[styles.gaugeFill, { width: `${(telemetry.speed / 100) * 100}%`, backgroundColor: '#3b82f6' }]} />
+              <View style={[styles.gaugeFill, { width: `${(telemetry.speed / 100) * 100}%`, backgroundColor: '#e86331' }]} />
             </View>
             <Text style={styles.gaugeSub}>Cruising Velocity</Text>
           </View>
@@ -229,7 +229,7 @@ export default function TelematicsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
   },
   header: {
     flexDirection: 'row',
@@ -238,30 +238,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 52,
     paddingBottom: 16,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   backBtn: {
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: '#334155',
+    backgroundColor: '#2f3a4e',
   },
   backBtnText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontWeight: '600',
     fontSize: 13,
   },
   title: {
-    color: '#f8fafc',
+    color: '#f4f6f8',
     fontSize: 17,
     fontWeight: '700',
   },
   statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 6,
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   statusPillText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 10,
     fontWeight: '700',
   },
@@ -282,28 +282,28 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   vehicleBar: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 12,
     padding: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
     marginBottom: 16,
   },
   vehicleLabel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
   },
   vehicleId: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
     marginTop: 2,
   },
   timestampText: {
-    color: '#64748b',
+    color: '#748bac',
     fontSize: 11,
   },
   alertBanner: {
@@ -341,12 +341,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   scheduleMaintText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 12,
     fontWeight: '700',
   },
   sectionTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 12,
@@ -360,26 +360,26 @@ const styles = StyleSheet.create({
   },
   gaugeCard: {
     width: '48%',
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   gaugeLabel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
     fontWeight: '600',
   },
   gaugeValue: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 26,
     fontWeight: '800',
     marginVertical: 4,
   },
   gaugeMeter: {
     height: 6,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 3,
     overflow: 'hidden',
     marginVertical: 6,
@@ -389,15 +389,15 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   gaugeSub: {
-    color: '#64748b',
+    color: '#748bac',
     fontSize: 10,
   },
   healthCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   healthLabel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -416,18 +416,18 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   healthSub: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 12,
   },
   healthRing: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   healthIcon: {
     fontSize: 24,

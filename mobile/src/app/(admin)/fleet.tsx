@@ -214,11 +214,11 @@ export default function FleetManagementScreen() {
         style={styles.content}
         contentContainerStyle={{ paddingBottom: 40 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#3b82f6" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#e86331" />
         }
       >
         {loading ? (
-          <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: 40 }} />
+          <ActivityIndicator size="large" color="#e86331" style={{ marginTop: 40 }} />
         ) : activeTab === 'drivers' ? (
           <>
             {drivers.map((drv) => (
@@ -242,7 +242,7 @@ export default function FleetManagementScreen() {
                     <Text
                       style={[
                         styles.statusText,
-                        { color: drv.status === 'active' ? '#22c55e' : '#94a3b8' },
+                        { color: drv.status === 'active' ? '#22c55e' : '#a2b2c7' },
                       ]}
                     >
                       {drv.status.toUpperCase()}
@@ -268,7 +268,7 @@ export default function FleetManagementScreen() {
                     <Text style={styles.cardSub}>Type: {veh.type}</Text>
                   </View>
                   <View style={styles.statusBadge}>
-                    <Text style={[styles.statusText, { color: '#60a5fa' }]}>
+                    <Text style={[styles.statusText, { color: '#f08b65' }]}>
                       {veh.status?.toUpperCase() || 'ACTIVE'}
                     </Text>
                   </View>
@@ -300,7 +300,7 @@ export default function FleetManagementScreen() {
               value={driverName}
               onChangeText={setDriverName}
               placeholder="e.g. Test Driver"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#748bac"
             />
 
             <Text style={styles.inputLabel}>Phone Number</Text>
@@ -309,7 +309,7 @@ export default function FleetManagementScreen() {
               value={driverPhone}
               onChangeText={setDriverPhone}
               placeholder="e.g. 9999999999"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#748bac"
               keyboardType="phone-pad"
             />
 
@@ -319,7 +319,7 @@ export default function FleetManagementScreen() {
               value={driverLicense}
               onChangeText={setDriverLicense}
               placeholder="e.g. MH12XY9999"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#748bac"
               autoCapitalize="characters"
             />
 
@@ -364,7 +364,7 @@ export default function FleetManagementScreen() {
               value={vehicleReg}
               onChangeText={setVehicleReg}
               placeholder="e.g. MH-01-AA-1111"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#748bac"
               autoCapitalize="characters"
             />
 
@@ -374,7 +374,7 @@ export default function FleetManagementScreen() {
               value={vehicleType}
               onChangeText={setVehicleType}
               placeholder="e.g. Large"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#748bac"
             />
 
             <Text style={styles.inputLabel}>Payload Capacity (kg)</Text>
@@ -383,7 +383,7 @@ export default function FleetManagementScreen() {
               value={vehicleCapacity}
               onChangeText={setVehicleCapacity}
               placeholder="e.g. 2000"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#748bac"
               keyboardType="numeric"
             />
 
@@ -416,7 +416,7 @@ export default function FleetManagementScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
   },
   header: {
     flexDirection: 'row',
@@ -425,23 +425,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 52,
     paddingBottom: 16,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   backBtn: {
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: '#334155',
+    backgroundColor: '#2f3a4e',
   },
   backBtnText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontWeight: '600',
     fontSize: 13,
   },
   title: {
-    color: '#f8fafc',
+    color: '#f4f6f8',
     fontSize: 17,
     fontWeight: '700',
   },
@@ -452,18 +452,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   addBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 13,
     fontWeight: '700',
   },
   tabsRow: {
     flexDirection: 'row',
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     paddingHorizontal: 16,
     paddingVertical: 8,
     gap: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   tab: {
     flex: 1,
@@ -475,12 +475,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563eb',
   },
   tabText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 13,
     fontWeight: '600',
   },
   tabTextActive: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontWeight: '700',
   },
   content: {
@@ -488,12 +488,12 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   card: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 12,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   cardTop: {
     flexDirection: 'row',
@@ -501,12 +501,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   cardName: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 15,
     fontWeight: '700',
   },
   cardSub: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginTop: 2,
   },
@@ -527,10 +527,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#334155',
+    borderTopColor: '#2f3a4e',
   },
   cardDetail: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 12,
   },
   ratingText: {
@@ -545,39 +545,39 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   modalTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 18,
     fontWeight: '700',
   },
   modalSubtitle: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginTop: 4,
     marginBottom: 16,
   },
   inputLabel: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 12,
     fontWeight: '600',
     marginTop: 10,
     marginBottom: 6,
   },
   modalInput: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   modalActions: {
     flexDirection: 'row',
@@ -589,10 +589,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: '#334155',
+    backgroundColor: '#2f3a4e',
   },
   cancelBtnText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -603,7 +603,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563eb',
   },
   saveBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 13,
     fontWeight: '700',
   },

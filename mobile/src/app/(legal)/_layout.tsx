@@ -6,7 +6,7 @@ export default function LegalLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: '#0f172a' },
+        contentStyle: { backgroundColor: '#0f141f' },
       }}
     />
   );

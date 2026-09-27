@@ -391,7 +391,7 @@ export default function MobileBusinessPortal() {
               onChangeText={(text) => setContractForm({ ...contractForm, vehicleCount: text })}
               keyboardType="numeric"
               placeholder="e.g. 3"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#748bac"
             />
 
             <View style={{ flexDirection: 'row', gap: 12 }}>
@@ -402,7 +402,7 @@ export default function MobileBusinessPortal() {
                   value={contractForm.startDate}
                   onChangeText={(text) => setContractForm({ ...contractForm, startDate: text })}
                   placeholder="YYYY-MM-DD"
-                  placeholderTextColor="#64748b"
+                  placeholderTextColor="#748bac"
                 />
               </View>
               <View style={{ flex: 1 }}>
@@ -412,7 +412,7 @@ export default function MobileBusinessPortal() {
                   value={contractForm.endDate}
                   onChangeText={(text) => setContractForm({ ...contractForm, endDate: text })}
                   placeholder="YYYY-MM-DD"
-                  placeholderTextColor="#64748b"
+                  placeholderTextColor="#748bac"
                 />
               </View>
             </View>
@@ -434,7 +434,7 @@ export default function MobileBusinessPortal() {
                 disabled={submittingContract}
               >
                 {submittingContract ? (
-                  <ActivityIndicator color="#0f172a" />
+                  <ActivityIndicator color="#0f141f" />
                 ) : (
                   <Text style={styles.modalSubmitText}>Submit Request</Text>
                 )}
@@ -470,12 +470,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#242e42',
   },
   backBtnText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 13,
     fontWeight: '600',
   },
   headerTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 17,
     fontWeight: '700',
   },
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#242e42',
   },
   tabBtnText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   creditCardTitle: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     fontWeight: '600',
     textTransform: 'uppercase',
@@ -554,13 +554,13 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   creditAmount: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 32,
     fontWeight: '800',
     marginVertical: 4,
   },
   creditSub: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginBottom: 12,
   },
@@ -592,13 +592,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   actionCardTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 15,
     fontWeight: '700',
     marginBottom: 2,
   },
   actionCardSub: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
   },
   managerCard: {
@@ -627,13 +627,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   managerName: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
     fontWeight: '700',
     marginTop: 2,
   },
   managerContact: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
     marginTop: 2,
   },
@@ -645,13 +645,13 @@ const styles = StyleSheet.create({
     borderColor: '#242e42',
   },
   perksTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 10,
   },
   perkItem: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     lineHeight: 22,
   },
@@ -662,7 +662,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionHeading: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 12,
@@ -693,7 +693,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   contractType: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 15,
     fontWeight: '700',
   },
@@ -719,11 +719,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contractDetailLabel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 10,
   },
   contractDetailVal: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 12,
     fontWeight: '600',
     marginTop: 2,
@@ -738,7 +738,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#242e42',
   },
   rateLabel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
   },
   rateVal: {
@@ -761,13 +761,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   invoiceId: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 2,
   },
   invoiceDate: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
   },
   invoiceRight: {
@@ -786,7 +786,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   downloadBadgeText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 10,
     fontWeight: '600',
   },
@@ -804,18 +804,18 @@ const styles = StyleSheet.create({
     borderColor: '#242e42',
   },
   modalTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 4,
   },
   modalSub: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginBottom: 16,
   },
   inputLabel: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 12,
     fontWeight: '600',
     marginBottom: 6,
@@ -840,7 +840,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(197, 168, 128, 0.15)',
   },
   typeOptionText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -852,7 +852,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 13,
     borderWidth: 1,
     borderColor: '#242e42',
@@ -876,7 +876,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalCancelText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 13,
     fontWeight: '600',
   },

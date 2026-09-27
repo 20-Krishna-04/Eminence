@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f97316',
   },
   acceptBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '600',
   },

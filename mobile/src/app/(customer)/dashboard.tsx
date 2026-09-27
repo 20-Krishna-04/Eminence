@@ -233,7 +233,7 @@ export default function CustomerDashboard() {
               setRefreshing(true);
               fetchDashboardData();
             }}
-            tintColor="#3b82f6"
+            tintColor="#e86331"
           />
         }
       >
@@ -277,7 +277,7 @@ export default function CustomerDashboard() {
             </View>
 
             {loading ? (
-              <ActivityIndicator color="#3b82f6" style={{ marginVertical: 20 }} />
+              <ActivityIndicator color="#e86331" style={{ marginVertical: 20 }} />
             ) : (
               <>
                 {/* Dynamically Created Bookings */}
@@ -535,7 +535,7 @@ export default function CustomerDashboard() {
               value={addressLabel}
               onChangeText={setAddressLabel}
               placeholder="e.g. Home"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#748bac"
             />
 
             <Text style={styles.inputLabel}>Street Address</Text>
@@ -544,7 +544,7 @@ export default function CustomerDashboard() {
               value={addressStreet}
               onChangeText={setAddressStreet}
               placeholder="e.g. 123 MG Road, Camp"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#748bac"
             />
 
             <View style={styles.modalRow}>
@@ -555,7 +555,7 @@ export default function CustomerDashboard() {
                   value={addressCity}
                   onChangeText={setAddressCity}
                   placeholder="Pune"
-                  placeholderTextColor="#64748b"
+                  placeholderTextColor="#748bac"
                 />
               </View>
               <View style={{ flex: 1, marginLeft: 8 }}>
@@ -565,7 +565,7 @@ export default function CustomerDashboard() {
                   value={addressPostal}
                   onChangeText={setAddressPostal}
                   placeholder="411001"
-                  placeholderTextColor="#64748b"
+                  placeholderTextColor="#748bac"
                   keyboardType="number-pad"
                 />
               </View>
@@ -615,7 +615,7 @@ export default function CustomerDashboard() {
                   style={styles.starBtn}
                   onPress={() => setReviewRating(star)}
                 >
-                  <Text style={[styles.starIcon, { color: star <= reviewRating ? '#f59e0b' : '#475569' }]}>
+                  <Text style={[styles.starIcon, { color: star <= reviewRating ? '#f59e0b' : '#425576' }]}>
                     ★
                   </Text>
                 </TouchableOpacity>
@@ -628,7 +628,7 @@ export default function CustomerDashboard() {
               value={reviewComment}
               onChangeText={setReviewComment}
               placeholder="e.g. Prompt arrival, careful loading"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#748bac"
             />
 
             <View style={styles.modalActions}>
@@ -660,7 +660,7 @@ export default function CustomerDashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
   },
   header: {
     flexDirection: 'row',
@@ -669,24 +669,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 52,
     paddingBottom: 16,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   welcomeLabel: {
-    color: '#3b82f6',
+    color: '#e86331',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1,
   },
   userName: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 20,
     fontWeight: '700',
     marginTop: 2,
   },
   userPhone: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginTop: 2,
   },
@@ -705,10 +705,10 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     paddingHorizontal: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   tabBtn: {
     flex: 1,
@@ -718,26 +718,26 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   tabBtnActive: {
-    borderBottomColor: '#3b82f6',
+    borderBottomColor: '#e86331',
   },
   tabBtnText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 13,
     fontWeight: '600',
   },
   tabBtnTextActive: {
-    color: '#ffffff',
+    color: '#f4f6f8',
   },
   content: {
     padding: 16,
     paddingBottom: 40,
   },
   actionCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#3b82f6',
+    borderColor: '#e86331',
     marginBottom: 20,
   },
   actionCardHeader: {
@@ -746,13 +746,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   actionTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
     fontWeight: '700',
   },
   actionBadge: {
-    color: '#60a5fa',
-    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    color: '#f08b65',
+    backgroundColor: 'rgba(232, 99, 49, 0.15)',
     paddingVertical: 2,
     paddingHorizontal: 8,
     borderRadius: 6,
@@ -760,19 +760,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   actionSubtitle: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginVertical: 8,
     lineHeight: 16,
   },
   bookBtn: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#e86331',
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: 'center',
   },
   bookBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
   },
@@ -786,28 +786,28 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
     fontWeight: '700',
   },
   addAddressBtn: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#e86331',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
   },
   addAddressBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 12,
     fontWeight: '700',
   },
   rideCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 14,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   rideHeader: {
     flexDirection: 'row',
@@ -816,7 +816,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   rideType: {
-    color: '#f8fafc',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
   },
@@ -854,12 +854,12 @@ const styles = StyleSheet.create({
   routeDivider: {
     width: 1,
     height: 12,
-    backgroundColor: '#475569',
+    backgroundColor: '#425576',
     marginLeft: 3,
     marginVertical: 2,
   },
   routeText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 13,
   },
   rideFooter: {
@@ -867,7 +867,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#334155',
+    borderTopColor: '#2f3a4e',
     paddingTop: 10,
   },
   esgTag: {
@@ -876,7 +876,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   rideFare: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 15,
     fontWeight: '700',
   },
@@ -884,36 +884,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 14,
     padding: 16,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   addressInfo: {
     flex: 1,
   },
   addressLabelBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#334155',
+    backgroundColor: '#2f3a4e',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,
     marginBottom: 4,
   },
   addressLabelText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
     fontWeight: '700',
   },
   addressStreet: {
-    color: '#f8fafc',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '600',
   },
   addressCity: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginTop: 2,
   },
@@ -929,68 +929,68 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   emptyCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 14,
     padding: 30,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   emptyCardIcon: {
     fontSize: 32,
     marginBottom: 8,
   },
   emptyCardTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
     fontWeight: '700',
   },
   emptyCardSub: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     textAlign: 'center',
     marginVertical: 8,
   },
   addFirstBtn: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#e86331',
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 16,
     marginTop: 6,
   },
   addFirstBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 13,
     fontWeight: '700',
   },
   walletCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
     marginBottom: 16,
   },
   walletLabel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
   },
   walletBalance: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 32,
     fontWeight: '800',
     marginVertical: 6,
   },
   walletSub: {
-    color: '#60a5fa',
+    color: '#f08b65',
     fontSize: 12,
   },
   referralCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   referralHeader: {
     flexDirection: 'row',
@@ -1001,12 +1001,12 @@ const styles = StyleSheet.create({
     fontSize: 28,
   },
   referralTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
     fontWeight: '700',
   },
   referralSub: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginTop: 2,
     lineHeight: 16,
@@ -1018,15 +1018,15 @@ const styles = StyleSheet.create({
   },
   codeBox: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   codeText: {
-    color: '#60a5fa',
+    color: '#f08b65',
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 1,
@@ -1038,7 +1038,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   copyBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -1061,20 +1061,20 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 20,
     padding: 24,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   modalTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 4,
   },
   modalSub: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginBottom: 16,
   },
@@ -1089,20 +1089,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   inputLabel: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 12,
     fontWeight: '600',
     marginBottom: 6,
     marginTop: 10,
   },
   modalInput: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
     paddingVertical: 10,
     paddingHorizontal: 14,
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
   },
   modalRow: {
@@ -1120,18 +1120,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   modalCancelText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 14,
     fontWeight: '600',
   },
   modalSaveBtn: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#e86331',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
   },
   modalSaveText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
   },
@@ -1158,13 +1158,13 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   b2bTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 2,
   },
   b2bSubtitle: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
   },
   b2bArrow: {

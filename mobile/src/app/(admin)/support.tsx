@@ -154,7 +154,7 @@ export default function AdminSupportInboxScreen() {
         </TouchableOpacity>
         <Text style={styles.title}>Live Support (TC-036)</Text>
         <View style={styles.statusBadge}>
-          <View style={[styles.dot, { backgroundColor: connected ? '#22c55e' : '#94a3b8' }]} />
+          <View style={[styles.dot, { backgroundColor: connected ? '#22c55e' : '#a2b2c7' }]} />
           <Text style={styles.statusText}>{connected ? 'ONLINE' : 'SYNCED'}</Text>
         </View>
       </View>
@@ -222,7 +222,7 @@ export default function AdminSupportInboxScreen() {
           <TextInput
             style={styles.input}
             placeholder="Type your support reply..."
-            placeholderTextColor="#64748b"
+            placeholderTextColor="#748bac"
             value={replyText}
             onChangeText={setReplyText}
             onSubmitEditing={handleSendMessage}
@@ -239,7 +239,7 @@ export default function AdminSupportInboxScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
   },
   header: {
     flexDirection: 'row',
@@ -248,23 +248,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 52,
     paddingBottom: 16,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   backBtn: {
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: '#334155',
+    backgroundColor: '#2f3a4e',
   },
   backBtnText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontWeight: '600',
     fontSize: 13,
   },
   title: {
-    color: '#f8fafc',
+    color: '#f4f6f8',
     fontSize: 17,
     fontWeight: '700',
   },
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 6,
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   statusText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 10,
     fontWeight: '700',
   },
@@ -291,31 +291,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   threadSelector: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   threadChip: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   threadChipActive: {
     backgroundColor: '#2563eb',
     borderColor: '#2563eb',
   },
   threadChipText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     fontWeight: '600',
   },
   threadChipTextActive: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontWeight: '700',
   },
   recipientBar: {
@@ -326,15 +326,15 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: 'rgba(30, 41, 59, 0.6)',
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   recipientName: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
   },
   recipientSub: {
-    color: '#64748b',
+    color: '#748bac',
     fontSize: 11,
   },
   verifiedTag: {
@@ -366,10 +366,10 @@ const styles = StyleSheet.create({
     borderColor: '#4338ca',
   },
   bubbleUser: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderTopLeftRadius: 2,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   bubbleSender: {
     color: '#38bdf8',
@@ -378,12 +378,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   bubbleText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     lineHeight: 19,
   },
   bubbleTime: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 9,
     marginTop: 4,
     alignSelf: 'flex-end',
@@ -391,21 +391,21 @@ const styles = StyleSheet.create({
   inputBar: {
     flexDirection: 'row',
     padding: 12,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderTopWidth: 1,
-    borderTopColor: '#334155',
+    borderTopColor: '#2f3a4e',
     gap: 10,
   },
   input: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   sendBtn: {
     backgroundColor: '#2563eb',
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sendBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontWeight: '700',
     fontSize: 13,
   },

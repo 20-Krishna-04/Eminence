@@ -192,15 +192,15 @@ export default function DriverDashboard() {
         <View style={[styles.statusCard, isOnline ? styles.statusCardOnline : styles.statusCardOffline]}>
           <View>
             <Text style={styles.statusLabel}>Duty Status</Text>
-            <Text style={[styles.statusState, { color: isOnline ? '#22c55e' : '#94a3b8' }]}>
+            <Text style={[styles.statusState, { color: isOnline ? '#22c55e' : '#a2b2c7' }]}>
               {isOnline ? '🟢 ONLINE — Receiving Trips' : '⚪ OFFLINE — Shift Paused'}
             </Text>
           </View>
           <Switch
             value={isOnline}
             onValueChange={handleToggleDuty}
-            thumbColor={isOnline ? '#22c55e' : '#cbd5e1'}
-            trackColor={{ false: '#334155', true: 'rgba(34, 197, 94, 0.4)' }}
+            thumbColor={isOnline ? '#22c55e' : '#c9d3df'}
+            trackColor={{ false: '#2f3a4e', true: 'rgba(34, 197, 94, 0.4)' }}
           />
         </View>
 
@@ -393,7 +393,7 @@ export default function DriverDashboard() {
               value={enteredOtp}
               onChangeText={setEnteredOtp}
               placeholder="8492"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#748bac"
               keyboardType="number-pad"
               maxLength={4}
             />
@@ -427,7 +427,7 @@ export default function DriverDashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
   },
   header: {
     flexDirection: 'row',
@@ -436,24 +436,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 52,
     paddingBottom: 16,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   pilotBadge: {
-    color: '#3b82f6',
+    color: '#e86331',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1,
   },
   userName: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 20,
     fontWeight: '700',
     marginTop: 2,
   },
   userPhone: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginTop: 2,
   },
@@ -488,11 +488,11 @@ const styles = StyleSheet.create({
     borderColor: '#22c55e',
   },
   statusCardOffline: {
-    backgroundColor: '#1e293b',
-    borderColor: '#334155',
+    backgroundColor: '#293243',
+    borderColor: '#2f3a4e',
   },
   statusLabel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     fontWeight: '500',
   },
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   incomingCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 16,
     padding: 18,
     borderWidth: 2,
@@ -529,18 +529,18 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   incomingFare: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 22,
     fontWeight: '800',
   },
   incomingBody: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 12,
     padding: 14,
     marginBottom: 14,
   },
   incomingRoute: {
-    color: '#f8fafc',
+    color: '#f4f6f8',
     fontSize: 13,
     fontWeight: '500',
   },
@@ -550,7 +550,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   incomingMeta: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
   },
   incomingActions: {
@@ -577,16 +577,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   acceptBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontWeight: '800',
     fontSize: 14,
   },
   activeTripCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 16,
     padding: 18,
     borderWidth: 2,
-    borderColor: '#3b82f6',
+    borderColor: '#e86331',
     marginBottom: 16,
   },
   activeTripHeader: {
@@ -599,40 +599,40 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   activeTripRef: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 18,
     fontWeight: '800',
     marginTop: 2,
   },
   stepBox: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 12,
     padding: 14,
   },
   stepHeading: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
   },
   stepAddress: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 13,
     marginTop: 4,
     marginBottom: 12,
   },
   stepSubtitle: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginVertical: 8,
   },
   stepActionBtn: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#e86331',
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: 'center',
   },
   stepActionBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontWeight: '700',
     fontSize: 14,
   },
@@ -643,13 +643,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   podText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
     textAlign: 'center',
     marginVertical: 10,
   },
   sectionTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 12,
@@ -661,40 +661,40 @@ const styles = StyleSheet.create({
   },
   toolCard: {
     flex: 1,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 14,
     padding: 16,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   toolIcon: {
     fontSize: 26,
     marginBottom: 6,
   },
   toolTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 13,
     fontWeight: '700',
   },
   toolSubtitle: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
     marginTop: 2,
   },
   earningsCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   earningsTitle: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
   },
   earningsAmount: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 30,
     fontWeight: '800',
     marginVertical: 6,
@@ -705,7 +705,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   breakdownLabel: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
   },
   breakdownVal: {
@@ -715,7 +715,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#334155',
+    backgroundColor: '#2f3a4e',
     marginVertical: 12,
   },
   netRow: {
@@ -725,7 +725,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   netLabel: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
   },
@@ -741,7 +741,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   payoutBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
   },
@@ -752,31 +752,31 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 20,
     padding: 24,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   modalTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 18,
     fontWeight: '700',
   },
   modalSubtitle: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 13,
     marginTop: 4,
     marginBottom: 20,
   },
   otpInput: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
     paddingVertical: 14,
     paddingHorizontal: 16,
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 24,
     fontWeight: '800',
     letterSpacing: 10,
@@ -793,7 +793,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   modalCancelText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -804,7 +804,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   modalVerifyText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
   },

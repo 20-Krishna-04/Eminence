@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   acceptButtonText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontWeight: '700',
     fontSize: 15,
   },

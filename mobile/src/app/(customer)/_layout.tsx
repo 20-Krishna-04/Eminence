@@ -5,7 +5,7 @@ export default function CustomerLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: '#0f172a' },
+        contentStyle: { backgroundColor: '#0f141f' },
       }}
     >
       <Stack.Screen name="dashboard" options={{ headerShown: false }} />

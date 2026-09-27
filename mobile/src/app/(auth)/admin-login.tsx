@@ -81,7 +81,7 @@ export default function AdminLoginScreen() {
             <TextInput
               style={styles.input}
               placeholder="admin@eminence.com"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor="#a2b2c7"
               keyboardType="email-address"
               autoCapitalize="none"
               value={email}
@@ -94,7 +94,7 @@ export default function AdminLoginScreen() {
             <TextInput
               style={styles.input}
               placeholder="••••••••••••"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor="#a2b2c7"
               secureTextEntry
               value={password}
               onChangeText={setPassword}
@@ -136,7 +136,7 @@ export default function AdminLoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
   },
   scrollContent: {
     flexGrow: 1,
@@ -166,29 +166,29 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#ffffff',
+    color: '#f4f6f8',
     letterSpacing: 2,
   },
   subtitle: {
     fontSize: 14,
-    color: '#94a3b8',
+    color: '#a2b2c7',
     marginTop: 4,
   },
   card: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 20,
     padding: 24,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   cardTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#f8fafc',
+    color: '#f4f6f8',
   },
   cardSubtitle: {
     fontSize: 13,
-    color: '#94a3b8',
+    color: '#a2b2c7',
     marginTop: 4,
     marginBottom: 20,
   },
@@ -211,17 +211,17 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#cbd5e1',
+    color: '#c9d3df',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
     paddingVertical: 14,
     paddingHorizontal: 16,
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 15,
   },
   demoFillBtn: {
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   primaryBtnText: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 16,
     fontWeight: '700',
   },
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   backBtnText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 14,
     fontWeight: '500',
   },

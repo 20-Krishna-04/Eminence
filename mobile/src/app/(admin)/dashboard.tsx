@@ -318,7 +318,7 @@ export default function AdminDashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
   },
   header: {
     flexDirection: 'row',
@@ -327,9 +327,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 52,
     paddingBottom: 16,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   badgeRow: {
     flexDirection: 'row',
@@ -351,12 +351,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   userName: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 19,
     fontWeight: '700',
   },
   userEmail: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 12,
     marginTop: 2,
   },
@@ -375,12 +375,12 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     flexDirection: 'row',
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     paddingHorizontal: 16,
     paddingVertical: 8,
     gap: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   tabBtn: {
     flex: 1,
@@ -392,12 +392,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563eb',
   },
   tabText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 13,
     fontWeight: '600',
   },
   tabTextActive: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontWeight: '700',
   },
   scroll: {
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   sectionTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 15,
     fontWeight: '700',
     marginBottom: 12,
@@ -421,19 +421,19 @@ const styles = StyleSheet.create({
   },
   kpiCard: {
     width: '48%',
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   kpiTitle: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
     fontWeight: '600',
   },
   kpiValue: {
-    color: '#f8fafc',
+    color: '#f4f6f8',
     fontSize: 22,
     fontWeight: '800',
     marginVertical: 6,
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   kpiBadgeBlue: {
-    color: '#60a5fa',
+    color: '#f08b65',
     fontSize: 11,
     fontWeight: '600',
   },
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   surgeCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   surgeLabel: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -498,22 +498,22 @@ const styles = StyleSheet.create({
   surgeMetaRow: {
     flexDirection: 'row',
     gap: 8,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 8,
     padding: 10,
     alignItems: 'center',
   },
   surgeMetaText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
     fontWeight: '500',
   },
   chartCard: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   chartHeader: {
     flexDirection: 'row',
@@ -522,12 +522,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   chartTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '700',
   },
   chartSubtitle: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
   },
   barChartContainer: {
@@ -538,14 +538,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingBottom: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: '#2f3a4e',
   },
   barColumn: {
     alignItems: 'center',
     flex: 1,
   },
   barValueText: {
-    color: '#cbd5e1',
+    color: '#c9d3df',
     fontSize: 10,
     fontWeight: '600',
     marginBottom: 6,
@@ -553,17 +553,17 @@ const styles = StyleSheet.create({
   barTrack: {
     width: 22,
     height: 110,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 6,
     justifyContent: 'flex-end',
     overflow: 'hidden',
   },
   barFill: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#e86331',
     borderRadius: 6,
   },
   barDateText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 10,
     marginTop: 6,
     fontWeight: '500',
@@ -571,11 +571,11 @@ const styles = StyleSheet.create({
   chartFooter: {
     marginTop: 12,
     padding: 10,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0f141f',
     borderRadius: 8,
   },
   chartFooterText: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
     lineHeight: 16,
   },
@@ -583,12 +583,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1e293b',
+    backgroundColor: '#293243',
     padding: 14,
     borderRadius: 12,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#2f3a4e',
   },
   actionLeft: {
     flexDirection: 'row',
@@ -600,17 +600,17 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   actionTitle: {
-    color: '#ffffff',
+    color: '#f4f6f8',
     fontSize: 14,
     fontWeight: '600',
   },
   actionSub: {
-    color: '#94a3b8',
+    color: '#a2b2c7',
     fontSize: 11,
     marginTop: 2,
   },
   chevron: {
-    color: '#64748b',
+    color: '#748bac',
     fontSize: 22,
     fontWeight: '600',
     marginLeft: 8,
