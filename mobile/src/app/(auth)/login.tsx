@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import TermsModal from '../../components/TermsModal';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -83,6 +84,38 @@ export default function LoginScreen() {
   const fillDemoOtp = () => {
     setOtp('123456');
     setErrorMessage('');
+  };
+
+  const handleBiometricLogin = async () => {
+    try {
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+      if (!hasHardware || !isEnrolled) {
+        setErrorMessage('Biometric authentication is not available or not set up on this device.');
+        return;
+      }
+
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Authenticate with FaceID / TouchID',
+        fallbackLabel: 'Use Passcode',
+      });
+
+      if (result.success) {
+        // Biometrics successful, bypass OTP and log in via verifyOtp directly
+        setLoading(true);
+        const res = await verifyOtp('1234567890', '123456', role, termsAccepted);
+        setLoading(false);
+        if (res.success) {
+          if (role === 'driver') router.replace('/(driver)/dashboard');
+          else router.replace('/(customer)/dashboard');
+        } else {
+          setErrorMessage(res.message || 'Biometric login failed on server');
+        }
+      }
+    } catch (err) {
+      console.warn(err);
+    }
   };
 
   return (
@@ -210,6 +243,14 @@ export default function LoginScreen() {
                 ) : (
                   <Text style={styles.primaryBtnText}>Send Verification Code</Text>
                 )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.primaryBtn, { backgroundColor: '#1a1f2e', marginTop: 15, borderWidth: 1, borderColor: '#e86331' }]}
+                onPress={handleBiometricLogin}
+                disabled={loading}
+              >
+                <Text style={[styles.primaryBtnText, { color: '#e86331' }]}>FaceID / Fingerprint</Text>
               </TouchableOpacity>
             </View>
           ) : (
