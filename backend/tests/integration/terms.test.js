@@ -1,7 +1,8 @@
 const request = require('supertest');
 const app = require('../../src/app');
 const jwt = require('jsonwebtoken');
-const { Customer, Driver, UserConsent, syncDatabase } = require('../../src/models');
+const crypto = require('crypto');
+const { Customer, Driver, Otp, UserConsent, syncDatabase } = require('../../src/models');
 
 describe('Terms and Conditions Integration Tests', () => {
   let customer;
@@ -28,13 +29,13 @@ describe('Terms and Conditions Integration Tests', () => {
 
     customerToken = jwt.sign(
       { id: customer.id, role: 'customer' },
-      process.env.JWT_SECRET || 'fallback_secret',
+      process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
     driverToken = jwt.sign(
       { id: driver.id, role: 'driver' },
-      process.env.JWT_SECRET || 'fallback_secret',
+      process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
   }, 30000);
@@ -108,7 +109,19 @@ describe('Terms and Conditions Integration Tests', () => {
   });
 
   describe('POST /api/auth/phone-verify with acceptedTerms', () => {
-    it('should record acceptance during demo login verification', async () => {
+    it('should record acceptance during login verification with valid OTP', async () => {
+      let testCust = await Customer.findOne({ where: { phone: '1234567890' } });
+      if (!testCust) {
+        testCust = await Customer.create({ phone: '1234567890', name: 'Terms Verification User' });
+      }
+      await Otp.destroy({ where: { customerId: testCust.id } });
+      await Otp.create({
+        customerId: testCust.id,
+        type: 'phone',
+        code: crypto.createHash('sha256').update('123456').digest('hex'),
+        expiresAt: new Date(Date.now() + 10 * 60000)
+      });
+
       const res = await request(app)
         .post('/api/auth/phone-verify')
         .send({
