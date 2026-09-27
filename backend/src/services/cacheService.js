@@ -4,59 +4,108 @@
  * pricing tiers, and other frequently-read data.
  */
 
-const DEFAULT_TTL_MS = 60 * 1000; // 1 minute default TTL
+const Redis = require('ioredis');
+
+const DEFAULT_TTL_MS = 60 * 1000;
 const MAX_CACHE_SIZE = 100;
 
-const cache = new Map();
+let redisClient = null;
+const memoryCache = new Map();
 
-/**
- * Set a value in the cache with an optional TTL (in ms).
- */
-const set = (key, value, ttl = DEFAULT_TTL_MS) => {
-  if (cache.size >= MAX_CACHE_SIZE) {
-    // Evict the oldest entry (LRU approximation)
-    const oldestKey = cache.keys().next().value;
-    cache.delete(oldestKey);
+if (process.env.REDIS_URL) {
+  redisClient = new Redis(process.env.REDIS_URL, {
+    maxRetriesPerRequest: 1,
+    retryStrategy(times) {
+      if (times > 3) return null; // stop retrying
+      return Math.min(times * 50, 2000);
+    }
+  });
+  redisClient.on('error', (err) => {
+    console.error('Redis connection error:', err.message);
+    redisClient = null; // fallback to memory on error
+  });
+}
+
+const set = async (key, value, ttl = DEFAULT_TTL_MS) => {
+  try {
+    if (redisClient) {
+      await redisClient.set(key, JSON.stringify(value), 'PX', ttl);
+      return;
+    }
+  } catch (err) {
+    console.error('Redis set error:', err.message);
   }
-  cache.set(key, {
+
+  // Fallback
+  if (memoryCache.size >= MAX_CACHE_SIZE) {
+    const oldestKey = memoryCache.keys().next().value;
+    memoryCache.delete(oldestKey);
+  }
+  memoryCache.set(key, {
     value,
     expiresAt: Date.now() + ttl
   });
 };
 
-/**
- * Get a value from the cache. Returns null if missing or expired.
- */
-const get = (key) => {
-  const entry = cache.get(key);
+const get = async (key) => {
+  try {
+    if (redisClient) {
+      const val = await redisClient.get(key);
+      if (val) return JSON.parse(val);
+      return null;
+    }
+  } catch (err) {
+    console.error('Redis get error:', err.message);
+  }
+
+  // Fallback
+  const entry = memoryCache.get(key);
   if (!entry) return null;
   if (Date.now() > entry.expiresAt) {
-    cache.delete(key);
+    memoryCache.delete(key);
     return null;
   }
   return entry.value;
 };
 
-/**
- * Delete a key from the cache.
- */
-const del = (key) => {
-  cache.delete(key);
+const del = async (key) => {
+  try {
+    if (redisClient) {
+      await redisClient.del(key);
+      return;
+    }
+  } catch (err) {
+    console.error('Redis del error:', err.message);
+  }
+  memoryCache.delete(key);
 };
 
-/**
- * Clear the entire cache.
- */
-const flush = () => {
-  cache.clear();
+const flush = async () => {
+  try {
+    if (redisClient) {
+      await redisClient.flushall();
+      return;
+    }
+  } catch (err) {
+    console.error('Redis flush error:', err.message);
+  }
+  memoryCache.clear();
 };
 
-/**
- * Get cache stats (for SLA monitoring).
- */
-const stats = () => ({
-  size: cache.size,
-  maxSize: MAX_CACHE_SIZE
-});
+const stats = async () => {
+  let size = memoryCache.size;
+  if (redisClient) {
+    try {
+      size = await redisClient.dbsize();
+    } catch (err) {
+      console.error('Redis stats error:', err.message);
+    }
+  }
+  return {
+    size,
+    maxSize: MAX_CACHE_SIZE,
+    type: redisClient ? 'redis' : 'memory'
+  };
+};
 
 module.exports = { set, get, del, flush, stats };

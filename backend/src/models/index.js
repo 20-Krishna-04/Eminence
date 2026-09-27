@@ -17,6 +17,7 @@ const AuditLog = require('./AuditLog');
 const PlatformConfig = require('./PlatformConfig');
 const UserConsent = require('./UserConsent');
 const SupportChat = require('./SupportChat');
+const Notification = require('./Notification');
 
 // Define Relationships
 Customer.hasMany(UserConsent, { foreignKey: 'userId', as: 'consents', constraints: false });
@@ -280,5 +281,6 @@ module.exports = {
   AuditLog,
   PlatformConfig,
   UserConsent,
-  SupportChat
+  SupportChat,
+  Notification
 };

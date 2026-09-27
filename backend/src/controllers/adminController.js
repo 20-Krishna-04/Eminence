@@ -441,7 +441,7 @@ const getRouteAnalytics = async (req, res) => {
 const getDriverUtilization = async (req, res) => {
   try {
     const cacheKey = 'analytics:driver_utilization';
-    const cached = cache.get(cacheKey);
+    const cached = await cache.get(cacheKey);
     if (cached) return res.status(200).json({ success: true, ...cached, fromCache: true });
 
     const totalDrivers = await Driver.count();
@@ -449,17 +449,20 @@ const getDriverUtilization = async (req, res) => {
     const onTripDrivers = await Driver.count({ where: { status: 'on_trip' } });
     const utilizationRate = totalDrivers > 0 ? ((onTripDrivers / totalDrivers) * 100).toFixed(1) : 0;
 
-    // TODO: Replace with real query: GROUP bookings by HOUR(time), ORDER BY count DESC
-    // STUB: Static peak hours data — does not reflect real booking patterns
-    const peakHours = [
-      { hour: '08:00', bookings: 12 }, { hour: '09:00', bookings: 18 },
-      { hour: '10:00', bookings: 22 }, { hour: '11:00', bookings: 15 },
-      { hour: '14:00', bookings: 20 }, { hour: '17:00', bookings: 28 },
-      { hour: '18:00', bookings: 35 }, { hour: '19:00', bookings: 25 }
-    ];
+    const allBookings = await Booking.findAll({ attributes: ['time'], raw: true });
+    const hourCounts = {};
+    for (const b of allBookings) {
+      if (!b.time) continue;
+      const hour = String(b.time).split(':')[0].padStart(2, '0') + ':00';
+      hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+    }
+    const peakHours = Object.keys(hourCounts)
+      .map(hour => ({ hour, bookings: hourCounts[hour] }))
+      .sort((a, b) => b.bookings - a.bookings)
+      .slice(0, 8); // top 8 peak hours
 
     const data = { totalDrivers, activeDrivers, onTripDrivers, utilizationRate, peakHours };
-    cache.set(cacheKey, data, 30000); // Cache 30 seconds
+    await cache.set(cacheKey, data, 30000); // Cache 30 seconds
     res.status(200).json({ success: true, ...data });
   } catch (error) {
     console.error('Error fetching driver utilization:', error);
@@ -488,7 +491,7 @@ const getSlaStats = async (req, res) => {
       uptimePercentage: '99.9%', // Simulated
       dbLatencyMs,
       memoryUsageMb: (memoryUsage.heapUsed / 1024 / 1024).toFixed(2),
-      cacheStats: cache.stats(),
+      cacheStats: await cache.stats(),
       activeAlerts: dbLatencyMs > 500 ? ['HIGH_DB_LATENCY'] : []
     };
     res.status(200).json({ success: true, sla });
@@ -522,14 +525,14 @@ const getAuditLogs = async (req, res) => {
 const getPlatformConfig = async (req, res) => {
   try {
     const cacheKey = 'platform:config';
-    const cached = cache.get(cacheKey);
+    const cached = await cache.get(cacheKey);
     if (cached) return res.status(200).json({ success: true, config: cached });
 
     let config = await PlatformConfig.findOne();
     if (!config) {
       config = await PlatformConfig.create({}); // Create with defaults
     }
-    cache.set(cacheKey, config.toJSON(), 5 * 60 * 1000); // Cache 5 mins
+    await cache.set(cacheKey, config.toJSON(), 5 * 60 * 1000); // Cache 5 mins
     res.status(200).json({ success: true, config });
   } catch (error) {
     console.error('Error fetching platform config:', error);
@@ -549,7 +552,7 @@ const updatePlatformConfig = async (req, res) => {
     let config = await PlatformConfig.findOne();
     if (!config) config = await PlatformConfig.create({});
     await config.update(updates);
-    cache.del('platform:config');
+    await cache.del('platform:config');
     res.status(200).json({ success: true, config });
   } catch (error) {
     console.error('Error updating platform config:', error);
@@ -597,7 +600,7 @@ const exportBookings = async (req, res) => {
 const getSurgePricing = async (req, res) => {
   try {
     const cacheKey = 'pricing:surge';
-    const cached = cache.get(cacheKey);
+    const cached = await cache.get(cacheKey);
     if (cached) return res.status(200).json({ success: true, ...cached, fromCache: true });
 
     const activeBookings = await Booking.count({ where: { status: ['pending', 'driver_assigned', 'in_transit'] } });
@@ -612,7 +615,7 @@ const getSurgePricing = async (req, res) => {
     else if (demandRatio > 1.5) { surgeMultiplier = 1.3; surgeLabel = 'Slightly Busy'; }
 
     const result = { surgeMultiplier, surgeLabel, activeBookings, availableDrivers, demandRatio: parseFloat(demandRatio.toFixed(2)) };
-    cache.set(cacheKey, result, 15000); // Cache 15s
+    await cache.set(cacheKey, result, 15000); // Cache 15s
     res.status(200).json({ success: true, ...result });
   } catch (error) {
     console.error('Error calculating surge pricing:', error);

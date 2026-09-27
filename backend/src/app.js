@@ -84,6 +84,7 @@ const walletRoutes = require('./routes/walletRoutes');
 const b2bRoutes = require('./routes/b2bRoutes');
 const addressRoutes = require('./routes/addressRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
@@ -95,5 +96,6 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/b2b', b2bRoutes);
 app.use('/api/address', addressRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 module.exports = app;
