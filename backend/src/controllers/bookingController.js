@@ -178,9 +178,35 @@ const updateBookingStatus = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Booking not found' });
     }
 
+    const userRole = req.user?.role;
+    const userId = req.user?.id;
     const { status, driverId } = req.body;
-    if (status) booking.status = status;
-    if (driverId) booking.driverId = driverId;
+
+    const isAdmin = userRole === 'admin';
+    const isAssignedDriver = userRole === 'driver' && booking.driverId === userId;
+    const isDriverClaiming = userRole === 'driver' && (!booking.driverId || booking.driverId === userId);
+    const isCustomerCancelling = userRole === 'customer' && booking.customerId === userId && status === 'cancelled';
+
+    if (!isAdmin && !isAssignedDriver && !isDriverClaiming && !isCustomerCancelling) {
+      return res.status(403).json({ success: false, message: 'Not authorized to update this booking' });
+    }
+
+    if (status) {
+      if (status === 'completed' && !isAdmin) {
+        return res.status(400).json({ success: false, message: 'Must use /complete endpoint with PoD verification' });
+      }
+      booking.status = status;
+    }
+
+    if (driverId) {
+      if (isAdmin) {
+        booking.driverId = driverId;
+      } else if (userRole === 'driver' && driverId === userId) {
+        booking.driverId = userId;
+      } else {
+        return res.status(403).json({ success: false, message: 'Cannot assign another driver' });
+      }
+    }
 
     await booking.save();
     res.status(200).json({ success: true, booking });
