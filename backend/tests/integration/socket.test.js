@@ -100,12 +100,18 @@ describe('Socket.io Authentication & Room Access Control Tests', () => {
 
   afterAll(async () => {
     jest.restoreAllMocks();
-    await closeSocket();
+    try {
+      await closeSocket();
+    } catch (err) {}
     await new Promise(resolve => {
-      server.close(resolve);
-      setTimeout(resolve, 1000); // Force resolve to prevent hanging
+      if (server && server.listening) {
+        server.close(() => resolve());
+        setTimeout(resolve, 1500); // Force resolve to prevent hanging
+      } else {
+        resolve();
+      }
     });
-  });
+  }, 30000);
 
   it('should reject connection when no auth token is provided', (done) => {
     const client = ioClient(serverAddress, {

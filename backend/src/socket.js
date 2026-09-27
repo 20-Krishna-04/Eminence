@@ -224,10 +224,17 @@ const getIo = () => {
 
 const closeSocket = async () => {
   if (io) {
-    io.close();
+    try {
+      io.disconnectSockets(true);
+    } catch (e) {}
+    await new Promise((resolve) => io.close(() => resolve()));
+    io = null;
   }
   if (pool) {
-    await pool.end();
+    try {
+      await pool.end();
+    } catch (e) {}
+    pool = null;
   }
 };
 
