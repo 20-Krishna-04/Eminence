@@ -771,7 +771,7 @@ $ npx sequelize-cli db:seed:all --env production
 - [ ] IVR booking works (test with real Twilio number)
 - [ ] Concurrent bookings don't conflict
 - [ ] SMS notifications deliver
-- [ ] Driver allocation logic correct
+- [x] Driver allocation logic correct
 
 ### **Phase 2: Enhancement Deployment (Week 10)**
 

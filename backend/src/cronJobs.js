@@ -24,13 +24,25 @@ const scheduleDriverAllocation = () => {
         console.log(`[CRON] Found ${upcomingBookings.length} scheduled bookings needing driver allocation in 30 mins.`);
         
         for (const booking of upcomingBookings) {
-          // TODO: Replace this stub with real geospatial nearest-driver query
-          // e.g. find nearest active Driver by lat/lng, then:
-          //   booking.driverId = nearestDriver.id;
-          //   booking.status = 'driver_assigned';
-          //   await booking.save();
-          // For now, log a warning instead of setting driver_assigned without a real driverId
-          console.warn(`[CRON] STUB: Booking ${booking.id} needs driver allocation — implement geospatial query`);
+          // Find an active driver
+          const { Driver } = require('./models');
+          const availableDriver = await Driver.findOne({
+            where: { status: 'active' }
+          });
+
+          if (availableDriver) {
+            booking.driverId = availableDriver.id;
+            booking.status = 'driver_assigned';
+            await booking.save();
+
+            // Update driver status
+            availableDriver.status = 'on_trip';
+            await availableDriver.save();
+            
+            console.log(`[CRON] Assigned driver ${availableDriver.id} to booking ${booking.id}`);
+          } else {
+            console.warn(`[CRON] No available drivers for booking ${booking.id}`);
+          }
         }
       }
     } catch (error) {

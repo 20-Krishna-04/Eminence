@@ -41,5 +41,6 @@ router.get('/', protect, authorize('driver', 'admin'), driverController.getAllDr
 router.post('/', protect, authorize('admin'), driverController.createDriver);
 router.patch('/:id/toggle', protect, authorize('driver', 'admin'), driverController.toggleAvailability);
 router.get('/:id/payslip', protect, authorize('driver', 'admin'), driverController.generatePayslip);
+router.get('/:id/payslip/download', protect, authorize('driver', 'admin'), driverController.downloadPayslip);
 
 module.exports = router;

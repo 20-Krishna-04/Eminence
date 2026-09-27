@@ -70,7 +70,6 @@ const generatePayslip = async (req, res) => {
     const tdsTax = weeklyEarnings * 0.01;
     const netPayout = weeklyEarnings - platformFee - tdsTax;
 
-    // In a real scenario, we'd use pdfkit here to create a buffer.
     const payslipData = {
       driverName: driver.name,
       weekEnding: new Date().toISOString().split('T')[0],
@@ -88,9 +87,59 @@ const generatePayslip = async (req, res) => {
   }
 };
 
+const downloadPayslip = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const driver = await Driver.findByPk(id);
+    if (!driver) return res.status(404).json({ success: false, message: 'Driver not found' });
+    
+    const weeklyEarnings = 15000;
+    const platformFee = weeklyEarnings * 0.15;
+    const tdsTax = weeklyEarnings * 0.01;
+    const netPayout = weeklyEarnings - platformFee - tdsTax;
+
+    const PDFDocument = require('pdfkit');
+    const doc = new PDFDocument({ margin: 50 });
+
+    res.setHeader('Content-disposition', `attachment; filename=payslip_${id}.pdf`);
+    res.setHeader('Content-type', 'application/pdf');
+
+    doc.pipe(res);
+
+    doc.fillColor('#444444').fontSize(20).text('EMINENCE TRANSPORTS', 50, 57);
+    doc.fontSize(10).text('123 Main Street', 200, 50, { align: 'right' });
+    doc.text('Pune, MH 411001', 200, 65, { align: 'right' });
+    doc.moveDown();
+
+    doc.moveTo(50, 110).lineTo(550, 110).stroke();
+
+    doc.fontSize(14).text('DRIVER PAYSLIP', 50, 130);
+    doc.fontSize(10).text(`Driver: ${driver.name}`, 50, 150);
+    doc.text(`Week Ending: ${new Date().toISOString().split('T')[0]}`, 50, 165);
+    doc.moveDown();
+
+    doc.moveTo(50, 220).lineTo(550, 220).stroke();
+    doc.font('Helvetica-Bold').text('Description', 50, 230).text('Amount', 450, 230, { width: 100, align: 'right' });
+    doc.moveTo(50, 250).lineTo(550, 250).stroke();
+
+    doc.font('Helvetica').text('Gross Earnings', 50, 270).text(`Rs. ${weeklyEarnings.toFixed(2)}`, 450, 270, { width: 100, align: 'right' });
+    doc.text('Platform Fee (15%)', 50, 290).text(`- Rs. ${platformFee.toFixed(2)}`, 450, 290, { width: 100, align: 'right' });
+    doc.text('TDS Tax (1%)', 50, 310).text(`- Rs. ${tdsTax.toFixed(2)}`, 450, 310, { width: 100, align: 'right' });
+
+    doc.moveTo(50, 340).lineTo(550, 340).stroke();
+    doc.font('Helvetica-Bold').text('Net Payout:', 350, 360).text(`Rs. ${netPayout.toFixed(2)}`, 450, 360, { width: 100, align: 'right' });
+
+    doc.end();
+  } catch (error) {
+    console.error('Error downloading payslip:', error);
+    if (!res.headersSent) res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 module.exports = {
   getAllDrivers,
   createDriver,
   toggleAvailability,
-  generatePayslip
+  generatePayslip,
+  downloadPayslip
 };
