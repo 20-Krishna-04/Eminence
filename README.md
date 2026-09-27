@@ -5,7 +5,7 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18%2B-61dafb.svg)](https://react.dev/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-NeonDB-336791.svg)](https://neon.tech/)
-[![Twilio](https://img.shields.io/badge/Twilio-Voice%20%26%20SMS-F22F46.svg)](https://www.twilio.com/)
+[![Fast2SMS](https://img.shields.io/badge/Fast2SMS-SMS-blue.svg)](https://www.fast2sms.com/)
 
 ---
 
@@ -63,7 +63,7 @@ Repeat customers call a helpline number → System recognizes them by phone numb
 
 - ✅ **Dual-Channel Booking**
   - React.js website for web bookings
-  - Twilio IVR helpline for voice bookings
+  - Fast2SMS integration for SMS alerts
   - Real-time synchronization between channels
 
 - ✅ **Caller Recognition Engine**
@@ -77,7 +77,7 @@ Repeat customers call a helpline number → System recognizes them by phone numb
   - Automatic fare estimation
 
 - ✅ **Multi-Channel Confirmations**
-  - SMS confirmations (Twilio)
+  - SMS confirmations (Fast2SMS)
   - WhatsApp notifications
   - Voice call confirmations
   - Real-time booking status updates
@@ -101,7 +101,7 @@ Repeat customers call a helpline number → System recognizes them by phone numb
          │                    │                      │
          ▼                    ▼                      ▼
     ┌─────────────┐     ┌──────────────┐    ┌───────────────┐
-    │React Website│     │Twilio IVR    │    │Admin Dashboard│
+    │React Website│     │Fast2SMS API  │    │Admin Dashboard│
     │(Vite)      │     │Helpline      │    │(React)       │
     └──────┬──────┘     └──────┬───────┘    └───────┬───────┘
            │                   │                    │
@@ -155,7 +155,7 @@ Sequelize                 - ORM
 PostgreSQL (NeonDB)       - Database
 JWT                       - Authentication
 Bcrypt                    - Password Hashing
-Twilio SDK                - Voice/SMS
+Fast2SMS                  - SMS API
 Google Maps API           - Distance & Routing
 WhatsApp Business API     - Messaging (Phase 2)
 Socket.io                 - Real-time Updates (Phase 2)
@@ -164,7 +164,7 @@ Socket.io                 - Real-time Updates (Phase 2)
 ### **External Services**
 
 ```
-Twilio                    - Voice & SMS
+Fast2SMS                  - SMS
 Google Maps               - Distance Matrix & Geocoding
 Firebase                  - Authentication (Google Sign-In)
 SMTP                      - Email Notifications (Nodemailer)
@@ -252,7 +252,7 @@ eminence/
 - Node.js v18+
 - npm or yarn
 - PostgreSQL (or NeonDB account)
-- Twilio Account (for IVR & SMS)
+- Fast2SMS API Key (for SMS)
 - Google Maps API Key
 - Git
 
@@ -525,7 +525,7 @@ NODE_ENV=production npm start
 
 | Method | Endpoint                  | Description                  |
 | ------ | ------------------------- | ---------------------------- |
-| POST   | `/api/ivr/webhook`        | Twilio incoming call webhook |
+| POST   | `/api/ivr/webhook`        | Incoming call webhook (Deprecated) |
 | POST   | `/api/ivr/gather-speech`  | Process speech input         |
 | POST   | `/api/ivr/create-booking` | Create booking via IVR       |
 
@@ -723,7 +723,7 @@ git push origin feature/your-feature-name
 
 ## 🙏 Acknowledgments
 
-- Twilio for Voice & SMS APIs
+- Fast2SMS for SMS APIs
 - Google Maps for location services
 - NeonDB for serverless PostgreSQL
 - Vercel & Render for deployment platforms
