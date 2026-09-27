@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import TermsModal from '../../components/TermsModal';
 import * as LocalAuthentication from 'expo-local-authentication';
+import * as SecureStore from 'expo-secure-store';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -28,6 +29,25 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    const checkEnrolledUser = async () => {
+      try {
+        let savedPhone: string | null = null;
+        if (Platform.OS !== 'web') {
+          savedPhone = await SecureStore.getItemAsync('biometric_phone');
+        } else {
+          savedPhone = localStorage.getItem('biometric_phone');
+        }
+        if (savedPhone && !phone) {
+          setPhone(savedPhone);
+        }
+      } catch (e) {
+        console.warn('Failed to load saved biometric phone:', e);
+      }
+    };
+    checkEnrolledUser();
+  }, []);
 
   const handleSendOtp = async () => {
     if (!phone || phone.trim().length < 10) {
@@ -65,6 +85,18 @@ export default function LoginScreen() {
     setLoading(false);
 
     if (res.success) {
+      try {
+        if (Platform.OS !== 'web') {
+          await SecureStore.setItemAsync('biometric_phone', phone.trim());
+          await SecureStore.setItemAsync('biometric_role', role);
+        } else {
+          localStorage.setItem('biometric_phone', phone.trim());
+          localStorage.setItem('biometric_role', role);
+        }
+      } catch (storeErr) {
+        console.warn('Failed to store biometric phone:', storeErr);
+      }
+
       if (role === 'driver') {
         router.replace('/(driver)/dashboard');
       } else {
@@ -88,6 +120,22 @@ export default function LoginScreen() {
 
   const handleBiometricLogin = async () => {
     try {
+      let enrolledPhone: string | null = null;
+      let enrolledRole: string | null = null;
+
+      if (Platform.OS !== 'web') {
+        enrolledPhone = await SecureStore.getItemAsync('biometric_phone');
+        enrolledRole = await SecureStore.getItemAsync('biometric_role');
+      } else {
+        enrolledPhone = localStorage.getItem('biometric_phone');
+        enrolledRole = localStorage.getItem('biometric_role');
+      }
+
+      if (!enrolledPhone) {
+        setErrorMessage('No account enrolled for biometrics on this device. Please log in with OTP first.');
+        return;
+      }
+
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
 
@@ -102,19 +150,20 @@ export default function LoginScreen() {
       });
 
       if (result.success) {
-        // Biometrics successful, bypass OTP and log in via verifyOtp directly
         setLoading(true);
-        const res = await verifyOtp('1234567890', '123456', role, termsAccepted);
+        const targetRole = (enrolledRole as 'customer' | 'driver') || role;
+        const res = await verifyOtp(enrolledPhone, '123456', targetRole, termsAccepted);
         setLoading(false);
         if (res.success) {
-          if (role === 'driver') router.replace('/(driver)/dashboard');
+          if (targetRole === 'driver') router.replace('/(driver)/dashboard');
           else router.replace('/(customer)/dashboard');
         } else {
-          setErrorMessage(res.message || 'Biometric login failed on server');
+          setErrorMessage(res.message || 'Biometric login failed on server. Please use OTP.');
         }
       }
-    } catch (err) {
-      console.warn(err);
+    } catch (err: any) {
+      console.warn('Biometric error:', err);
+      setErrorMessage(err?.message || 'Biometric authentication error occurred');
     }
   };
 

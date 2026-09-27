@@ -118,7 +118,7 @@ async function runPhase4Tests() {
   // TC-033: Add New Vehicle
   // ----------------------------------------------------------------
   try {
-    const uniqueReg = 'MH-01-AA-' + Math.floor(1000 + Math.random() * 9000);
+    const uniqueReg = 'MH-' + Math.floor(10 + Math.random() * 89) + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
     const vehiclePayload = {
       registrationNumber: uniqueReg,
       type: 'large',
