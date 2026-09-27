@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Modal,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
@@ -24,6 +25,10 @@ export default function BookScreen() {
   const [goodsType, setGoodsType] = useState('Electronics');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState('14:00');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'online'>('online');
+  const [showRazorpay, setShowRazorpay] = useState(false);
+  const [currentBookingId, setCurrentBookingId] = useState<string | null>(null);
+  const [currentOrder, setCurrentOrder] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -96,7 +101,7 @@ export default function BookScreen() {
         date,
         time,
         estimatedFare,
-        paymentMethod: 'online',
+        paymentMethod,
         customerId: user?.id,
       };
 
@@ -104,12 +109,44 @@ export default function BookScreen() {
 
       if (res.data?.success && res.data?.booking) {
         const bookingId = res.data.booking.id;
-        router.replace(`/(customer)/track?bookingId=${bookingId}` as any);
+        
+        if (paymentMethod === 'online') {
+          // Initialize Razorpay Order
+          try {
+            const orderRes = await api.post('/api/integrations/razorpay-order', { bookingId });
+            setCurrentBookingId(bookingId);
+            setCurrentOrder(orderRes.data?.order);
+            setShowRazorpay(true);
+          } catch (err) {
+            setErrorMessage('Razorpay initialization failed');
+          }
+        } else {
+          router.replace(`/(customer)/track?bookingId=${bookingId}` as any);
+        }
       } else {
         setErrorMessage(res.data?.message || 'Failed to create booking');
       }
     } catch (err: any) {
       setErrorMessage(err.response?.data?.message || err.message || 'Error creating booking');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRazorpaySuccess = async () => {
+    if (!currentBookingId || !currentOrder) return;
+    setIsSubmitting(true);
+    try {
+      await api.post('/api/integrations/razorpay-verify', {
+        razorpay_order_id: currentOrder.id,
+        razorpay_payment_id: 'pay_mock_' + Math.random().toString(36).substring(7),
+        razorpay_signature: 'mock_signature'
+      });
+      setShowRazorpay(false);
+      router.replace(`/(customer)/track?bookingId=${currentBookingId}` as any);
+    } catch (err) {
+      setErrorMessage('Payment Verification Failed');
+      setShowRazorpay(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -267,7 +304,29 @@ export default function BookScreen() {
           </View>
         </View>
 
-        {/* SECTION 4: FARE BREAKDOWN & CONFIRM */}
+        {/* SECTION 4: PAYMENT METHOD */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>💳 Payment Method</Text>
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            <TouchableOpacity
+              style={[styles.tempoOption, paymentMethod === 'online' && styles.tempoOptionActive, { flex: 1 }]}
+              onPress={() => setPaymentMethod('online')}
+            >
+              <Text style={{ fontSize: 24, marginBottom: 4 }}>UPI</Text>
+              <Text style={styles.tempoName}>Pay Online</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.tempoOption, paymentMethod === 'cash' && styles.tempoOptionActive, { flex: 1 }]}
+              onPress={() => setPaymentMethod('cash')}
+            >
+              <Text style={{ fontSize: 24, marginBottom: 4 }}>💵</Text>
+              <Text style={styles.tempoName}>Cash/PoD</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* SECTION 5: FARE BREAKDOWN & CONFIRM */}
         <View style={styles.fareCard}>
           <View style={styles.fareRow}>
             <Text style={styles.fareLabel}>Base Fare ({tempoType.toUpperCase()})</Text>
@@ -308,6 +367,34 @@ export default function BookScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* RAZORPAY NATIVE MODAL MOCK */}
+      <Modal visible={showRazorpay} animationType="slide" presentationStyle="pageSheet">
+        <View style={{ flex: 1, backgroundColor: '#0f141f', padding: 20, justifyContent: 'center' }}>
+          <View style={{ backgroundColor: '#1a2235', padding: 24, borderRadius: 16, alignItems: 'center' }}>
+            <Text style={{ fontSize: 40, marginBottom: 12 }}>⚡</Text>
+            <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>Razorpay Checkout (Mock)</Text>
+            <Text style={{ color: '#b87333', fontSize: 24, fontWeight: 'bold', marginBottom: 24 }}>
+              ₹{currentOrder?.amount ? currentOrder.amount / 100 : estimatedFare}
+            </Text>
+            
+            <TouchableOpacity 
+              style={[styles.confirmBtn, { width: '100%', marginBottom: 12 }]} 
+              onPress={handleRazorpaySuccess}
+            >
+              <Text style={styles.confirmBtnText}>Pay Now Successfully</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.confirmBtn, { width: '100%', backgroundColor: 'transparent', borderWidth: 1, borderColor: '#334155' }]} 
+              onPress={() => setShowRazorpay(false)}
+            >
+              <Text style={styles.confirmBtnText}>Cancel Payment</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 }
