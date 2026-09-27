@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { Package, CheckCircle, Wallet, MapPin, Plus, Gift, Copy, Crown, Target, Star, Leaf, Truck } from 'lucide-react';
+import { Package, CheckCircle, Wallet, MapPin, Plus, Gift, Copy, Crown, Target, Star, Leaf, Truck, Bell, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { updateProfileSuccess } from '../redux/slices/authSlice';
@@ -45,12 +45,49 @@ const CustomerDashboard = () => {
   // Trip History State
   const [selectedTrip, setSelectedTrip] = useState(null);
 
+  // Notifications State
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await api.get('/api/notifications');
+      setNotifications(res.data.notifications || []);
+      setUnreadCount(res.data.unreadCount || 0);
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  };
+
+  const markAsRead = async (id) => {
+    try {
+      await api.put(`/api/notifications/${id}/read`);
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const markAllRead = async () => {
+    try {
+      await api.put('/api/notifications/mark-all-read');
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     if (token) {
       fetchWallet();
     }
     if (activeTab === 'addresses' && token) {
       fetchAddresses();
+    }
+    if (activeTab === 'notifications' && token) {
+      fetchNotifications();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, token]);
@@ -153,7 +190,7 @@ const CustomerDashboard = () => {
         
         {/* Tab Navigation */}
         <div className="flex space-x-2 border-b border-loft-800 mb-8 overflow-x-auto hide-scrollbar">
-          {['history', 'tracking', 'invoices', 'addresses', 'payments', 'rewards', 'support', 'profile'].map((tab) => (
+          {['history', 'tracking', 'invoices', 'addresses', 'payments', 'rewards', 'notifications', 'support', 'profile'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -164,6 +201,11 @@ const CustomerDashboard = () => {
               }`}
             >
               {tab === 'history' ? 'Bookings' : tab}
+              {tab === 'notifications' && unreadCount > 0 && (
+                <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
+                  {unreadCount}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -516,6 +558,42 @@ const CustomerDashboard = () => {
             >
               <h3 className="text-xl font-bold text-loft-200 mb-2 capitalize">{activeTab}</h3>
               <p className="text-loft-400 max-w-md">This section is currently under development.</p>
+            </motion.div>
+          )}
+
+          {activeTab === 'notifications' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-loft-50">Notifications</h3>
+                {unreadCount > 0 && (
+                  <button onClick={markAllRead} className="text-copper-500 text-sm font-medium hover:text-copper-400">Mark all as read</button>
+                )}
+              </div>
+              <div className="card bg-loft-900 border-loft-800 overflow-hidden p-6">
+                {notifications.length === 0 ? (
+                  <div className="text-center py-8 text-loft-400">No notifications yet.</div>
+                ) : (
+                  <div className="space-y-4">
+                    {notifications.map((notification) => (
+                      <div key={notification.id} className={`flex items-start gap-4 p-4 rounded-lg border transition-colors ${notification.isRead ? 'bg-loft-950/50 border-loft-800/50' : 'bg-copper-900/10 border-copper-500/30'}`}>
+                        <div className={`p-2 rounded-full ${notification.isRead ? 'bg-loft-800 text-loft-400' : 'bg-copper-500/20 text-copper-400'}`}>
+                          <Bell className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className={`font-bold ${notification.isRead ? 'text-loft-300' : 'text-loft-50'}`}>{notification.title}</h4>
+                          <p className={`text-sm mt-1 ${notification.isRead ? 'text-loft-400' : 'text-loft-200'}`}>{notification.message}</p>
+                          <span className="text-xs text-loft-500 mt-2 block">{new Date(notification.createdAt).toLocaleString()}</span>
+                        </div>
+                        {!notification.isRead && (
+                          <button onClick={() => markAsRead(notification.id)} className="p-2 text-moss-500 hover:bg-moss-500/10 rounded-full" title="Mark as read">
+                            <Check className="w-5 h-5" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </motion.div>
           )}
 
