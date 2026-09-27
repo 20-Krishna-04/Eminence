@@ -678,6 +678,33 @@ const updateContractStatus = async (req, res) => {
   }
 };
 
+// Get Peak Hours Heatmap (Bookings grouped by hour)
+const getPeakHoursAnalytics = async (req, res) => {
+  try {
+    const isPostgres = sequelize.getDialect() === 'postgres';
+    
+    let query;
+    if (isPostgres) {
+      query = `SELECT EXTRACT(HOUR FROM "createdAt") AS hour, COUNT(id) AS count FROM "Bookings" GROUP BY EXTRACT(HOUR FROM "createdAt") ORDER BY hour ASC`;
+    } else {
+      query = `SELECT strftime('%H', createdAt) AS hour, COUNT(id) AS count FROM Bookings GROUP BY strftime('%H', createdAt) ORDER BY hour ASC`;
+    }
+
+    const peakHoursData = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+    
+    // Map hour strings to integers
+    const formattedData = peakHoursData.map(d => ({
+      hour: parseInt(d.hour, 10),
+      count: parseInt(d.count, 10)
+    }));
+
+    res.status(200).json({ success: true, peakHoursData: formattedData });
+  } catch (error) {
+    console.error('Error fetching peak hours analytics:', error);
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
+  }
+};
+
 module.exports = {
   getDrivers,
   createDriver,
@@ -694,6 +721,7 @@ module.exports = {
   getOverviewStats,
   getRevenueAnalytics,
   getRouteAnalytics,
+  getPeakHoursAnalytics,
   getDriverUtilization,
   getSlaStats,
   getAuditLogs,

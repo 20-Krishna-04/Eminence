@@ -14,6 +14,7 @@ router.use(authorize('admin'));
 router.get('/overview', adminController.getOverviewStats);
 router.get('/revenue', adminController.getRevenueAnalytics);
 router.get('/routes', adminController.getRouteAnalytics);
+router.get('/peak-hours', adminController.getPeakHoursAnalytics);
 router.get('/utilization', adminController.getDriverUtilization);
 router.get('/sla', adminController.getSlaStats);
 router.get('/audit-logs', adminController.getAuditLogs);
