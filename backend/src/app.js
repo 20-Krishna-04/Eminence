@@ -11,9 +11,6 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 const app = express();
 app.use(cookieParser());
 
-const csrfProtection = require('./middleware/csrfMiddleware');
-app.use(csrfProtection);
-
 // Middleware - Secure Origin-Restricted CORS
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
@@ -37,6 +34,9 @@ app.use(cors({
   },
   credentials: true
 }));
+
+const csrfProtection = require('./middleware/csrfMiddleware');
+app.use(csrfProtection);
 app.use(express.json({
   verify: (req, res, buf) => {
     const urlPath = req.originalUrl.split('?')[0];

@@ -10,6 +10,7 @@ import {
 import { useRouter } from 'expo-router';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE_URL } from '../../services/api';
 
 interface TelemetryUpdate {
   vehicleId: string;
@@ -40,7 +41,7 @@ export default function TelematicsScreen() {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    const socketUrl = 'http://localhost:3000';
+    const socketUrl = API_BASE_URL;
     const s = io(socketUrl, {
       auth: { token },
       transports: ['websocket'],

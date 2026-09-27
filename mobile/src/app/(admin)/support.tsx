@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'expo-router';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE_URL } from '../../services/api';
 
 interface ChatMessage {
   id?: string;
@@ -61,7 +62,7 @@ export default function AdminSupportInboxScreen() {
       setMessages(activeChats[0].messages);
     }
 
-    const socketUrl = 'http://localhost:3000';
+    const socketUrl = API_BASE_URL;
     const s = io(socketUrl, {
       auth: { token },
       transports: ['websocket'],

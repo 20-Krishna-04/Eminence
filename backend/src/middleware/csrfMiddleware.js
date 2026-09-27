@@ -41,6 +41,11 @@ const csrfProtection = (req, res, next) => {
     return next();
   }
 
+  // Bypass CSRF for Expo Web (localhost:8081) in development
+  if (process.env.NODE_ENV === 'development' && (origin === 'http://localhost:8081' || origin === 'http://127.0.0.1:8081')) {
+    return next();
+  }
+
   // Validate CSRF token for state-changing requests
   const cookieToken = req.cookies['XSRF-TOKEN'];
   const headerToken = req.get('x-xsrf-token') || req.get('x-csrf-token');
