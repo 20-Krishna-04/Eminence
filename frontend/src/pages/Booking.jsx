@@ -115,6 +115,16 @@ const Booking = () => {
   const handleNext = () => setStep(step + 1);
   const handleBack = () => setStep(step - 1);
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -137,8 +147,57 @@ const Booking = () => {
           phone: formData.phone || user?.phone,
         }
       );
-      const bookingId = res.data?.booking?.id || 'pending';
-      navigate(`/tracking/${bookingId}`);
+      const bookingId = res.data?.booking?.id;
+      
+      if (formData.paymentMethod === 'online' && bookingId) {
+        const resScript = await loadRazorpayScript();
+        if (!resScript) {
+          setError('Razorpay SDK failed to load. Please check your connection.');
+          setIsSubmitting(false);
+          return;
+        }
+
+        const orderRes = await api.post('/api/integrations/razorpay-order', { bookingId });
+        const { order } = orderRes.data;
+
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_mock',
+          amount: order.amount,
+          currency: order.currency,
+          name: 'Eminence Logistics',
+          description: 'Tempo Booking Payment',
+          order_id: order.id,
+          handler: async function (response) {
+            try {
+              await api.post('/api/integrations/razorpay-verify', {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              });
+              navigate(`/tracking/${bookingId}`);
+            } catch (verifyErr) {
+              setError('Payment verification failed.');
+              setIsSubmitting(false);
+            }
+          },
+          prefill: {
+            name: user?.name || 'Customer',
+            email: user?.email || 'customer@example.com',
+            contact: formData.phone || user?.phone || '9999999999',
+          },
+          theme: { color: '#b87333' },
+          modal: { ondismiss: function () { setIsSubmitting(false); } }
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+          setError(`Payment failed: ${response.error.description}`);
+          setIsSubmitting(false);
+        });
+        rzp.open();
+      } else {
+        navigate(`/tracking/${bookingId || 'pending'}`);
+      }
     } catch (err) {
       console.error('Booking submission error:', err);
       setError(err.response?.data?.message || 'Unable to create booking. Please try again.');
