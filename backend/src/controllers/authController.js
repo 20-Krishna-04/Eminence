@@ -31,6 +31,14 @@ const getJwtSecret = () => {
   return secret;
 };
 
+// Mask sensitive Government ID (Aadhaar / PAN) for DPDP Act privacy compliance
+const maskGovernmentId = (id) => {
+  if (!id || typeof id !== 'string') return null;
+  const trimmed = id.trim();
+  if (trimmed.length <= 4) return 'XXXX';
+  return trimmed.slice(0, -4).replace(/./g, 'X') + trimmed.slice(-4);
+};
+
 const googleLogin = async (req, res) => {
   const { idToken } = req.body;
   
@@ -106,7 +114,7 @@ const googleLogin = async (req, res) => {
         city: customer.city,
         state: customer.state,
         address: customer.address,
-        governmentId: customer.governmentId,
+        governmentId: maskGovernmentId(customer.governmentId),
         isEmailVerified: customer.isEmailVerified,
         isPhoneVerified: customer.isPhoneVerified,
         isProfileComplete: customer.isProfileComplete,
@@ -151,7 +159,12 @@ const updateProfile = async (req, res) => {
     await customer.save();
     customer = await checkAndSetProfileComplete(customer);
 
-    return res.status(200).json({ success: true, user: customer });
+    const safeUser = customer.toJSON ? customer.toJSON() : { ...customer };
+    if (safeUser.governmentId) {
+      safeUser.governmentId = maskGovernmentId(safeUser.governmentId);
+    }
+
+    return res.status(200).json({ success: true, user: safeUser });
   } catch (error) {
     console.error('Update Profile Error:', error);
     const message = error.name === 'SequelizeUniqueConstraintError' 
@@ -442,6 +455,9 @@ const phoneVerify = async (req, res) => {
           { expiresIn: process.env.JWT_EXPIRE || '7d' }
         );
         userObj = customer.toJSON ? customer.toJSON() : { ...customer };
+        if (userObj.governmentId) {
+          userObj.governmentId = maskGovernmentId(userObj.governmentId);
+        }
       }
 
       userObj.role = userRole;
@@ -549,6 +565,9 @@ const phoneVerify = async (req, res) => {
 
     const userObj = user.toJSON ? user.toJSON() : { ...user };
     userObj.role = userRole;
+    if (userObj.governmentId) {
+      userObj.governmentId = maskGovernmentId(userObj.governmentId);
+    }
 
     res.cookie('accessToken', token, {
       httpOnly: true,
