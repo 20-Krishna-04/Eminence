@@ -11,6 +11,19 @@ const BusinessDashboard = () => {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const { token } = useSelector((state) => state.auth);
 
+  const [expenseReports, setExpenseReports] = useState([
+    { id: 'EXP-901', date: '2026-09-25', employee: 'Rahul Verma', amount: '₹1,250', rides: 3, status: 'pending_approval' },
+    { id: 'EXP-882', date: '2026-09-20', employee: 'Sneha Patel', amount: '₹800', rides: 2, status: 'approved' },
+  ]);
+
+  const handleApproveExpense = (id) => {
+    setExpenseReports(expenseReports.map(exp => exp.id === id ? { ...exp, status: 'approved' } : exp));
+  };
+  
+  const handleRejectExpense = (id) => {
+    setExpenseReports(expenseReports.map(exp => exp.id === id ? { ...exp, status: 'rejected' } : exp));
+  };
+
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
@@ -132,7 +145,7 @@ const BusinessDashboard = () => {
 
         {/* Tab Navigation */}
         <div className="flex space-x-2 border-b border-loft-800 mb-8 overflow-x-auto hide-scrollbar">
-          {['overview', 'contracts', 'bulk-load', 'trips', 'invoices', 'fleet', 'support'].map((tab) => (
+          {['overview', 'contracts', 'bulk-load', 'trips', 'expenses', 'invoices', 'fleet', 'support'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -413,7 +426,63 @@ const BusinessDashboard = () => {
             </motion.div>
           )}
 
-          {activeTab !== 'overview' && activeTab !== 'bulk-load' && activeTab !== 'contracts' && activeTab !== 'invoices' && (
+          {activeTab === 'expenses' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold text-loft-50">Expense Reports & Approvals</h3>
+                <button className="btn-primary py-2 px-4 text-sm font-medium">Build New Report</button>
+              </div>
+              <div className="card bg-loft-900 border-loft-800 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm text-loft-300">
+                    <thead className="bg-loft-950/50 text-xs uppercase font-medium">
+                      <tr>
+                        <th className="px-6 py-4">Report ID</th>
+                        <th className="px-6 py-4">Date</th>
+                        <th className="px-6 py-4">Employee</th>
+                        <th className="px-6 py-4">Rides</th>
+                        <th className="px-6 py-4">Amount</th>
+                        <th className="px-6 py-4">Status</th>
+                        <th className="px-6 py-4">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-loft-800">
+                      {expenseReports.map((report) => (
+                        <tr key={report.id} className="hover:bg-loft-800/50 transition-colors">
+                          <td className="px-6 py-4 font-medium text-loft-200">{report.id}</td>
+                          <td className="px-6 py-4">{report.date}</td>
+                          <td className="px-6 py-4">{report.employee}</td>
+                          <td className="px-6 py-4">{report.rides}</td>
+                          <td className="px-6 py-4 font-bold text-loft-100">{report.amount}</td>
+                          <td className="px-6 py-4">
+                            <span className={`text-xs px-2 py-0.5 rounded font-bold uppercase ${
+                              report.status === 'approved' ? 'bg-moss-500/20 text-moss-500' : 
+                              report.status === 'rejected' ? 'bg-red-500/20 text-red-500' : 
+                              'bg-amber-500/20 text-amber-500'
+                            }`}>
+                              {report.status.replace('_', ' ')}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 flex gap-2">
+                            {report.status === 'pending_approval' ? (
+                              <>
+                                <button onClick={() => handleApproveExpense(report.id)} className="text-moss-500 hover:text-moss-400 border border-moss-500/30 hover:bg-moss-500/10 px-3 py-1 rounded text-xs transition-colors">Approve</button>
+                                <button onClick={() => handleRejectExpense(report.id)} className="text-red-500 hover:text-red-400 border border-red-500/30 hover:bg-red-500/10 px-3 py-1 rounded text-xs transition-colors">Reject</button>
+                              </>
+                            ) : (
+                              <button className="text-copper-500 hover:text-copper-400 text-xs border border-copper-500/30 px-3 py-1 rounded transition-colors">View Details</button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab !== 'overview' && activeTab !== 'bulk-load' && activeTab !== 'contracts' && activeTab !== 'invoices' && activeTab !== 'expenses' && (
              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="card p-12 text-center flex flex-col items-center justify-center border-dashed border-loft-800/80">
               <h3 className="text-xl font-bold text-loft-200 mb-2 capitalize">{activeTab}</h3>
               <p className="text-loft-400 max-w-md">This section is currently under development.</p>
