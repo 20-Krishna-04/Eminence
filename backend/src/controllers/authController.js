@@ -42,22 +42,19 @@ const googleLogin = async (req, res) => {
     let uid, email, name, picture;
     
     try {
-      // Attempt official Firebase Admin verification
+      // Enforce official Firebase Admin verification
       const decodedToken = await admin.auth().verifyIdToken(idToken);
       uid = decodedToken.uid;
       email = decodedToken.email;
       name = decodedToken.name;
       picture = decodedToken.picture;
-    } catch (_adminError) {
-      console.warn('Firebase Admin verification failed, falling back to manual decode for local dev');
-      // For local development without a service account key, just decode the token
-      const decodedToken = jwt.decode(idToken);
-      if (!decodedToken) throw new Error('Invalid token format');
-      
-      uid = decodedToken.sub || decodedToken.user_id;
-      email = decodedToken.email;
-      name = decodedToken.name;
-      picture = decodedToken.picture;
+    } catch (adminError) {
+      console.error('Firebase Admin verification failed:', adminError.message);
+      return res.status(401).json({ success: false, message: 'Invalid or unverified Google ID token' });
+    }
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Google account has no associated email address' });
     }
 
     let customer = await Customer.findOne({ where: { email } });
