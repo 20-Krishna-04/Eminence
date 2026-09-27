@@ -61,8 +61,7 @@ const initSocket = (httpServer) => {
     }
 
     try {
-      const jwtSecret =
-        process.env.JWT_SECRET || (['development', 'test'].includes(process.env.NODE_ENV) ? 'fallback_secret' : null);
+      const jwtSecret = process.env.JWT_SECRET;
 
       if (!jwtSecret) {
         return next(new Error('Server misconfigured: JWT_SECRET is required'));

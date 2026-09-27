@@ -25,13 +25,10 @@ const generateOtp = () => {
 // Secure JWT Secret Loader
 const getJwtSecret = () => {
   const secret = process.env.JWT_SECRET;
-  if (!secret && process.env.NODE_ENV === 'production') {
-    throw new Error('FATAL: JWT_SECRET is not defined in production');
-  }
   if (!secret) {
-    console.warn('[SECURITY WARNING] JWT_SECRET is not set in environment; falling back to default secret.');
+    throw new Error('FATAL: JWT_SECRET environment variable is missing');
   }
-  return secret || 'fallback_secret';
+  return secret;
 };
 
 const googleLogin = async (req, res) => {

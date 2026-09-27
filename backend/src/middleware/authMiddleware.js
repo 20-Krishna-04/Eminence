@@ -14,8 +14,13 @@ const authMiddleware = (req, res, next) => {
     return res.status(401).json({ success: false, message: 'No token provided' });
   }
 
+  if (!process.env.JWT_SECRET) {
+    console.error('FATAL: JWT_SECRET environment variable is not configured');
+    return res.status(500).json({ success: false, message: 'Authentication configuration error' });
+  }
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; // Contains id and role
     next();
   } catch (error) {
