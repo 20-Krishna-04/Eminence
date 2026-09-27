@@ -14,6 +14,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
 export default function DriverDashboard() {
   const router = useRouter();
@@ -35,11 +36,16 @@ export default function DriverDashboard() {
 
   // Active Trip Progression (TC-022)
   const [activeTrip, setActiveTrip] = useState<any>(null);
-  const [tripStep, setTripStep] = useState<'assigned' | 'arrived' | 'in_transit' | 'completed'>('assigned');
+  const [tripStep, setTripStep] = useState<'assigned' | 'arrived' | 'in_transit' | 'arrived_dest' | 'completed'>('assigned');
   const [enteredOtp, setEnteredOtp] = useState('');
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
-  const [podHash, setPodHash] = useState('');
+  const [podHash, setPodHash] = useState<string | null>(null);
 
+  // Camera State
+  const [permission, requestPermission] = useCameraPermissions();
+  const [showCamera, setShowCamera] = useState(false);
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [cameraRef, setCameraRef] = useState<any>(null);
   // Driver Payslip / Earnings (TC-024)
   const [payslip, setPayslip] = useState<any>({
     grossEarnings: 1850,
@@ -142,7 +148,24 @@ export default function DriverDashboard() {
     }
   };
 
+  const handleTakePicture = async () => {
+    if (cameraRef) {
+      try {
+        const photo = await cameraRef.takePictureAsync({ base64: true });
+        setPhotoUri(photo.uri);
+        setShowCamera(false);
+      } catch (err) {
+        Alert.alert('Error', 'Failed to take photo');
+      }
+    }
+  };
+
   const handleCompleteDelivery = async () => {
+    if (!photoUri) {
+      Alert.alert('Digital PoD Required', 'Please capture a photo of the delivery to complete the trip.');
+      return;
+    }
+    
     setLoading(true);
     try {
       if (activeTrip?.bookingId && activeTrip.bookingId.length > 20) {
@@ -154,6 +177,7 @@ export default function DriverDashboard() {
         setPodHash('a9f4c33089d3421e90bce24d55');
       }
       setTripStep('completed');
+      setPhotoUri(null); // Reset for next trip
     } catch (err) {
       setPodHash('a9f4c33089d3421e90bce24d55');
       setTripStep('completed');
@@ -287,15 +311,55 @@ export default function DriverDashboard() {
               </View>
             )}
 
-            {/* Step 3: In-Transit to Destination */}
-            {tripStep === 'in_transit' && (
+            {/* Step 3: In-Transit to Destination (Arrived & PoD) */}
+            {(tripStep === 'in_transit' || tripStep === 'arrived_dest') && (
               <View style={styles.stepBox}>
-                <Text style={styles.stepHeading}>Step 3: Goods in Transit 🚚</Text>
+                <Text style={styles.stepHeading}>Step 3: Goods at Destination 🚚</Text>
                 <Text style={styles.stepAddress}>🎯 Destination: {activeTrip.dropAddress}</Text>
+
+                <View style={{ marginTop: 16 }}>
+                  {!photoUri && !showCamera && (
+                    <>
+                      <Text style={styles.stepSubtitle}>Capture digital proof of delivery (photo of goods) to proceed.</Text>
+                      <TouchableOpacity
+                        style={[styles.stepActionBtn, { backgroundColor: '#3b82f6', marginBottom: 12 }]}
+                        onPress={() => {
+                          if (!permission?.granted) requestPermission();
+                          setShowCamera(true);
+                        }}
+                      >
+                        <Text style={styles.stepActionBtnText}>📸 Capture PoD Photo</Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+
+                  {showCamera && permission?.granted && (
+                    <View style={{ height: 300, width: '100%', borderRadius: 12, overflow: 'hidden', marginBottom: 12 }}>
+                      <CameraView style={{ flex: 1 }} facing="back" ref={(ref) => setCameraRef(ref)}>
+                        <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 20 }}>
+                          <TouchableOpacity
+                            style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#fff', borderWidth: 4, borderColor: '#e86331' }}
+                            onPress={handleTakePicture}
+                          />
+                        </View>
+                      </CameraView>
+                    </View>
+                  )}
+
+                  {photoUri && (
+                    <View style={{ marginBottom: 12, padding: 12, backgroundColor: '#1e293b', borderRadius: 8 }}>
+                      <Text style={{ color: '#10b981', fontWeight: 'bold', marginBottom: 4 }}>✅ Photo Captured Successfully</Text>
+                      <TouchableOpacity onPress={() => setShowCamera(true)}>
+                        <Text style={{ color: '#3b82f6', fontSize: 12 }}>Retake Photo</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+
                 <TouchableOpacity
-                  style={[styles.stepActionBtn, { backgroundColor: '#22c55e' }]}
+                  style={[styles.stepActionBtn, { backgroundColor: photoUri ? '#22c55e' : '#475569' }]}
                   onPress={handleCompleteDelivery}
-                  disabled={loading}
+                  disabled={loading || !photoUri}
                 >
                   <Text style={styles.stepActionBtnText}>Mark Delivered & Collect ₹{activeTrip.fare} ✅</Text>
                 </TouchableOpacity>
