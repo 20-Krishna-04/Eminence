@@ -1,13 +1,40 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
-import { View, ActivityIndicator, StatusBar } from 'react-native';
+import { View, ActivityIndicator, StatusBar, Platform } from 'react-native';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import '../services/LocationTracking'; // Initialize global task manager
+import { initOfflineDB, syncOfflineQueue } from '../services/OfflineSync';
+import { registerForPushNotificationsAsync } from '../services/PushNotifications';
+import NetInfo from '@react-native-community/netinfo';
 
 function RootNavigationLayout() {
   const { user, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+
+  // Initialize features once on mount
+  useEffect(() => {
+    // 1. Init SQLite for Offline Queue
+    if (Platform.OS !== 'web') {
+      try {
+        initOfflineDB();
+      } catch (e) {
+        console.warn('Failed to init SQLite offline db', e);
+      }
+      
+      // 2. Request Push Notification permissions
+      registerForPushNotificationsAsync();
+      
+      // 3. Listen to Network state changes to trigger Sync
+      const unsubscribe = NetInfo.addEventListener(state => {
+        if (state.isConnected) {
+          syncOfflineQueue();
+        }
+      });
+      
+      return () => unsubscribe();
+    }
+  }, []);
 
   useEffect(() => {
     if (isLoading) return;
