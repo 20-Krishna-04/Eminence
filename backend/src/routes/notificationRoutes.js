@@ -11,8 +11,8 @@ const notificationLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-router.use(protect);
 router.use(notificationLimiter);
+router.use(protect);
 
 router.get('/', notificationController.getNotifications);
 router.put('/mark-all-read', notificationController.markAllAsRead);
