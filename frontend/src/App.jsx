@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { setAuthInitialized } from './redux/slices/authSlice';
@@ -47,8 +47,12 @@ const RequireAuth = ({ children, allowedRoles }) => {
 
 const ProfileModalWrapper = () => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const location = useLocation();
+
+  const customerRoutes = ['/customer/dashboard', '/book', '/booking'];
+  const isCustomerRoute = customerRoutes.some(path => location.pathname.startsWith(path));
   
-  if (isAuthenticated && user?.role === 'customer') {
+  if (isAuthenticated && user?.role === 'customer' && !user?.isProfileComplete && isCustomerRoute) {
     return <CompleteProfileModal />;
   }
   
