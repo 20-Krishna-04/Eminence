@@ -13,8 +13,11 @@ router.post('/payment/create-order', authLimiter, createOrder);
 router.post('/payment/verify', authLimiter, verifyPayment);
 router.post('/razorpay-webhook', razorpayWebhook);
 
-// Invoices
-router.get('/invoice/:bookingId', apiLimiter, generateInvoice);
+const crypto = require('crypto');
+const protect = require('../middleware/authMiddleware');
+
+// Invoices (protected by authentication: requires valid bearer token, cookie, or query token)
+router.get('/invoice/:bookingId', protect, apiLimiter, generateInvoice);
 
 // WhatsApp Webhooks
 router.get('/whatsapp-webhook', (req, res) => {
@@ -40,12 +43,32 @@ router.get('/whatsapp-webhook', (req, res) => {
 });
 
 router.post('/whatsapp-webhook', (req, res) => {
+  const signature = req.headers['x-hub-signature-256'];
+  const appSecret = process.env.WHATSAPP_APP_SECRET;
+
+  if (appSecret) {
+    if (!signature) {
+      return res.status(401).json({ success: false, message: 'Missing webhook signature' });
+    }
+    const rawPayload = JSON.stringify(req.body);
+    const expectedSignature = 'sha256=' + crypto.createHmac('sha256', appSecret).update(rawPayload).digest('hex');
+    try {
+      if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
+        return res.status(403).json({ success: false, message: 'Invalid webhook signature' });
+      }
+    } catch {
+      return res.status(403).json({ success: false, message: 'Invalid webhook signature length' });
+    }
+  } else if (process.env.NODE_ENV === 'production') {
+    return res.status(401).json({ success: false, message: 'WHATSAPP_APP_SECRET required for webhook verification in production' });
+  }
+
   const body = req.body;
 
   if (body.object) {
     if (body.entry && body.entry[0].changes && body.entry[0].changes[0] && body.entry[0].changes[0].value.messages) {
       const from = body.entry[0].changes[0].value.messages[0].from;
-      const msgBody = body.entry[0].changes[0].value.messages[0].text.body;
+      const msgBody = body.entry[0].changes[0].value.messages[0].text?.body || '';
       console.log(`Incoming WhatsApp message from ${from}: ${msgBody}`);
     } else if (body.entry && body.entry[0].changes && body.entry[0].changes[0].value.statuses) {
       const status = body.entry[0].changes[0].value.statuses[0].status;

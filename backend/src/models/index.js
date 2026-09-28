@@ -143,6 +143,12 @@ const bootstrapDatabase = async () => {
 // Function to sync models
 const syncDatabase = async () => {
   try {
+    if (process.env.NODE_ENV === 'production') {
+      console.log('Production environment detected: Skipping automatic schema alteration. Controlled database migrations should be used.');
+      await sequelize.authenticate();
+      return;
+    }
+
     await bootstrapDatabase();
     // Sync schema without expensive alter operations on every start
     await sequelize.sync();

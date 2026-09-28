@@ -1,4 +1,5 @@
-const { Customer, B2BContract, Invoice } = require('../models');
+const { Customer, B2BContract, Invoice, Booking } = require('../models');
+const sequelize = require('../config/database');
 
 const registerBusiness = async (req, res) => {
   try {
@@ -98,17 +99,123 @@ const getInvoices = async (req, res) => {
 
 const batchBookings = async (req, res) => {
   try {
-    // In a real implementation, we would parse req.file using multer
-    // and map the CSV rows to bulk Booking.bulkCreate() logic.
-    // For now, we mock the success response.
-    
-    // Simulating processing delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
+    const customerId = req.user.id;
+    const customer = await Customer.findByPk(customerId);
+
+    if (!customer) {
+      return res.status(404).json({ success: false, message: 'Customer not found' });
+    }
+
+    let rawRecords = [];
+
+    if (req.file) {
+      const fileContent = req.file.buffer.toString('utf-8').trim();
+      if (fileContent.startsWith('[') || fileContent.startsWith('{')) {
+        try {
+          const parsed = JSON.parse(fileContent);
+          rawRecords = Array.isArray(parsed) ? parsed : [parsed];
+        } catch {
+          return res.status(400).json({ success: false, message: 'Invalid JSON file content' });
+        }
+      } else {
+        // Parse CSV
+        const lines = fileContent.split(/\r?\n/).filter(line => line.trim().length > 0);
+        if (lines.length <= 1) {
+          return res.status(400).json({ success: false, message: 'CSV file contains no data rows' });
+        }
+        const headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.trim().replace(/^["']|["']$/g, ''));
+          const record = {};
+          headers.forEach((header, idx) => {
+            record[header] = values[idx] !== undefined ? values[idx] : '';
+          });
+          rawRecords.push(record);
+        }
+      }
+    } else if (req.body.bookings) {
+      rawRecords = Array.isArray(req.body.bookings) ? req.body.bookings : (typeof req.body.bookings === 'string' ? JSON.parse(req.body.bookings) : []);
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'No batch booking data provided. Upload a CSV/JSON file or send bookings array in request body.'
+      });
+    }
+
+    if (!rawRecords.length) {
+      return res.status(400).json({ success: false, message: 'No records to process' });
+    }
+
+    const validRows = [];
+    const failedRows = [];
+    const validTempoTypes = ['small', 'medium', 'large'];
+
+    rawRecords.forEach((item, index) => {
+      const rowNum = index + 1;
+      const pickupAddress = item.pickupAddress || item.pickup;
+      const dropAddress = item.dropAddress || item.drop;
+      const tempoType = (item.tempoType || 'medium').toLowerCase();
+      const estimatedFare = parseFloat(item.estimatedFare || item.fare);
+      const weight = parseFloat(item.weight) || 50;
+      const goodsType = item.goodsType || 'General Cargo';
+      const date = item.date || new Date().toISOString().split('T')[0];
+      const time = item.time || '10:00:00';
+
+      if (!pickupAddress || !dropAddress) {
+        failedRows.push({ row: rowNum, error: 'Missing pickup or drop address' });
+        return;
+      }
+      if (!validTempoTypes.includes(tempoType)) {
+        failedRows.push({ row: rowNum, error: `Invalid tempoType '${tempoType}'. Must be small, medium, or large` });
+        return;
+      }
+      if (isNaN(estimatedFare) || estimatedFare <= 0) {
+        failedRows.push({ row: rowNum, error: 'Invalid or non-positive estimatedFare' });
+        return;
+      }
+
+      validRows.push({
+        customerId,
+        pickupAddress,
+        dropAddress,
+        tempoType,
+        estimatedFare,
+        weight,
+        goodsType,
+        date,
+        time,
+        status: 'pending',
+        isB2B: true,
+        paymentMethod: customer.billingMode === 'postpaid' ? 'corporate_credit' : 'online',
+        paymentStatus: 'pending'
+      });
+    });
+
+    if (validRows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'All batch booking records failed validation',
+        errors: failedRows
+      });
+    }
+
+    // Execute bulk creation inside a database transaction
+    const t = await sequelize.transaction();
+    let createdBookings = [];
+    try {
+      createdBookings = await Booking.bulkCreate(validRows, { transaction: t });
+      await t.commit();
+    } catch (dbErr) {
+      await t.rollback();
+      throw dbErr;
+    }
+
     return res.status(200).json({
       success: true,
-      message: 'Batch bookings scheduled successfully',
-      processedCount: 15
+      message: `Batch bookings processed successfully: ${createdBookings.length} created, ${failedRows.length} failed`,
+      processedCount: createdBookings.length,
+      failedCount: failedRows.length,
+      errors: failedRows.length > 0 ? failedRows : undefined
     });
   } catch (error) {
     console.error('Batch Bookings Error:', error);

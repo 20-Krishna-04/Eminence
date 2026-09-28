@@ -31,8 +31,15 @@ const createOrder = async (req, res) => {
     };
     
     // Fallback logic if keys are mock
-    if (process.env.RAZORPAY_KEY_ID === 'rzp_test_mock' || !process.env.RAZORPAY_KEY_ID) {
-      console.log('Using Mock Razorpay Order');
+    const isMock = process.env.RAZORPAY_KEY_ID === 'rzp_test_mock' || !process.env.RAZORPAY_KEY_ID;
+    if (isMock) {
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(503).json({
+          success: false,
+          message: 'Payment gateway is misconfigured or disabled in production mode.'
+        });
+      }
+      console.log('Using Mock Razorpay Order in non-production mode');
       return res.status(200).json({
         success: true,
         order: {
@@ -55,7 +62,14 @@ const verifyPayment = (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
-    if (process.env.RAZORPAY_KEY_ID === 'rzp_test_mock' || !process.env.RAZORPAY_KEY_ID) {
+    const isMock = process.env.RAZORPAY_KEY_ID === 'rzp_test_mock' || !process.env.RAZORPAY_KEY_ID;
+    if (isMock) {
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(503).json({
+          success: false,
+          message: 'Mock payment verification is prohibited in production mode.'
+        });
+      }
       return res.status(200).json({ success: true, message: 'Payment verified (Mock)' });
     }
 

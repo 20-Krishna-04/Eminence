@@ -12,6 +12,7 @@ const server = http.createServer(app);
 const io = initSocket(server);
 
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { sanitizeChatMessage, sanitizeString } = require('./middleware/requestValidator');
 
 const { SupportChat } = require('./models');
@@ -155,7 +156,7 @@ io.on('connection', (socket) => {
     if (!cleanText) return;
 
     const message = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      id: crypto.randomUUID(),
       customerId,
       sender,
       text: cleanText,
@@ -192,7 +193,7 @@ io.on('connection', (socket) => {
         try {
           const botResponseText = await handleSupportMessage(customerId, cleanText);
           const botMessage = {
-            id: `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+            id: crypto.randomUUID(),
             customerId,
             sender: 'support_bot',
             text: botResponseText,

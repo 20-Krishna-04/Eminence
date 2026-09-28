@@ -15,6 +15,9 @@ const sendWhatsAppMessage = async (to, templateName, variables = []) => {
 
     // Fallback/Mock mode for development
     if (!token || !phoneNumberId) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('WhatsApp service credentials (WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID) are missing in production mode');
+      }
       console.log(`\n===========================================`);
       console.log(`MOCK WHATSAPP MESSAGE SENT`);
       console.log(`To: ${to}`);

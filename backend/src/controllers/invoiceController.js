@@ -1,21 +1,31 @@
 const PDFDocument = require('pdfkit');
+const { Booking, Customer } = require('../models');
 
-const generateInvoice = (req, res) => {
+const generateInvoice = async (req, res) => {
   try {
     const { bookingId } = req.params;
     
-    // In a real app, fetch booking from DB
-    // const booking = await Booking.findByPk(bookingId, { include: [Customer] });
-    // For now, mock data
-    const booking = {
-      id: bookingId || 'BKG-12345',
-      date: new Date().toLocaleDateString(),
-      customerName: 'Test Customer',
-      pickupAddress: 'Viman Nagar, Pune',
-      dropAddress: 'Hinjewadi, Pune',
-      amount: 450,
-      status: 'completed'
-    };
+    const booking = await Booking.findByPk(bookingId, {
+      include: [{ model: Customer, as: 'customer' }]
+    });
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: 'Booking not found' });
+    }
+
+    // Authorization check: must be the booking owner, assigned driver, or admin
+    if (req.user) {
+      const isOwner = req.user.id === booking.customerId;
+      const isDriver = req.user.id === booking.driverId;
+      const isAdmin = req.user.role === 'admin';
+      if (!isOwner && !isDriver && !isAdmin) {
+        return res.status(403).json({ success: false, message: 'Forbidden: You are not authorized to view this invoice' });
+      }
+    }
+
+    const customerName = booking.customer?.name || 'Valued Customer';
+    const amount = parseFloat(booking.estimatedFare) || 0;
+    const bookingDate = booking.date || new Date(booking.createdAt).toLocaleDateString();
 
     const doc = new PDFDocument({ margin: 50 });
     
@@ -45,15 +55,15 @@ const generateInvoice = (req, res) => {
       .text('INVOICE', 50, 130)
       .fontSize(10)
       .text(`Invoice Number: INV-${booking.id}`, 50, 150)
-      .text(`Invoice Date: ${booking.date}`, 50, 165)
-      .text(`Balance Due: ₹0.00`, 50, 180)
+      .text(`Invoice Date: ${bookingDate}`, 50, 165)
+      .text(`Payment Status: ${(booking.paymentStatus || 'pending').toUpperCase()}`, 50, 180)
       .moveDown();
 
     // Customer details
     doc
       .text(`Billed To:`, 300, 150)
       .font('Helvetica-Bold')
-      .text(booking.customerName, 300, 165)
+      .text(customerName, 300, 165)
       .font('Helvetica')
       .text('Pune, Maharashtra', 300, 180);
 
@@ -68,15 +78,15 @@ const generateInvoice = (req, res) => {
     // Table row
     doc
       .font('Helvetica')
-      .text(`Transport Services (Pickup: ${booking.pickupAddress} - Drop: ${booking.dropAddress})`, 50, 270, { width: 350 })
-      .text(`₹${booking.amount.toFixed(2)}`, 450, 270, { width: 100, align: 'right' });
+      .text(`Transport Services (Pickup: ${booking.pickupAddress || 'N/A'} - Drop: ${booking.dropAddress || 'N/A'})`, 50, 270, { width: 350 })
+      .text(`₹${amount.toFixed(2)}`, 450, 270, { width: 100, align: 'right' });
 
     // Total
     doc.moveTo(50, 320).lineTo(550, 320).stroke();
     doc
       .font('Helvetica-Bold')
       .text('Total:', 350, 340)
-      .text(`₹${booking.amount.toFixed(2)}`, 450, 340, { width: 100, align: 'right' });
+      .text(`₹${amount.toFixed(2)}`, 450, 340, { width: 100, align: 'right' });
 
     // Footer
     doc
@@ -86,6 +96,7 @@ const generateInvoice = (req, res) => {
 
     doc.end();
 
+    return;
   } catch (error) {
     console.error('Error generating invoice:', error);
     if (!res.headersSent) {

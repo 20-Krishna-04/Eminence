@@ -3,13 +3,12 @@
  * Calculates a dynamic surge multiplier based on time of day, weather, and traffic conditions.
  */
 
-const calculateSurgeMultiplier = () => {
+const calculateSurgeMultiplier = (options = {}) => {
   let multiplier = 1.0;
   
-  // Simulated factors
-  const currentHour = new Date().getHours();
-  const isRaining = Math.random() > 0.8; // 20% chance of rain
-  const highTraffic = Math.random() > 0.7; // 30% chance of high traffic
+  const currentHour = options.hour !== undefined ? options.hour : new Date().getHours();
+  const isRaining = options.isRaining !== undefined ? Boolean(options.isRaining) : false;
+  const highTraffic = options.highTraffic !== undefined ? Boolean(options.highTraffic) : false;
   
   // 1. Time-based surge (Rush Hour: 9am-11am & 6pm-8pm)
   if ((currentHour >= 9 && currentHour <= 11) || (currentHour >= 18 && currentHour <= 20)) {
@@ -18,12 +17,12 @@ const calculateSurgeMultiplier = () => {
     multiplier += 0.2; // 1.2x late night fee
   }
   
-  // 2. Weather surge
+  // 2. Weather surge (when observed/reported)
   if (isRaining) {
     multiplier += 0.3; // 1.3x during rain
   }
   
-  // 3. Traffic surge
+  // 3. Traffic surge (when reported by telematics/routes)
   if (highTraffic) {
     multiplier += 0.2; // 1.2x during heavy traffic
   }

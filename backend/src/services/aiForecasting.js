@@ -36,6 +36,8 @@ const getSurgeHeatmap = () => {
     timestamp: new Date().toISOString(),
     forecastWindow: 'Next 2 Hours',
     modelConfidence: '92.4%',
+    isSimulated: true,
+    engine: 'Heuristic-TimeSeries-Forecast-v1',
     hotspots
   };
 };

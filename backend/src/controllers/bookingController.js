@@ -43,7 +43,13 @@ const getAllBookings = async (req, res) => {
 // Create a booking
 const createBooking = async (req, res) => {
   try {
-    const customerId = req.user?.id || req.body.customerId;
+    let customerId = req.user?.id;
+    if (req.user?.role === 'admin' && req.body.customerId) {
+      customerId = req.body.customerId;
+    }
+    if (!customerId) {
+      return res.status(401).json({ success: false, message: 'Authentication required to create a booking' });
+    }
     const bookingData = { ...req.body, customerId };
 
     // 1. ESG Carbon Footprint Calculation

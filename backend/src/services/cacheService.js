@@ -38,11 +38,26 @@ const set = async (key, value, ttl = DEFAULT_TTL_MS) => {
     console.error('Redis set error:', err.message);
   }
 
-  // Fallback
-  if (memoryCache.size >= MAX_CACHE_SIZE) {
-    const oldestKey = memoryCache.keys().next().value;
-    memoryCache.delete(oldestKey);
+  // Fallback: True LRU behavior
+  if (memoryCache.has(key)) {
+    memoryCache.delete(key);
+  } else if (memoryCache.size >= MAX_CACHE_SIZE) {
+    // Purge expired keys first
+    const now = Date.now();
+    for (const [k, v] of memoryCache.entries()) {
+      if (now > v.expiresAt) {
+        memoryCache.delete(k);
+      }
+    }
+    // If still at capacity, evict least recently used (first inserted/accessed)
+    if (memoryCache.size >= MAX_CACHE_SIZE) {
+      const oldestKey = memoryCache.keys().next().value;
+      if (oldestKey !== undefined) {
+        memoryCache.delete(oldestKey);
+      }
+    }
   }
+
   memoryCache.set(key, {
     value,
     expiresAt: Date.now() + ttl
@@ -67,6 +82,9 @@ const get = async (key) => {
     memoryCache.delete(key);
     return null;
   }
+  // True LRU: move accessed entry to the most-recently-used position
+  memoryCache.delete(key);
+  memoryCache.set(key, entry);
   return entry.value;
 };
 
