@@ -56,8 +56,8 @@ describe('Socket.io Authentication & Room Access Control Tests', () => {
         socket.emit('chat_list', Object.values(activeChats));
       });
 
-      socket.on('join_room', ({ customerId, name, role }) => {
-        if (role === 'admin' || socket.user?.role === 'admin') {
+      socket.on('join_room', ({ customerId, name }) => {
+        if (socket.user?.role === 'admin') {
           socket.join('admin_inbox');
           if (customerId) {
             socket.join(`chat_${customerId}`);
@@ -152,6 +152,24 @@ describe('Socket.io Authentication & Room Access Control Tests', () => {
     client.on('connect', () => {
       // Attempt to join customer-2's private chat
       client.emit('join_room', { customerId: 'customer-2', role: 'customer' });
+    });
+
+    client.on('error', (err) => {
+      expect(err.message).toMatch(/Cannot join another user's chat room/);
+      client.disconnect();
+      done();
+    });
+  });
+
+  it('should block non-admin client attempting to spoof admin role in join_room', (done) => {
+    const client = ioClient(serverAddress, {
+      transports: ['websocket'],
+      auth: { token: customerToken }
+    });
+
+    client.on('connect', () => {
+      // Attempt to spoof admin role in payload to access another customer's room
+      client.emit('join_room', { customerId: 'customer-2', role: 'admin' });
     });
 
     client.on('error', (err) => {

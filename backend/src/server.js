@@ -90,9 +90,9 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Join a room for a customer chat (enforce room ownership or admin role)
-  socket.on('join_room', async ({ customerId, name, role }) => {
-    if (role === 'admin' || socket.user?.role === 'admin') {
+  // Join a room for a customer chat (enforce room ownership or verified admin role)
+  socket.on('join_room', async ({ customerId, name }) => {
+    if (socket.user?.role === 'admin') {
       socket.join('admin_inbox');
       if (customerId) {
         socket.join(`chat_${customerId}`);

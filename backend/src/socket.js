@@ -15,7 +15,7 @@ const initSocket = (httpServer) => {
   });
 
   const dbUrl = process.env.DATABASE_URL;
-  const useSqlite = process.env.USE_SQLITE === 'true' || process.env.DB_DIALECT === 'sqlite' || !dbUrl || dbUrl.startsWith('sqlite:');
+  const useSqlite = process.env.NODE_ENV === 'test' || process.env.USE_SQLITE === 'true' || process.env.DB_DIALECT === 'sqlite' || !dbUrl || dbUrl.startsWith('sqlite:');
 
   if (!useSqlite && dbUrl) {
     try {

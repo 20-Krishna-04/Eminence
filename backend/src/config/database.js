@@ -3,12 +3,16 @@ const { Sequelize } = require('sequelize');
 const dotenv = require('dotenv');
 const path = require('path');
 
+const initialNodeEnv = process.env.NODE_ENV;
 // Load environment variables (.env.local first, overriding any parent process variables)
 dotenv.config({ path: path.resolve(__dirname, '../../.env.local'), override: true });
 dotenv.config({ path: path.resolve(__dirname, '../../.env'), override: true });
+if (initialNodeEnv === 'test') {
+  process.env.NODE_ENV = 'test';
+}
 
 const dbUrl = process.env.DATABASE_URL;
-const useSqlite = process.env.USE_SQLITE === 'true' || process.env.DB_DIALECT === 'sqlite' || !dbUrl || dbUrl.startsWith('sqlite:');
+const useSqlite = process.env.NODE_ENV === 'test' || process.env.USE_SQLITE === 'true' || process.env.DB_DIALECT === 'sqlite' || !dbUrl || dbUrl.startsWith('sqlite:');
 let sequelize;
 
 if (!useSqlite && dbUrl) {
