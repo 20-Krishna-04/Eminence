@@ -104,7 +104,7 @@ const CustomerDashboard = () => {
   const handleSaveAddress = async () => {
     try {
       const res = await api.post('/api/address', newAddress);
-      setAddresses([...addresses, res.data]);
+      setAddresses((prevAddresses) => [...prevAddresses, res.data]);
       setIsAddAddressOpen(false);
       setNewAddress({ label: '', street: '', city: '', postalCode: '' });
     } catch (error) {
@@ -115,7 +115,7 @@ const CustomerDashboard = () => {
   const handleDeleteAddress = async (id) => {
     try {
       await api.delete(`/api/address/${id}`);
-      setAddresses(addresses.filter(addr => addr.id !== id));
+      setAddresses((prevAddresses) => prevAddresses.filter(addr => addr.id !== id));
     } catch (error) {
       console.error('Error deleting address:', error);
     }
