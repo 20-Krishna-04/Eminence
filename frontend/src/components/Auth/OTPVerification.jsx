@@ -34,7 +34,7 @@ const OTPVerification = () => {
   }, [location, navigate]);
 
   useEffect(() => {
-    if (autoSubmit && !isLoading) {
+    if (import.meta.env.DEV && autoSubmit && !isLoading) {
       setOtp(['1', '2', '3', '4', '5', '6']);
       // Directly call the backend
       const autoVerify = async () => {

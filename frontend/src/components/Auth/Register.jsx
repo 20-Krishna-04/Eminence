@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Phone, User } from 'lucide-react';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../../config/firebase';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../../redux/slices/authSlice';
 import TermsModal from '../Common/TermsModal';
 import api from '../../services/api';
 
@@ -23,6 +25,8 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('customer');
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -60,15 +64,36 @@ const Register = () => {
     try {
       setIsLoading(true);
       const result = await signInWithPopup(auth, googleProvider);
-      const token = await result.user.getIdToken();
+      const idToken = await result.user.getIdToken();
       
-      console.log("Firebase Google Token:", token);
-      
+      const response = await api.post('/api/auth/google-login', { 
+        idToken,
+        role: activeTab,
+        acceptedTerms: termsAccepted
+      });
+      const data = response.data;
       setIsLoading(false);
-      navigate(`/${activeTab}/dashboard`);
+
+      if (data.success) {
+        dispatch(loginSuccess({
+          id: data.user.id,
+          email: data.user.email,
+          name: data.user.name,
+          role: data.user.role || activeTab,
+          token: data.token,
+          isProfileComplete: data.user.isProfileComplete
+        }));
+
+        if (!data.user.isProfileComplete) {
+          navigate('/complete-profile');
+        } else {
+          navigate(`/${data.user.role || activeTab}/dashboard`);
+        }
+      }
     } catch (error) {
       console.error("Google Sign-Up Error", error);
       setIsLoading(false);
+      alert(error.response?.data?.message || 'Google sign up failed. Please try again.');
     }
   };
 

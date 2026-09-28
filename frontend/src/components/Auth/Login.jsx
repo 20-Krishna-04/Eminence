@@ -91,6 +91,10 @@ const Login = () => {
   };
 
   const handleDemoLogin = async () => {
+    if (!import.meta.env.DEV) {
+      setError('Demo login is disabled in production builds.');
+      return;
+    }
     const demoPhone = import.meta.env.VITE_DEMO_PHONE || '9999999999';
     setIsLoading(true);
     try {
@@ -348,15 +352,17 @@ const Login = () => {
                 </Link>
               </div>
 
-              <div className="mt-6 pt-6 border-t border-loft-800 text-center">
-                <button
-                  onClick={handleDemoLogin}
-                  disabled={isLoading}
-                  className="text-sm font-medium text-loft-400 hover:text-copper-400 transition-colors"
-                >
-                  Quick demo? <span className="underline decoration-copper-500/50 underline-offset-4">Log in as Demo User</span>
-                </button>
-              </div>
+              {import.meta.env.DEV && (
+                <div className="mt-6 pt-6 border-t border-loft-800 text-center">
+                  <button
+                    onClick={handleDemoLogin}
+                    disabled={isLoading}
+                    className="text-sm font-medium text-loft-400 hover:text-copper-400 transition-colors"
+                  >
+                    Quick demo? <span className="underline decoration-copper-500/50 underline-offset-4">Log in as Demo User</span>
+                  </button>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
