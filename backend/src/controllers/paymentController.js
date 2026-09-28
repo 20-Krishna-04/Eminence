@@ -78,7 +78,11 @@ const verifyPayment = (req, res) => {
 
 const razorpayWebhook = async (req, res) => {
   try {
-    const secret = process.env.RAZORPAY_WEBHOOK_SECRET || 'eminence_secret';
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    if (!secret) {
+      console.error('FATAL: RAZORPAY_WEBHOOK_SECRET environment variable is not configured');
+      return res.status(500).json({ success: false, message: 'Server configuration error: RAZORPAY_WEBHOOK_SECRET is required' });
+    }
     const signature = req.headers['x-razorpay-signature'];
     const body = req.rawBody;
 
