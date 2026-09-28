@@ -4,6 +4,8 @@ import { Phone, MessageSquare, ShieldCheck, Check, Copy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import TrackingMap from '../components/Tracking/TrackingMap';
 import ReviewModal from '../components/Customer/ReviewModal';
+import api from '../services/api';
+import { io } from 'socket.io-client';
 
 const Tracking = () => {
   const { bookingId } = useParams();
@@ -15,16 +17,37 @@ const Tracking = () => {
   // Pune coordinates for mock
   const punePosition = [18.5204, 73.8567];
 
-  // Simulate status progression for demo purposes
   useEffect(() => {
-    const timer1 = setTimeout(() => setStatus('arrived'), 5000);
-    const timer2 = setTimeout(() => setStatus('in_transit'), 10000);
-    const timer3 = setTimeout(() => {
-      setStatus('completed');
-      setIsReviewModalOpen(true);
-    }, 15000);
-    return () => { clearTimeout(timer1); clearTimeout(timer2); clearTimeout(timer3); };
-  }, []);
+    const loadBooking = async () => {
+      try {
+        const response = await api.get(`/api/bookings/${bookingId}`);
+        setStatus(response.data.status);
+      } catch {
+        console.error('Unable to load booking status.');
+      }
+    };
+
+    if (bookingId) {
+      loadBooking();
+    }
+
+    const socket = io(api.defaults.baseURL || 'http://localhost:5000');
+    socket.emit('join_booking', { bookingId });
+
+    socket.on('booking_status_updated', ({ bookingId: id, status }) => {
+      if (id === bookingId) {
+        setStatus(status);
+        if (status === 'completed') {
+          setIsReviewModalOpen(true);
+        }
+      }
+    });
+
+    return () => {
+      socket.off('booking_status_updated');
+      socket.disconnect();
+    };
+  }, [bookingId]);
 
   const getStatusText = () => {
     switch(status) {
