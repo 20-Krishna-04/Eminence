@@ -3,12 +3,18 @@
  * Protects endpoints from injection, stored XSS, and malformed inputs.
  */
 
-// Helper to escape dangerous HTML characters to prevent XSS
+// Helper to escape and neutralize dangerous HTML/XSS vectors
 const sanitizeString = (str) => {
   if (typeof str !== 'string') return str;
   return str
     .trim()
-    .replace(/[<>]/g, ''); // strip angle brackets
+    .replace(/<[^>]*>?/gm, '') // Strip full HTML tags (<script>...</script>, <img>, <iframe>, etc.)
+    .replace(/[<>]/g, '') // Strip any residual stray brackets
+    .replace(/javascript\s*:/gi, '') // Strip javascript: pseudo-protocol URIs
+    .replace(/data\s*:\s*text\/html/gi, '') // Strip data: HTML URIs
+    .replace(/vbscript\s*:/gi, '') // Strip vbscript: URIs
+    .replace(/on\w+\s*=/gi, '') // Strip inline event handlers like onerror=, onload=, onclick=
+    .replace(/&#[xX]?[0-9a-fA-F]+;/g, ''); // Strip encoded HTML entities used to evade filters
 };
 
 // Safe O(N) linear email validator that prevents polynomial ReDoS (CodeQL js/polynomial-redos)
@@ -115,10 +121,7 @@ const validateVehicle = (req, res, next) => {
 // Chat message content sanitizer
 const sanitizeChatMessage = (text) => {
   if (typeof text !== 'string') return '';
-  return text
-    .trim()
-    .slice(0, 1000) // max 1000 characters
-    .replace(/[<>]/g, ''); // strip potential HTML / script tags
+  return sanitizeString(text).slice(0, 1000); // max 1000 characters with complete XSS stripping
 };
 
 module.exports = {
