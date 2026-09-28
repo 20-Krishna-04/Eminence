@@ -226,10 +226,18 @@ const aiVoiceBooking = async (req, res) => {
     
     // Naive NLP entity extraction for demo purposes
     let tempoType = 'small';
-    if (transcript.toLowerCase().includes('large')) tempoType = 'large';
-    if (transcript.toLowerCase().includes('medium')) tempoType = 'medium';
+    if (transcript && typeof transcript === 'string') {
+      if (transcript.toLowerCase().includes('large')) tempoType = 'large';
+      else if (transcript.toLowerCase().includes('medium')) tempoType = 'medium';
+    }
+    // Ensure booking is tied to authenticated customer
+    const customerId = req.user?.id || req.body.customerId;
+    if (!customerId) {
+      return res.status(401).json({ success: false, message: 'Authentication required: customerId must be provided' });
+    }
 
     const mockExtractedData = {
+      customerId,
       pickupAddress: 'Eminence Hub, Pune', // Mock extracted
       dropAddress: 'Destination (Extracted from Voice)',
       date: new Date().toISOString().split('T')[0],
