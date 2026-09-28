@@ -1,4 +1,4 @@
-# Advanced Mobile Test Cases (Assigned to: Pranay)
+# Advanced Mobile (React Native / Expo App) Test Cases (Assigned to: Pranay)
 
 ## Overview
 This document covers advanced test cases for the Eminence React Native (Expo) Mobile App, primarily focusing on hardware integrations, background task reliability, and battery impact.

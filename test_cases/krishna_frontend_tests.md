@@ -1,4 +1,4 @@
-# Advanced Frontend Test Cases (Assigned to: Krishna)
+# Advanced Frontend (React Web Portal) Test Cases (Assigned to: Krishna)
 
 ## Overview
 This document outlines advanced UI/UX, state management, and API integration testing scenarios for the Eminence React Web Portal.
