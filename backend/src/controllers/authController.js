@@ -264,6 +264,9 @@ const verifyOtp = async (req, res) => {
       
       if (otpRecord.attempts >= 5) {
         otpRecord.lockoutUntil = new Date(Date.now() + 15 * 60000); // 15 min lockout
+        otpRecord.expiresAt = new Date(Date.now() - 1000); // Invalidate OTP code completely (Issue #158)
+        await otpRecord.save();
+        return res.status(429).json({ success: false, message: 'Maximum OTP verification attempts exceeded. Please request a new OTP.' });
       }
       await otpRecord.save();
       return res.status(400).json({ success: false, message: 'Invalid OTP' });
@@ -512,6 +515,9 @@ const phoneVerify = async (req, res) => {
       
       if (otpRecord.attempts >= 5) {
         otpRecord.lockoutUntil = new Date(Date.now() + 15 * 60000); // 15 min lockout
+        otpRecord.expiresAt = new Date(Date.now() - 1000); // Invalidate OTP code completely (Issue #158)
+        await otpRecord.save();
+        return res.status(429).json({ success: false, message: 'Maximum OTP verification attempts exceeded. Please request a new OTP.' });
       }
       await otpRecord.save();
       return res.status(400).json({ success: false, message: 'Invalid OTP' });

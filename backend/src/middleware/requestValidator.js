@@ -6,9 +6,15 @@
 // Helper to escape and neutralize dangerous HTML/XSS vectors
 const sanitizeString = (str) => {
   if (typeof str !== 'string') return str;
-  return str
-    .trim()
-    .replace(/<[^>]*>?/gm, '') // Strip full HTML tags (<script>...</script>, <img>, <iframe>, etc.)
+  let sanitized = str.trim();
+  let prev;
+  // Iteratively strip HTML tags to prevent nested tag bypasses (CodeQL js/incomplete-multi-character-sanitization)
+  do {
+    prev = sanitized;
+    sanitized = sanitized.replace(/<[^>]*>?/gm, '');
+  } while (sanitized !== prev);
+
+  return sanitized
     .replace(/[<>]/g, '') // Strip any residual stray brackets
     .replace(/javascript\s*:/gi, '') // Strip javascript: pseudo-protocol URIs
     .replace(/data\s*:\s*text\/html/gi, '') // Strip data: HTML URIs
