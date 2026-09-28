@@ -27,24 +27,46 @@ const CompleteProfile = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
 
-  const handleDocumentUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setDocumentFile(file);
-      setIsScanning(true);
-      setScanResult(null);
+  const handleDocumentUpload = async (e) => {
+    const file = e.target.files?.[0];
 
-      // Simulate ML OCR Pipeline (2 second delay)
-      setTimeout(() => {
-        setIsScanning(false);
-        setScanResult({
-          type: 'Driving License',
-          extractedName: 'Rahul Sharma',
-          idNumber: 'MH-14-20210012345',
-          expiry: '2035-08-15'
-        });
-        setMessage('Document successfully verified via AI OCR.');
-      }, 2500);
+    if (!file) return;
+
+    const allowedTypes = [
+      'image/jpeg',
+      'image/png',
+      'application/pdf',
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      setError('Unsupported document format.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Document must be smaller than 5 MB.');
+      return;
+    }
+
+    setDocumentFile(file);
+    const formData = new FormData();
+    formData.append('document', file);
+
+    setIsScanning(true);
+    setScanResult(null);
+
+    try {
+      const response = await api.post(
+        '/api/verification/documents',
+        formData
+      );
+
+      setScanResult(response.data);
+      setMessage('Document successfully verified via API.');
+    } catch (error) {
+      setError('Document verification failed.');
+    } finally {
+      setIsScanning(false);
     }
   };
 
