@@ -91,10 +91,7 @@ const CompleteProfileModal = () => {
     if (!internal) setLoading(true);
     setError('');
     try {
-      await api.post(
-        '/api/auth/send-otp',
-        { type }
-      );
+      await api.post('/api/auth/send-otp', { type });
       setOtpType(type);
       setOtpCooldown(60);
       setMessage(`OTP sent to your ${type}. Check your backend console for the code.`);
@@ -123,10 +120,7 @@ const CompleteProfileModal = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await api.post(
-        '/api/auth/verify-otp',
-        { type: otpType, code }
-      );
+      const res = await api.post('/api/auth/verify-otp', { type: otpType, code });
       dispatch(updateProfileSuccess(res.data.user));
       setOtpType(null);
       setOtpCode('');

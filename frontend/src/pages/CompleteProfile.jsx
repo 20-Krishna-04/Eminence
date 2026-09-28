@@ -75,10 +75,7 @@ const CompleteProfile = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await api.post(
-        '/api/auth/complete-profile',
-        { name, phone, location }
-      );
+      const res = await api.post('/api/auth/complete-profile', { name, phone, location });
       dispatch(updateProfileSuccess(res.data.user));
       setMessage('Profile updated. Please verify email and phone if required.');
       if (res.data.user.isProfileComplete) {
@@ -96,10 +93,7 @@ const CompleteProfile = () => {
     setError('');
     setMessage('');
     try {
-      await api.post(
-        '/api/auth/send-otp',
-        { type }
-      );
+      await api.post('/api/auth/send-otp', { type });
       setOtpType(type);
       setMessage(`OTP sent to your ${type}`);
     } catch (err) {

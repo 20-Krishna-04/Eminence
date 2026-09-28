@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { MapPin, Calendar, Clock, Box, ShieldCheck, Tag, Shield, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import axios from 'axios';
+
 import api from '../services/api';
 
 const Booking = () => {
@@ -101,10 +101,7 @@ const Booking = () => {
   const handleApplyPromo = async () => {
     if (!promoCode) return;
     try {
-      await axios.post(
-        'http://localhost:5000/api/wallet/referral',
-        { referralCode: promoCode }
-      );
+      await api.post('/api/wallet/referral', { referralCode: promoCode });
       setDiscount(100); // 100 Rs discount applied immediately for UI purposes
       setPromoMessage({ type: 'success', text: 'Referral applied! ₹100 discount added.' });
     } catch (error) {
