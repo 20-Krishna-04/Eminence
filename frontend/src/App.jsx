@@ -26,6 +26,8 @@ const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 const Terms = lazy(() => import('./pages/Terms'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 import CompleteProfileModal from './components/Customer/CompleteProfileModal';
+import WebRTCCaller from './components/Shared/WebRTCCaller';
+import WebRTCAdminReceiver from './components/Shared/WebRTCAdminReceiver';
 
 const RequireAuth = ({ children, allowedRoles }) => {
   const { isAuthenticated, user, loading, isLoading } = useSelector((state) => state.auth);
@@ -52,11 +54,22 @@ const ProfileModalWrapper = () => {
   const customerRoutes = ['/customer/dashboard', '/book', '/booking'];
   const isCustomerRoute = customerRoutes.some(path => location.pathname.startsWith(path));
   
+  
   if (isAuthenticated && user?.role === 'customer' && !user?.isProfileComplete && isCustomerRoute) {
     return <CompleteProfileModal />;
   }
   
   return null;
+};
+
+const WebRTCWrapper = () => {
+  const { user } = useSelector((state) => state.auth);
+  
+  if (user?.role === 'admin') {
+    return <WebRTCAdminReceiver />;
+  }
+  
+  return <WebRTCCaller />;
 };
 
 function App() {
@@ -72,6 +85,7 @@ function App() {
     <Router>
       <MainLayout>
         <ProfileModalWrapper />
+        <WebRTCWrapper />
         <ErrorBoundary>
           <Suspense fallback={<div className="flex h-screen items-center justify-center"><div className="w-12 h-12 border-4 border-copper-500 border-t-transparent rounded-full animate-spin"></div></div>}>
             <Routes>

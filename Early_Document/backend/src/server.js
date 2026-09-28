@@ -11,6 +11,14 @@ const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 const io = initSocket(server);
 
+// Attach PeerJS Signaling Server for WebRTC Voice Calls
+const { ExpressPeerServer } = require('peer');
+const peerServer = ExpressPeerServer(server, {
+  debug: true,
+  path: '/'
+});
+app.use('/peerjs', peerServer);
+
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { sanitizeChatMessage, sanitizeString } = require('./middleware/requestValidator');
