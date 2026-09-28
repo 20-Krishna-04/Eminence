@@ -4,6 +4,7 @@ const initialState = {
   user: null, // { id, name, email, phone, isEmailVerified, isPhoneVerified, isProfileComplete, role }
   isAuthenticated: false,
   loading: false,
+  isLoading: true,
   error: null,
 };
 
@@ -11,6 +12,9 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    setAuthInitialized: (state) => {
+      state.isLoading = false;
+    },
     loginStart: (state) => {
       state.loading = true;
       state.error = null;
@@ -36,6 +40,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { loginStart, loginSuccess, loginFailure, logout, updateProfileSuccess } = authSlice.actions;
+export const { setAuthInitialized, loginStart, loginSuccess, loginFailure, logout, updateProfileSuccess } = authSlice.actions;
 
 export default authSlice.reducer;
