@@ -9,6 +9,7 @@
 [![Socket.io](https://img.shields.io/badge/Socket.io-v4-010101?logo=socketdotio&logoColor=white)](https://socket.io/)
 
 [![Setup Guide](https://img.shields.io/badge/Setup-Guide-green.svg)](CONTRIBUTING.md)
+[![Documentation](https://img.shields.io/badge/Docs-Full%20Reference-blue.svg)](DOCUMENTATION.md)
 
 ---
 
