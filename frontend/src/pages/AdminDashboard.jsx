@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { getToken } from '../services/tokenService';
 import { 
@@ -19,7 +21,6 @@ import SettingsTab from '../components/admin/SettingsTab';
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const { user } = useSelector((state) => state.auth);
-  const token = user?.token || getToken();
 
   return (
     <div className="w-full pt-12 pb-24 relative min-h-screen bg-loft-950">
