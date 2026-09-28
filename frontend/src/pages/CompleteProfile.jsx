@@ -114,13 +114,25 @@ const CompleteProfile = () => {
   };
 
   const handleVerifyOtp = async () => {
+    if (!otpType) {
+      setError('Select an OTP verification method.');
+      return;
+    }
+
+    const code = otpCode.trim();
+
+    if (!/^\d{6}$/.test(code)) {
+      setError('Enter a valid 6-digit OTP.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     try {
       const token = getToken();
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/verify-otp`,
-        { type: otpType, code: otpCode },
+        { type: otpType, code },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       dispatch(updateProfileSuccess(res.data.user));
