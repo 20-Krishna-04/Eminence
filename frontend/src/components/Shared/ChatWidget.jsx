@@ -3,8 +3,6 @@ import { useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
 import { MessageCircle, X, Send } from 'lucide-react';
 import { getToken } from '../../services/tokenService';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 import api from '../../services/api';
 
 const ChatWidget = () => {
@@ -34,7 +32,7 @@ const ChatWidget = () => {
     }
 
     // Connect to Socket.io server
-    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000', {
+    const socket = io(api.defaults.baseURL?.replace('/api', '') || 'http://localhost:5000', {
       withCredentials: true
     });
     socketRef.current = socket;

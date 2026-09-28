@@ -3,7 +3,7 @@ import { getToken } from '../services/tokenService';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import api from '../services/api';
-import axios from 'axios';
+
 import { io } from 'socket.io-client';
 import { 
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, 

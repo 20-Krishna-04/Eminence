@@ -40,19 +40,11 @@ const OTPVerification = () => {
       const autoVerify = async () => {
         setIsLoading(true);
         try {
-          const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/phone-verify`, {
-            method: 'POST',
-            body: JSON.stringify({ 
-              phone, 
-              code: '123456', 
-              role: location.state?.role || 'customer',
-              acceptedTerms: !!location.state?.acceptedTerms 
-            }),
-            headers: {
-              'Content-Type': 'application/json',
-              'x-xsrf-token': getCsrfToken()
-            },
-            credentials: 'include'
+          const response = await api.post('/api/auth/phone-verify', {
+            phone, 
+            code: '123456', 
+            role: location.state?.role || 'customer',
+            acceptedTerms: !!location.state?.acceptedTerms 
           });
           const data = response.data;
           setIsLoading(false);
@@ -106,19 +98,11 @@ const OTPVerification = () => {
     setIsLoading(true);
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/phone-verify`, {
-        method: 'POST',
-        body: JSON.stringify({ 
-          phone, 
-          code: otpValue, 
-          role: location.state?.role || 'customer',
-          acceptedTerms: !!location.state?.acceptedTerms 
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          'x-xsrf-token': getCsrfToken()
-        },
-        credentials: 'include'
+      const response = await api.post('/api/auth/phone-verify', {
+        phone, 
+        code: otpValue, 
+        role: location.state?.role || 'customer',
+        acceptedTerms: !!location.state?.acceptedTerms 
       });
       
       const data = response.data;
