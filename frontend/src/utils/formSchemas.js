@@ -1,0 +1,45 @@
+import { z } from 'zod';
+
+// Registration Form Validation Schema
+export const registrationSchema = z.object({
+  name: z.string().trim().min(2, 'Name must be at least 2 characters').max(100, 'Name is too long'),
+  phone: z.string().trim().regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian mobile number'),
+  email: z.string().trim().email('Please enter a valid email address').optional().or(z.literal('')),
+  password: z.string().min(6, 'Password must be at least 6 characters').optional()
+});
+
+// Login Form Validation Schema
+export const loginSchema = z.object({
+  phone: z.string().trim().regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian mobile number')
+});
+
+// Booking Form Validation Schemas
+export const bookingLocationsSchema = z.object({
+  pickup: z.string().trim().min(3, 'Pickup address must be at least 3 characters'),
+  drops: z.array(z.string().trim().min(3, 'Drop address must be at least 3 characters')).min(1, 'At least one drop address is required'),
+  date: z.string().min(1, 'Please select a date'),
+  time: z.string().min(1, 'Please select a pickup time')
+});
+
+export const bookingDetailsSchema = z.object({
+  goodsType: z.string().trim().min(2, 'Please specify goods type'),
+  weight: z.coerce.number().positive('Weight must be greater than 0').max(25000, 'Max capacity is 25,000 kg'),
+  tempoType: z.enum(['small', 'medium', 'large']),
+  totalDistance: z.coerce.number().positive('Distance must be greater than 0 km').max(5000, 'Distance cannot exceed 5000 km')
+});
+
+// Customer Address Schema
+export const addressSchema = z.object({
+  label: z.string().trim().min(1, 'Label is required (e.g. Home, Office)'),
+  street: z.string().trim().min(5, 'Street address must be at least 5 characters'),
+  city: z.string().trim().min(2, 'City is required'),
+  postalCode: z.string().trim().regex(/^\d{6}$/, 'Postal code must be a 6-digit PIN')
+});
+
+// Profile Settings Schema
+export const profileSchema = z.object({
+  name: z.string().trim().min(2, 'Name must be at least 2 characters'),
+  phone: z.string().trim().regex(/^[6-9]\d{9}$/, 'Must be a valid 10-digit mobile number'),
+  email: z.string().trim().email('Invalid email address').optional().or(z.literal('')),
+  city: z.string().trim().optional().or(z.literal(''))
+});

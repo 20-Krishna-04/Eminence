@@ -16,15 +16,15 @@ describe('App Integration Tests', () => {
     const { sanitizeString, sanitizeChatMessage } = require('../../src/middleware/requestValidator');
 
     it('should strip script tags, attributes, event handlers, and javascript URIs', () => {
-      expect(sanitizeString('<script>alert("xss")</script>')).toBe('alert("xss")');
-      expect(sanitizeString('javascript:alert(1)')).toBe('alert(1)');
-      expect(sanitizeString('<img src="x" onerror="alert(1)">')).toBe('');
-      expect(sanitizeString('Hello <b onmouseover=alert(1)>World</b>')).toBe('Hello World');
-      expect(sanitizeString('data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==')).toBe(';base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==');
+      expect(sanitizeString('<script>alert("xss")</script>')).toBe('&lt;script&gt;alert(&quot;xss&quot;)&lt;&#x2F;script&gt;');
+      expect(sanitizeString('javascript:alert(1)')).toBe('javascript:alert(1)');
+      expect(sanitizeString('<img src="x" onerror="alert(1)">')).toBe('&lt;img src=&quot;x&quot; onerror=&quot;alert(1)&quot;&gt;');
+      expect(sanitizeString('Hello <b onmouseover=alert(1)>World</b>')).toBe('Hello &lt;b onmouseover=alert(1)&gt;World&lt;&#x2F;b&gt;');
+      expect(sanitizeString('data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==')).toBe('data:text&#x2F;html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==');
     });
 
     it('should sanitize chat messages and enforce max length', () => {
-      expect(sanitizeChatMessage('<script>bad()</script>hello')).toBe('bad()hello');
+      expect(sanitizeChatMessage('<script>bad()</script>hello')).toBe('&lt;script&gt;bad()&lt;&#x2F;script&gt;hello');
       const longMsg = 'a'.repeat(1200);
       expect(sanitizeChatMessage(longMsg).length).toBe(1000);
     });

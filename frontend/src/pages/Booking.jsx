@@ -1,14 +1,18 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { MapPin, Calendar, Clock, Box, ShieldCheck, Tag, Shield, Crown } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  MapPin, Calendar, Clock, Box, ShieldCheck, Tag, Shield, Crown, 
+  Mic, MicOff, Sparkles, X, Leaf
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import api from '../services/api';
+import { bookingLocationsSchema, bookingDetailsSchema } from '../utils/formSchemas';
 
 const Booking = () => {
   const navigate = useNavigate();
-  const { user, token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -23,10 +27,19 @@ const Booking = () => {
   // Gamification States
   const [hasInsurance, setHasInsurance] = useState(false);
   const [isPro] = useState(user?.isPro || false); // Only actual Pro subscribers get the discount
+
+  // AI Voice Booking States
+  const [showVoiceModal, setShowVoiceModal] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceTranscript, setVoiceTranscript] = useState('');
+  const [voiceError, setVoiceError] = useState('');
+  const [isVoiceSubmitting, setIsVoiceSubmitting] = useState(false);
+  const recognitionRef = useRef(null);
   
   const [formData, setFormData] = useState({
     pickup: '',
     drops: [''], // Array of drop-off addresses
+    totalDistance: 15, // Default 15km
     date: '',
     time: '',
     goodsType: '',
@@ -38,6 +51,112 @@ const Booking = () => {
     phone: '',
     paymentMethod: 'online'
   });
+
+  const getEsgEmissions = () => {
+    const distance = parseFloat(formData.totalDistance) || 15;
+    const rate = formData.tempoType === 'large' ? 350 : (formData.tempoType === 'medium' ? 200 : 120);
+    return ((distance * rate) / 1000).toFixed(2);
+  };
+
+  const startListening = () => {
+    setVoiceError('');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setVoiceError('Speech recognition is not supported in this browser. You can type your request directly.');
+      return;
+    }
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-IN';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        setVoiceTranscript(transcript);
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        setVoiceError(`Voice recognition: ${event.error}. You may type your booking prompt directly.`);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (e) {
+      console.error(e);
+      setVoiceError('Could not start microphone. You can type your voice booking command directly.');
+      setIsListening(false);
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
+
+  const handleVoiceBookingSubmit = async () => {
+    if (!voiceTranscript.trim()) {
+      setVoiceError('Please speak or type a booking prompt first.');
+      return;
+    }
+    setIsVoiceSubmitting(true);
+    setVoiceError('');
+    try {
+      const res = await api.post('/api/bookings/ai-booking', { transcript: voiceTranscript });
+      if (res.data?.booking?.id) {
+        setShowVoiceModal(false);
+        navigate(`/tracking/${res.data.booking.id}`);
+      } else {
+        setVoiceError('Could not create booking from voice command.');
+      }
+    } catch (err) {
+      console.error('Voice booking error:', err);
+      setVoiceError(err.response?.data?.message || 'Voice booking failed. Please try again.');
+    } finally {
+      setIsVoiceSubmitting(false);
+    }
+  };
+
+  const handleApplyVoiceToForm = () => {
+    if (!voiceTranscript.trim()) return;
+    const lower = voiceTranscript.toLowerCase();
+    
+    let detectedType = formData.tempoType;
+    if (lower.includes('large')) detectedType = 'large';
+    else if (lower.includes('medium')) detectedType = 'medium';
+    else if (lower.includes('small')) detectedType = 'small';
+
+    const match = voiceTranscript.match(/from\s+([^to]+?)\s+to\s+(.+)/i);
+    if (match) {
+      setFormData(prev => ({
+        ...prev,
+        pickup: match[1].trim(),
+        drops: [match[2].trim()],
+        tempoType: detectedType
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        tempoType: detectedType
+      }));
+    }
+    setShowVoiceModal(false);
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -109,8 +228,37 @@ const Booking = () => {
     }
   };
 
-  const handleNext = () => setStep(step + 1);
-  const handleBack = () => setStep(step - 1);
+  const handleNext = () => {
+    setError('');
+    if (step === 1) {
+      const val = bookingLocationsSchema.safeParse({
+        pickup: formData.pickup,
+        drops: formData.drops,
+        date: formData.date,
+        time: formData.time
+      });
+      if (!val.success) {
+        setError(val.error.issues[0]?.message || 'Please complete all location fields');
+        return;
+      }
+    } else if (step === 2) {
+      const val = bookingDetailsSchema.safeParse({
+        goodsType: formData.goodsType,
+        weight: formData.weight,
+        tempoType: formData.tempoType,
+        totalDistance: formData.totalDistance
+      });
+      if (!val.success) {
+        setError(val.error.issues[0]?.message || 'Please verify goods and vehicle specifications');
+        return;
+      }
+    }
+    setStep(step + 1);
+  };
+  const handleBack = () => {
+    setError('');
+    setStep(step - 1);
+  };
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -132,6 +280,7 @@ const Booking = () => {
         {
           pickupAddress: formData.pickup,
           dropAddress: formData.drops.join(' → '),
+          totalDistance: parseFloat(formData.totalDistance) || 15,
           date: formData.date,
           time: formData.time,
           goodsType: formData.goodsType,
@@ -247,7 +396,39 @@ const Booking = () => {
             {/* Step 1: Locations */}
             {step === 1 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
-                <h2 className="text-xl font-bold text-loft-50 mb-4 border-b border-loft-800 pb-2">Where to?</h2>
+                <div className="flex justify-between items-center border-b border-loft-800 pb-2">
+                  <h2 className="text-xl font-bold text-loft-50">Where to?</h2>
+                  <button
+                    type="button"
+                    onClick={() => { setShowVoiceModal(true); setVoiceError(''); }}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-copper-400 bg-copper-500/10 hover:bg-copper-500/20 px-3 py-1.5 rounded-lg border border-copper-500/30 transition-all cursor-pointer"
+                  >
+                    <Mic className="w-3.5 h-3.5 text-copper-400" />
+                    <span>AI Voice Booking</span>
+                  </button>
+                </div>
+
+                {/* AI Voice Booking Banner */}
+                <div className="p-4 rounded-xl border border-copper-500/30 bg-gradient-to-r from-copper-500/10 via-loft-900 to-loft-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-copper-500/20 text-copper-400 flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-5 h-5 text-copper-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-loft-50 text-sm flex items-center gap-2">
+                        AI Voice Agent <span className="text-[10px] bg-copper-500/20 text-copper-300 px-1.5 py-0.5 rounded font-mono uppercase">Speech to Text</span>
+                      </h3>
+                      <p className="text-xs text-loft-300">Speak your trip details to auto-fill or book instantly with NLP.</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setShowVoiceModal(true); setVoiceError(''); }}
+                    className="btn-primary py-2 px-3 text-xs flex items-center justify-center gap-2 whitespace-nowrap self-start sm:self-auto cursor-pointer"
+                  >
+                    <Mic className="w-3.5 h-3.5 text-white" /> Start Voice Booking
+                  </button>
+                </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-loft-200 mb-1">Pickup Address</label>
@@ -343,7 +524,7 @@ const Booking = () => {
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
                 <h2 className="text-xl font-bold text-loft-50 mb-4 border-b border-loft-800 pb-2">What are you moving?</h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-loft-200 mb-1">Goods Type</label>
                     <div className="relative">
@@ -354,6 +535,36 @@ const Booking = () => {
                   <div>
                     <label className="block text-sm font-medium text-loft-200 mb-1">Approx. Weight (kg)</label>
                     <input required name="weight" value={formData.weight} onChange={handleChange} type="number" className="input-field" placeholder="e.g. 500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-loft-200 mb-1">Estimated Distance (km)</label>
+                    <input 
+                      required 
+                      name="totalDistance" 
+                      value={formData.totalDistance} 
+                      onChange={handleChange} 
+                      type="number" 
+                      min="1"
+                      step="0.5"
+                      className="input-field" 
+                      placeholder="e.g. 10" 
+                    />
+                  </div>
+                </div>
+
+                {/* ESG Carbon Footprint Preview */}
+                <div className="p-3.5 bg-moss-500/10 border border-moss-500/25 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-moss-400">
+                    <Leaf className="w-4 h-4 text-moss-500" />
+                    <span className="text-xs font-semibold">Estimated ESG Carbon Footprint:</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-moss-300 bg-moss-500/20 px-2.5 py-1 rounded border border-moss-500/30">
+                      🌿 {getEsgEmissions()} kg CO₂
+                    </span>
+                    <span className="text-[11px] text-loft-400">
+                      ({formData.tempoType === 'large' ? '350g/km' : formData.tempoType === 'medium' ? '200g/km' : '120g/km'})
+                    </span>
                   </div>
                 </div>
 
@@ -491,6 +702,12 @@ const Booking = () => {
                       <span className="font-medium text-moss-400">+₹50</span>
                     </div>
                   )}
+                  <div className="flex justify-between items-center mb-2 text-moss-400">
+                    <span className="text-loft-300 flex items-center gap-1.5"><Leaf className="w-4 h-4 text-moss-500"/> Estimated ESG Footprint</span>
+                    <span className="font-mono text-xs font-bold text-moss-400">
+                      🌿 {getEsgEmissions()} kg CO₂
+                    </span>
+                  </div>
                   {isPro && (
                     <div className="flex justify-between items-center mb-2 text-yellow-500">
                       <span className="text-yellow-500 flex items-center gap-2 font-bold"><Crown className="w-4 h-4"/> Eminence Pro Discount</span>
@@ -587,6 +804,99 @@ const Booking = () => {
           </form>
         </motion.div>
       </div>
+
+      {/* Speech-to-Text / AI Voice Booking Modal */}
+      <AnimatePresence>
+        {showVoiceModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-loft-950/80 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="card w-full max-w-lg p-6 md:p-8 bg-loft-900 border-copper-500/30 relative shadow-2xl"
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  stopListening();
+                  setShowVoiceModal(false);
+                }}
+                className="absolute top-4 right-4 p-2 text-loft-400 hover:text-loft-100 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-copper-500/20 text-copper-400 flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-copper-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-loft-50 font-serif">AI Voice Booking Agent</h3>
+                  <p className="text-xs text-loft-300">Natural language booking powered by NLP</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center justify-center py-6 border border-loft-800 rounded-2xl bg-loft-950/60 mb-6">
+                <button
+                  type="button"
+                  onClick={isListening ? stopListening : startListening}
+                  className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 shadow-xl cursor-pointer ${
+                    isListening 
+                      ? 'bg-red-500 text-white animate-pulse shadow-[0_0_25px_rgba(239,68,68,0.5)]' 
+                      : 'bg-copper-500 hover:bg-copper-400 text-white shadow-[0_0_20px_rgba(232,99,49,0.3)]'
+                  }`}
+                >
+                  {isListening ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
+                </button>
+                <span className="text-sm font-semibold text-loft-200 mt-4">
+                  {isListening ? 'Listening... Speak your trip details' : 'Click microphone to speak'}
+                </span>
+                <span className="text-xs text-loft-400 mt-1 max-w-xs text-center">
+                  Example: "I need a large tempo from Kalyani Nagar to Hinjewadi tomorrow"
+                </span>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-loft-300 mb-2">
+                  Voice Transcript / Command
+                </label>
+                <textarea
+                  value={voiceTranscript}
+                  onChange={(e) => setVoiceTranscript(e.target.value)}
+                  placeholder="Your speech transcript will appear here, or you can type directly..."
+                  rows={3}
+                  className="input-field resize-none text-sm"
+                />
+              </div>
+
+              {voiceError && (
+                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-xs">
+                  {voiceError}
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={handleApplyVoiceToForm}
+                  disabled={!voiceTranscript.trim() || isVoiceSubmitting}
+                  className="btn-secondary flex-1 py-3 text-xs cursor-pointer"
+                >
+                  Auto-Fill Form
+                </button>
+                <button
+                  type="button"
+                  onClick={handleVoiceBookingSubmit}
+                  disabled={!voiceTranscript.trim() || isVoiceSubmitting}
+                  className="btn-primary flex-1 py-3 text-xs flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isVoiceSubmitting ? 'Booking with AI...' : '⚡ Instant Book with AI'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

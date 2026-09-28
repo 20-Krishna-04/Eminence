@@ -131,7 +131,7 @@ Eminence/
 
 ---
 
-## 🚀 Getting Started & Local Setup
+## 🚀 Setup & Quick Start
 
 ### Prerequisites
 - **Node.js**: v18.0.0 or higher

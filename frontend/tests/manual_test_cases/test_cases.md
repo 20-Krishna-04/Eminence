@@ -210,9 +210,9 @@
 ### TC-042 — ESG Carbon Calculation
 | Field | Details |
 |-------|---------|
-| **Steps** | 1. Create a booking with `tempoType: 'large'` and `totalDistance: 10` (if applicable) |
-| **Expected Result** | ✅ `booking.esgEmissions` is populated with a non-zero float value. |
-| **Status** | `[ ] Pass` `[ ] Fail` |
+| **Steps** | 1. Create a booking with `tempoType: 'large'` and `totalDistance: 10` via UI (Booking Wizard Step 2) or via `POST /api/bookings` |
+| **Expected Result** | ✅ `booking.esgEmissions` displays `3.50 kg CO2` preview badge in UI and is persisted as float value `3.5` in the DB. |
+| **Status** | `[x] Pass` `[ ] Fail` |
 
 ### TC-043 — AI Voice Booking (NLP Endpoint)
 | Field | Details |

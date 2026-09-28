@@ -9,21 +9,34 @@ import { io } from 'socket.io-client';
 
 const Tracking = () => {
   const { bookingId } = useParams();
-  const [status, setStatus] = useState('driver_assigned'); // searching, driver_assigned, arrived, in_transit, completed
+  const [booking, setBooking] = useState(null);
+  const [status, setStatus] = useState('searching'); // searching, driver_assigned, arrived, in_transit, completed
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [copiedPod, setCopiedPod] = useState(false);
-  const podHash = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+  const fallbackPodHash = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
   
   // Pune coordinates for mock
   const punePosition = [18.5204, 73.8567];
 
   useEffect(() => {
+    let isMounted = true;
     const loadBooking = async () => {
       try {
+        setLoading(true);
         const response = await api.get(`/api/bookings/${bookingId}`);
-        setStatus(response.data.status);
-      } catch {
-        console.error('Unable to load booking status.');
+        const data = response.data?.booking || response.data;
+        if (isMounted && data) {
+          setBooking(data);
+          if (data.status) setStatus(data.status);
+          if (data.status === 'completed') setIsReviewModalOpen(true);
+        }
+      } catch (err) {
+        console.error('Unable to load booking status:', err);
+        if (isMounted) setError('Unable to load real-time booking details.');
+      } finally {
+        if (isMounted) setLoading(false);
       }
     };
 
@@ -31,19 +44,22 @@ const Tracking = () => {
       loadBooking();
     }
 
-    const socket = io(api.defaults.baseURL || 'http://localhost:5000');
+    const socketUrl = import.meta.env.VITE_API_URL || api.defaults.baseURL || 'http://localhost:5000';
+    const socket = io(socketUrl);
     socket.emit('join_booking', { bookingId });
 
-    socket.on('booking_status_updated', ({ bookingId: id, status }) => {
+    socket.on('booking_status_updated', ({ bookingId: id, status: newStatus }) => {
       if (id === bookingId) {
-        setStatus(status);
-        if (status === 'completed') {
+        setStatus(newStatus);
+        setBooking(prev => prev ? { ...prev, status: newStatus } : prev);
+        if (newStatus === 'completed') {
           setIsReviewModalOpen(true);
         }
       }
     });
 
     return () => {
+      isMounted = false;
       socket.off('booking_status_updated');
       socket.disconnect();
     };
@@ -119,7 +135,9 @@ const Tracking = () => {
               </p>
               <p className="text-xs text-loft-300">Share this with the driver</p>
             </div>
-            <div className="text-3xl font-mono font-bold tracking-widest text-loft-50">8492</div>
+            <div className="text-3xl font-mono font-bold tracking-widest text-loft-50">
+              {booking?.otp || '8492'}
+            </div>
           </div>
         )}
 
@@ -140,11 +158,11 @@ const Tracking = () => {
             </p>
             <div className="bg-loft-950/80 p-3 rounded-lg border border-loft-800 flex items-center justify-between">
               <span className="font-mono text-xs text-moss-300 break-all select-all">
-                {podHash}
+                {booking?.podHash || fallbackPodHash}
               </span>
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText(podHash);
+                  navigator.clipboard.writeText(booking?.podHash || fallbackPodHash);
                   setCopiedPod(true);
                   setTimeout(() => setCopiedPod(false), 2000);
                 }}
@@ -164,24 +182,26 @@ const Tracking = () => {
               👤
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-bold text-loft-50">Ramesh Kumar</h3>
+              <h3 className="text-lg font-bold text-loft-50">
+                {booking?.driver?.name || 'Ramesh Kumar'}
+              </h3>
               <div className="flex items-center gap-2 text-sm text-loft-300">
-                <span>⭐ 4.8</span>
+                <span>⭐ {booking?.driver?.rating || '4.8'}</span>
                 <span>&bull;</span>
-                <span>Tata Ace (Medium)</span>
+                <span className="capitalize">{booking?.vehicle?.type ? `${booking.vehicle.type} tempo` : 'Tata Ace (Medium)'}</span>
               </div>
             </div>
           </div>
           
           <div className="flex items-center justify-between">
             <div className="bg-loft-800 px-3 py-1 rounded text-lg font-mono font-bold text-loft-50 border border-loft-700">
-              MH 12 AB 1234
+              {booking?.vehicle?.registrationNumber || booking?.driver?.licenseNumber || 'MH 12 AB 1234'}
             </div>
             <div className="flex gap-2">
               <button className="w-10 h-10 rounded-full bg-copper-500/10 border border-copper-500/20 text-copper-500 flex items-center justify-center hover:bg-copper-500/20 transition-colors">
                 <MessageSquare className="w-5 h-5" />
               </button>
-              <a href="tel:+919876543210" className="w-10 h-10 rounded-full bg-moss-500 text-white flex items-center justify-center shadow-lg shadow-moss-500/20 hover:bg-moss-400 transition-colors">
+              <a href={`tel:${booking?.driver?.phone || '+919876543210'}`} className="w-10 h-10 rounded-full bg-moss-500 text-white flex items-center justify-center shadow-lg shadow-moss-500/20 hover:bg-moss-400 transition-colors">
                 <Phone className="w-5 h-5" />
               </a>
             </div>
@@ -198,13 +218,13 @@ const Tracking = () => {
             <div className="relative">
               <div className="absolute -left-[29px] top-0.5 w-4 h-4 rounded-full bg-moss-500 border-4 border-loft-900"></div>
               <p className="text-sm font-bold text-loft-200">Pickup</p>
-              <p className="text-sm text-loft-400">123 Market Street, Viman Nagar, Pune</p>
+              <p className="text-sm text-loft-400">{booking?.pickupAddress || '123 Market Street, Viman Nagar, Pune'}</p>
             </div>
             
             <div className="relative">
               <div className="absolute -left-[29px] top-0.5 w-4 h-4 rounded-full bg-copper-500 border-4 border-loft-900"></div>
               <p className="text-sm font-bold text-loft-200">Drop</p>
-              <p className="text-sm text-loft-400">456 Industrial Area, Hinjewadi Phase 1, Pune</p>
+              <p className="text-sm text-loft-400">{booking?.dropAddress || '456 Industrial Area, Hinjewadi Phase 1, Pune'}</p>
             </div>
           </div>
         </div>
@@ -223,8 +243,8 @@ const Tracking = () => {
         isOpen={isReviewModalOpen} 
         onClose={() => setIsReviewModalOpen(false)} 
         bookingId={bookingId} 
-        driverId="d1234567-89ab-cdef-0123-456789abcdef" 
-        driverName="Ramesh Kumar" 
+        driverId={booking?.driverId || "d1234567-89ab-cdef-0123-456789abcdef"} 
+        driverName={booking?.driver?.name || "Ramesh Kumar"} 
       />
     </div>
   );

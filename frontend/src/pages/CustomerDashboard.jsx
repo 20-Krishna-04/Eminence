@@ -1,11 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
-import { Package, CheckCircle, Wallet, MapPin, Plus, Gift, Copy, Crown, Target, Star, Leaf, Truck, Bell, Check } from 'lucide-react';
+import { useSelector, useDispatch } from 'react-redux';
+import { 
+  Package, CheckCircle, Wallet, MapPin, Plus, Gift, Copy, 
+  Crown, Target, Star, Leaf, Truck, Bell, Check, AlertCircle, RefreshCw 
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { updateProfileSuccess } from '../redux/slices/authSlice';
-import { useDispatch } from 'react-redux';
 import ReviewModal from '../components/Customer/ReviewModal';
+import { addressSchema, profileSchema } from '../utils/formSchemas';
+
 const CustomerDashboard = () => {
   const { user, token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -29,11 +33,29 @@ const CustomerDashboard = () => {
   const [reviewTrip, setReviewTrip] = useState(null);
   const [reviewedBookings, setReviewedBookings] = useState({});
   
-  // Addresses State
-  const [addresses, setAddresses] = useState([]);
+  // Addresses State with explicit request tracking
+  const [addressState, setAddressState] = useState({
+    loading: false,
+    error: null,
+    data: []
+  });
+  const [addressFormError, setAddressFormError] = useState('');
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
   const [newAddress, setNewAddress] = useState({ label: '', street: '', city: '', postalCode: '' });
 
-  // Profile State
+  // Wallet State with explicit request tracking
+  const [walletState, setWalletState] = useState({
+    loading: false,
+    error: null,
+    data: null
+  });
+
+  // Profile State with explicit request tracking
+  const [profileState, setProfileState] = useState({
+    loading: false,
+    error: null,
+    success: false
+  });
   const [profileForm, setProfileForm] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -93,53 +115,90 @@ const CustomerDashboard = () => {
   }, [activeTab, token]);
 
   const fetchAddresses = async () => {
+    setAddressState(prev => ({ ...prev, loading: true, error: null }));
     try {
       const res = await api.get('/api/address');
-      setAddresses(res.data);
+      setAddressState({ loading: false, error: null, data: Array.isArray(res.data) ? res.data : [] });
     } catch (error) {
       console.error('Error fetching addresses:', error);
+      setAddressState({ 
+        loading: false, 
+        error: error.response?.data?.message || 'Unable to load addresses. Please check your connection.', 
+        data: [] 
+      });
     }
   };
 
   const handleSaveAddress = async () => {
+    setAddressFormError('');
+    const validation = addressSchema.safeParse(newAddress);
+    if (!validation.success) {
+      setAddressFormError(validation.error.issues[0]?.message || 'Please verify address fields');
+      return;
+    }
+    setIsSavingAddress(true);
     try {
       const res = await api.post('/api/address', newAddress);
-      setAddresses((prevAddresses) => [...prevAddresses, res.data]);
+      setAddressState(prev => ({ ...prev, data: [...prev.data, res.data] }));
       setIsAddAddressOpen(false);
       setNewAddress({ label: '', street: '', city: '', postalCode: '' });
     } catch (error) {
       console.error('Error saving address:', error);
+      setAddressFormError(error.response?.data?.message || 'Failed to save address.');
+    } finally {
+      setIsSavingAddress(false);
     }
   };
 
   const handleDeleteAddress = async (id) => {
     try {
       await api.delete(`/api/address/${id}`);
-      setAddresses((prevAddresses) => prevAddresses.filter(addr => addr.id !== id));
+      setAddressState(prev => ({ ...prev, data: prev.data.filter(addr => addr.id !== id) }));
     } catch (error) {
       console.error('Error deleting address:', error);
+      alert('Unable to delete address.');
     }
   };
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
+    setProfileState({ loading: true, error: null, success: false });
+    const validation = profileSchema.safeParse(profileForm);
+    if (!validation.success) {
+      setProfileState({ 
+        loading: false, 
+        error: validation.error.issues[0]?.message || 'Please check profile fields', 
+        success: false 
+      });
+      return;
+    }
     try {
       const res = await api.post('/api/auth/complete-profile', profileForm);
       dispatch(updateProfileSuccess(res.data.user));
-      alert('Profile updated successfully!');
-      // In a real app we'd dispatch(loginSuccess(res.data)) to update Redux state
+      setProfileState({ loading: false, error: null, success: true });
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert(error.response?.data?.message || 'Error updating profile');
+      setProfileState({ 
+        loading: false, 
+        error: error.response?.data?.message || 'Error updating profile', 
+        success: false 
+      });
     }
   };
 
   const fetchWallet = async () => {
+    setWalletState(prev => ({ ...prev, loading: true, error: null }));
     try {
       const res = await api.get('/api/wallet');
       setWalletData(res.data);
+      setWalletState({ loading: false, error: null, data: res.data });
     } catch (error) {
       console.error('Error fetching wallet:', error);
+      setWalletState({ 
+        loading: false, 
+        error: error.response?.data?.message || 'Unable to load wallet information.', 
+        data: null 
+      });
     }
   };
 

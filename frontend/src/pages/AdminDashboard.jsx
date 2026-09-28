@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 
-import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { 
   BarChart3, Users, Truck, FileText, Settings, 
@@ -19,7 +18,7 @@ import SettingsTab from '../components/admin/SettingsTab';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const { user } = useSelector((state) => state.auth);
+  const { token } = useSelector((state) => state.auth);
 
   return (
     <div className="w-full pt-12 pb-24 relative min-h-screen bg-loft-950">

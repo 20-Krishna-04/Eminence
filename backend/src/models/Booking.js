@@ -23,7 +23,7 @@ const Booking = sequelize.define('Booking', {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: true,
     validate: {
-      min: { args: [0], msg: 'Distance cannot be negative' }
+      min: { args: [0.1], msg: 'Distance must be at least 0.1 km' }
     }
   },
   isRoundTrip: {

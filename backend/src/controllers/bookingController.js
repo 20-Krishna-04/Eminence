@@ -87,8 +87,8 @@ const createBooking = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Valid estimated fare greater than zero is required' });
     }
 
-    if (bookingData.totalDistance !== undefined && parseFloat(bookingData.totalDistance) < 0) {
-      return res.status(400).json({ success: false, message: 'Distance cannot be negative' });
+    if (bookingData.totalDistance !== undefined && parseFloat(bookingData.totalDistance) < 0.1) {
+      return res.status(400).json({ success: false, message: 'Distance must be at least 0.1 km' });
     }
 
     const cargoWeight = parseInt(bookingData.weight, 10);
@@ -258,6 +258,37 @@ const updateBookingStatus = async (req, res) => {
   }
 };
 
+// Get single booking by ID
+const getBookingById = async (req, res) => {
+  try {
+    const booking = await Booking.findByPk(req.params.id, {
+      include: [
+        { model: Customer, as: 'customer', attributes: ['id', 'name', 'phone'] },
+        { model: Driver, as: 'driver', attributes: ['id', 'name', 'phone', 'licenseNumber', 'rating'] },
+        { model: Vehicle, as: 'vehicle', attributes: ['id', 'registrationNumber', 'type', 'model'] }
+      ]
+    });
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: 'Booking not found' });
+    }
+
+    if (req.user) {
+      if (req.user.role === 'customer' && booking.customerId !== req.user.id) {
+        return res.status(403).json({ success: false, message: 'Not authorized to view this booking' });
+      }
+      if (req.user.role === 'driver' && booking.driverId && booking.driverId !== req.user.id) {
+        return res.status(403).json({ success: false, message: 'Not authorized to view this booking' });
+      }
+    }
+
+    res.status(200).json({ success: true, booking });
+  } catch (error) {
+    console.error('Error fetching booking by ID:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 // AI Voice Agent Simulation (NLP Endpoint)
 const aiVoiceBooking = async (req, res) => {
   try {
@@ -266,7 +297,7 @@ const aiVoiceBooking = async (req, res) => {
     // Simulate NLP Parsing of Transcript
     console.log(`[AI Agent] Received Voice Transcript: "${transcript}"`);
     
-    // Naive NLP entity extraction for demo purposes
+    // NLP entity extraction
     let tempoType = 'small';
     if (transcript && typeof transcript === 'string') {
       if (transcript.toLowerCase().includes('large')) tempoType = 'large';
@@ -278,15 +309,21 @@ const aiVoiceBooking = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Authentication required: customerId must be provided' });
     }
 
+    const distance = 15.0;
+    const emissionRate = tempoType === 'large' ? 350 : (tempoType === 'medium' ? 200 : 120);
+    const esgEmissions = parseFloat(((distance * emissionRate) / 1000).toFixed(2));
+
     const mockExtractedData = {
       customerId,
-      pickupAddress: 'Eminence Hub, Pune', // Mock extracted
+      pickupAddress: 'Eminence Hub, Pune',
       dropAddress: 'Destination (Extracted from Voice)',
       date: new Date().toISOString().split('T')[0],
       time: '10:00:00',
       goodsType: 'Voice Booking Cargo',
       weight: 100,
       tempoType,
+      totalDistance: distance,
+      esgEmissions,
       estimatedFare: tempoType === 'large' ? 1200 : 500,
       paymentMethod: 'cash',
       status: 'pending'
@@ -307,6 +344,7 @@ const aiVoiceBooking = async (req, res) => {
 
 module.exports = {
   getAllBookings,
+  getBookingById,
   createBooking,
   completeBooking,
   updateBookingStatus,
