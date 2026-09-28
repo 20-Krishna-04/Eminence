@@ -64,3 +64,36 @@ This document outlines advanced, edge-case, and security-focused testing scenari
 3. Forcefully sever TCP connection without clean disconnect.
 4. Reconnect immediately with same Driver ID.
 **Expected Result:** System cleans up old socket session and accepts the new one without duplicating the driver icon on tracking map.
+
+## 4. Complex Database Transactions & Concurrency
+
+### TC-BE-008: Wallet Race Condition (Double Spend)
+**Objective:** Verify that concurrent requests to deduct balance from the wallet do not result in a negative balance or double spending.
+**Steps:**
+1. Setup customer wallet with $50.
+2. Send two concurrent API requests simulating payments of $40 each via `/api/wallet/deduct`.
+3. Check wallet balance and transaction logs.
+**Expected Result:** The first request succeeds, deducting $40. The second request fails with "Insufficient Funds" (HTTP 400). Wallet balance is $10. No negative balance allowed.
+
+### TC-BE-009: Cascading Deletions and Orphans
+**Objective:** Verify that when a B2B corporate account is deleted, all associated contracts, invoices, and sub-accounts are correctly managed or cascade deleted.
+**Steps:**
+1. Create a B2B Account with 3 contracts and 5 invoices.
+2. Send `DELETE /api/b2b/account/:id`.
+3. Query database for the contracts and invoices.
+**Expected Result:** Contracts are deleted or marked inactive. Invoices remain for compliance but their `accountId` is set to null (or retained strictly as orphaned historical records according to data retention policy).
+
+## 5. Security Edge Cases
+
+### TC-BE-010: JWT Token Expiration and Rotation
+**Objective:** Ensure that expired tokens are strictly rejected and cannot be refreshed arbitrarily without a valid refresh mechanism.
+**Steps:**
+1. Generate an Access Token manually with an expiration of -1 minute (`expiresIn: -60s`).
+2. Attempt to call an authenticated route (e.g., `/api/auth/profile`).
+**Expected Result:** HTTP 401 Unauthorized. Server logs show `TokenExpiredError`.
+
+### TC-BE-011: SQL Injection via Order/Sort Parameters
+**Objective:** Ensure that dynamic `orderBy` or `sortBy` parameters in listing APIs do not execute injected SQL.
+**Steps:**
+1. Call `/api/admin/drivers?sortBy=id; DROP TABLE drivers;--`
+**Expected Result:** Validation middleware rejects the request with HTTP 400, or ORM automatically escapes the payload resulting in a harmless query. Table is completely safe.

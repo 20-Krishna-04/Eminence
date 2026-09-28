@@ -54,6 +54,40 @@ This document outlines advanced UI/UX, state management, and API integration tes
 ### TC-FE-006: Responsive Grid Degradation
 **Objective:** Verify multi-column tracking dashboards on tablets/smaller web screens.
 **Steps:**
-1. Resize window to 768px (iPad portrait).
+5. Resize window to 768px (iPad portrait).
 2. View `Tracking.jsx`.
 **Expected Result:** ESG badges, Telematics Dials, and the Map collapse from side-by-side flexbox layout to a single column vertical stack seamlessly.
+
+## 4. State Hydration and Persistence
+
+### TC-FE-007: Redux/Context Persistence on Reload
+**Objective:** Verify that critical state like Auth token and user role persists correctly after a hard page refresh.
+**Steps:**
+1. Login as Admin.
+2. Navigate to Admin Dashboard.
+3. Hard refresh the page (`Ctrl+F5` or `Cmd+Shift+R`).
+**Expected Result:** User remains logged in. Role remains "admin". UI does not flicker to the login screen or customer dashboard.
+
+### TC-FE-008: Stale State Invalidation
+**Objective:** Verify that old user data is completely cleared when switching accounts.
+**Steps:**
+1. Login as User A and view profile/wallet data.
+2. Logout.
+3. Login as User B.
+**Expected Result:** Profile and wallet data immediately reflect User B's state without displaying User A's cached data for a few seconds.
+
+## 5. Web Accessibility (a11y)
+
+### TC-FE-009: Keyboard Navigation via Tab Index
+**Objective:** Ensure a user can fully book a ride using only the keyboard.
+**Steps:**
+1. Navigate to the Booking page.
+2. Use `Tab` to navigate through input fields, select menus, and the "Proceed" button.
+**Expected Result:** Every interactive element has a visible focus state. Dropdowns can be interacted with using `Enter` or `Space`, and form submits properly on `Enter`.
+
+### TC-FE-010: Screen Reader Compatibility
+**Objective:** Verify that critical notifications and dynamic updates are read by screen readers.
+**Steps:**
+1. Enable VoiceOver (Mac) or NVDA (Windows).
+2. Complete a booking flow until the "Booking Successful" toast appears.
+**Expected Result:** The screen reader announces the success toast immediately via `aria-live="polite"` or `aria-live="assertive"` tags.

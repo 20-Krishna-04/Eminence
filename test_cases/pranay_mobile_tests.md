@@ -47,3 +47,20 @@ This document covers advanced test cases for the Eminence React Native (Expo) Mo
 1. Connect to WebSocket as driver.
 2. Inject a mock telemetry packet with `temperature: 110` (Celsius).
 **Expected Result:** A high-priority red alert overlay appears on the driver's screen warning of "Coolant Overheating Risk", with a distinct haptic vibration.
+
+## 4. Push Notifications & OS Integration
+
+### TC-MO-006: Background Push Notification Deep Linking
+**Objective:** Verify that tapping a push notification routes the driver to the correct screen.
+**Steps:**
+1. Put app in background.
+2. Dispatch a push notification: "New Ride Request: Andheri to Bandra".
+3. Tap the notification from the OS notification center.
+**Expected Result:** The app opens directly to the "Active Trip / Accept" screen with the specific booking details loaded, rather than just the home screen.
+
+### TC-MO-007: Device Wake Lock Management
+**Objective:** Verify that the screen stays awake while the driver is actively navigating an ongoing trip.
+**Steps:**
+1. Start an active trip in the app.
+2. Leave the device untouched for 5 minutes.
+**Expected Result:** Screen does not turn off or dim. `expo-keep-awake` correctly maintains the wake lock during the trip, but releases it when the trip finishes.
