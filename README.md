@@ -8,7 +8,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-NeonDB-4169E1?logo=postgresql&logoColor=white)](https://neon.tech/)
 [![Socket.io](https://img.shields.io/badge/Socket.io-v4-010101?logo=socketdotio&logoColor=white)](https://socket.io/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Setup Guide](https://img.shields.io/badge/Setup-Guide-green.svg)](SETUP.md)
 
 ---
 
@@ -24,14 +24,10 @@
   - [6. Security & Data Protection](#6-security--data-protection)
 - [Tech Stack](#tech-stack)
 - [Architecture & Monorepo Layout](#architecture--monorepo-layout)
-- [Getting Started & Local Setup](#getting-started--local-setup)
-  - [Prerequisites](#prerequisites)
-  - [1. Backend Setup](#1-backend-setup)
-  - [2. Frontend Web Setup](#2-frontend-web-setup)
-  - [3. Mobile App Setup](#3-mobile-app-setup)
+- [Setup & Quick Start](#setup--quick-start)
 - [Running Automated Tests](#running-automated-tests)
 - [Security & Responsible Disclosure](#security--responsible-disclosure)
-- [Contributing](#contributing)
+- [Detailed Setup Guide](#detailed-setup-guide)
 - [License](#license)
 
 ---
@@ -128,7 +124,7 @@ Eminence/
 │   │   └── services/         # SQLite offline sync, push notifications, GPS telemetry
 │   └── tests/                # 31-case automated mobile QA integration test suite
 ├── run_all_tests.js          # Unified pre-commit test runner (Scorecard)
-├── CONTRIBUTING.md           # Contributor onboarding & PR standards
+├── SETUP.md                  # Complete setup & installation guide
 ├── SECURITY.md               # Security policy & defense architecture
 └── README.md                 # Project documentation
 ```
@@ -239,9 +235,9 @@ Security is fundamental to Eminence. Please report any potential vulnerabilities
 
 ---
 
-## 🤝 Contributing
+## 📖 Detailed Setup Guide
 
-We welcome contributions from the community! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on code style, branch naming conventions, and the pull request submission process.
+For comprehensive installation instructions, zero-config SQLite mode, production PostgreSQL/NeonDB setup, default demo credentials, and troubleshooting FAQs, please refer to our complete **[SETUP.md](SETUP.md)**.
 
 ---
 
