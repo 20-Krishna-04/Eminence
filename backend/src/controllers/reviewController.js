@@ -16,7 +16,15 @@ const createReview = async (req, res) => {
     if (bookingId) {
       try {
         const b = await Booking.findByPk(bookingId);
-        if (b) validBookingId = b.id;
+        if (b) {
+          if (customerId && b.customerId && b.customerId !== customerId) {
+            return res.status(403).json({ success: false, message: 'You can only review bookings that belong to you' });
+          }
+          if (b.status !== 'completed') {
+            return res.status(400).json({ success: false, message: 'Reviews can only be submitted for completed trips' });
+          }
+          validBookingId = b.id;
+        }
       } catch {
         validBookingId = null;
       }

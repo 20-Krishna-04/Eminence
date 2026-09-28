@@ -76,6 +76,28 @@ const createBooking = async (req, res) => {
       bookingData.dropAddress = req.body.drops[0];
     }
 
+    // Bounds & Financial Validation (Issue #172)
+    if (!bookingData.estimatedFare || parseFloat(bookingData.estimatedFare) <= 0) {
+      return res.status(400).json({ success: false, message: 'Valid estimated fare greater than zero is required' });
+    }
+
+    if (bookingData.totalDistance !== undefined && parseFloat(bookingData.totalDistance) < 0) {
+      return res.status(400).json({ success: false, message: 'Distance cannot be negative' });
+    }
+
+    const cargoWeight = parseInt(bookingData.weight, 10);
+    if (isNaN(cargoWeight) || cargoWeight <= 0) {
+      return res.status(400).json({ success: false, message: 'Valid cargo weight greater than zero is required' });
+    }
+
+    const maxCapacities = { small: 750, medium: 1500, large: 5000 };
+    if (bookingData.tempoType && maxCapacities[bookingData.tempoType] && cargoWeight > maxCapacities[bookingData.tempoType]) {
+      return res.status(400).json({
+        success: false,
+        message: `Cargo weight (${cargoWeight}kg) exceeds maximum capacity for ${bookingData.tempoType} vehicle (${maxCapacities[bookingData.tempoType]}kg)`
+      });
+    }
+
     const customer = await Customer.findByPk(customerId);
     if (!customer) {
       return res.status(404).json({ success: false, message: 'Customer not found' });
@@ -83,8 +105,22 @@ const createBooking = async (req, res) => {
 
     if (customer.isBusiness) {
       bookingData.isB2B = true;
+
+      // Deduct negotiated B2B contract discount if active contract exists
+      const { B2BContract } = require('../models');
+      const activeContract = await B2BContract.findOne({
+        where: { customerId: customer.id, status: 'active' },
+        order: [['createdAt', 'DESC']]
+      });
+
+      if (activeContract && activeContract.discountPercentage > 0) {
+        const discountRate = parseFloat(activeContract.discountPercentage) / 100;
+        const discountAmount = parseFloat(bookingData.estimatedFare) * discountRate;
+        bookingData.estimatedFare = parseFloat((parseFloat(bookingData.estimatedFare) - discountAmount).toFixed(2));
+      }
+
       // GST Calculation (Assuming 18% for B2B)
-      bookingData.gstAmount = bookingData.estimatedFare * 0.18;
+      bookingData.gstAmount = parseFloat((bookingData.estimatedFare * 0.18).toFixed(2));
     }
 
     if (bookingData.paymentMethod === 'postpaid') {

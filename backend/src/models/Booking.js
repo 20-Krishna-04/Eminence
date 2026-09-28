@@ -22,6 +22,9 @@ const Booking = sequelize.define('Booking', {
   totalDistance: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: true,
+    validate: {
+      min: { args: [0], msg: 'Distance cannot be negative' }
+    }
   },
   isRoundTrip: {
     type: DataTypes.BOOLEAN,
@@ -62,6 +65,10 @@ const Booking = sequelize.define('Booking', {
   weight: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    validate: {
+      min: { args: [1], msg: 'Weight must be at least 1 kg' },
+      max: { args: [25000], msg: 'Weight cannot exceed 25,000 kg' }
+    }
   },
   tempoType: {
     type: DataTypes.ENUM('small', 'medium', 'large'),
@@ -70,6 +77,9 @@ const Booking = sequelize.define('Booking', {
   estimatedFare: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
+    validate: {
+      min: { args: [0.01], msg: 'Estimated fare must be greater than zero' }
+    }
   },
   status: {
     type: DataTypes.ENUM('pending', 'driver_assigned', 'arrived', 'in_transit', 'completed', 'cancelled'),

@@ -10,6 +10,7 @@ const Wallet = sequelize.define('Wallet', {
   customerId: {
     type: DataTypes.UUID,
     allowNull: false,
+    unique: true,
   },
   balance: {
     type: DataTypes.DECIMAL(12, 2),

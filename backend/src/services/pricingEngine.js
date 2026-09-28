@@ -32,6 +32,21 @@ const calculateSurgeMultiplier = () => {
   return Math.min(Number(multiplier.toFixed(2)), 2.5);
 };
 
+/**
+ * Calculates fare with corporate contract volume discounts and surge waiving.
+ */
+const calculateCorporateFare = (baseFare, contract) => {
+  let fare = parseFloat(baseFare) || 0;
+  if (!contract || contract.status !== 'active') return fare;
+
+  if (contract.discountPercentage && contract.discountPercentage > 0) {
+    const discountRate = parseFloat(contract.discountPercentage) / 100;
+    fare -= fare * discountRate;
+  }
+  return parseFloat(fare.toFixed(2));
+};
+
 module.exports = {
-  calculateSurgeMultiplier
+  calculateSurgeMultiplier,
+  calculateCorporateFare
 };
