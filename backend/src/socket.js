@@ -24,9 +24,14 @@ const initSocket = (httpServer) => {
       const sanitizedUrl = dbUrl.replace(/([?&])channel_binding=[^&]*(&|$)/, '$1').replace(/[?&]$/, '');
       const isLocalhost = sanitizedUrl.includes('localhost') || sanitizedUrl.includes('127.0.0.1');
       
+      const sslConfig = !isLocalhost ? {
+        rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED === 'false' ? false : true,
+        ...(process.env.DB_CA_CERT ? { ca: process.env.DB_CA_CERT } : {})
+      } : false;
+
       pool = new Pool({
         connectionString: sanitizedUrl,
-        ssl: !isLocalhost ? { rejectUnauthorized: false } : false
+        ssl: sslConfig
       });
 
       pool.query(`
