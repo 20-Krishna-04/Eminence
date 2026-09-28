@@ -1,11 +1,2 @@
-export const setToken = (token) => {
-  localStorage.setItem('token', token);
-};
-
-export const getToken = () => {
-  return localStorage.getItem('token');
-};
-
-export const removeToken = () => {
-  localStorage.removeItem('token');
-};
+// Token handling is now done securely via HttpOnly cookies by the backend.
+// This file is kept empty to avoid import errors if there are any lingering imports.

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getToken } from '../services/tokenService';
+
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import api from '../services/api';
@@ -44,7 +44,6 @@ const CustomRouteTooltip = ({ active, payload }) => {
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const { user } = useSelector((state) => state.auth);
-  const token = user?.token || getToken();
 
   // Overview stats & list state
   const [stats, setStats] = useState({
@@ -146,7 +145,7 @@ const AdminDashboard = () => {
     }
 
     const socket = io(API_BASE_URL, {
-      auth: { token }
+      withCredentials: true
     });
     socketRef.current = socket;
 
@@ -192,7 +191,6 @@ const AdminDashboard = () => {
     if (activeTab !== 'telematics') return;
     
     const telemetrySocket = io(API_BASE_URL.replace('/api', ''), {
-      auth: { token },
       withCredentials: true,
     });
     
@@ -211,7 +209,7 @@ const AdminDashboard = () => {
       telemetrySocket.emit('leave_admin_telemetry');
       telemetrySocket.disconnect();
     };
-  }, [activeTab, token]);
+  }, [activeTab]);
 
   const selectChatRoom = (chat) => {
     const prevId = selectedChat?.customerId;
