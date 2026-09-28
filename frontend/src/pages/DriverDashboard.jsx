@@ -37,11 +37,9 @@ const DriverDashboard = () => {
   }, [isNavigating]);
 
   useEffect(() => {
-    const newSocket = io(api.defaults.baseURL.replace('/api', ''), {
-      auth: { token }, // Pass JWT so server can verify identity in production
+    const newSocket = io(api.defaults.baseURL?.replace('/api', '') || 'http://localhost:5000', {
       withCredentials: true,
     });
-    setSocket(newSocket);
     socketRef.current = newSocket;
     const isValidRideRequest = (data) => {
       return (
@@ -76,7 +74,7 @@ const DriverDashboard = () => {
       newSocket.disconnect();
       socketRef.current = null;
     };
-  }, [token]);
+  }, []);
 
   // Watch real GPS position
   useEffect(() => {
