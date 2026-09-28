@@ -195,7 +195,7 @@ npm install
 1. Ensure your mobile device and development computer are connected to the **same local Wi-Fi network**.
 2. Start the Expo bundler:
    ```bash
-   npm start
+   npx expo start
    ```
 3. Open the **Expo Go** app on your phone:
    - **Android**: Tap "Scan QR code" and point your camera at the terminal.

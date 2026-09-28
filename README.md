@@ -190,7 +190,7 @@ cd mobile
 npm install
 
 # Start the Expo development bundler
-npm start
+npx expo start
 ```
 - Press `w` to open in your desktop browser.
 - Scan the terminal QR code using **Expo Go** on Android or iOS.
