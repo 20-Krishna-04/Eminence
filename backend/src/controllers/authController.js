@@ -686,6 +686,111 @@ const acceptTerms = async (req, res) => {
   }
 };
 
+// --- DPDP / GDPR DATA COMPLIANCE ---
+
+// Export all personal data associated with the authenticated user
+const exportUserData = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const { Booking, AddressBook, Wallet, Review } = require('../models');
+
+    let profile = null;
+    if (req.user.role === 'driver') {
+      profile = await Driver.findByPk(userId);
+    } else {
+      profile = await Customer.findByPk(userId);
+    }
+
+    if (!profile) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const [bookings, addresses, wallet, reviews, consents] = await Promise.all([
+      Booking.findAll({ where: { [req.user.role === 'driver' ? 'driverId' : 'customerId']: userId } }),
+      AddressBook ? AddressBook.findAll({ where: { customerId: userId } }) : [],
+      Wallet ? Wallet.findOne({ where: { customerId: userId } }) : null,
+      Review ? Review.findAll({ where: { [req.user.role === 'driver' ? 'driverId' : 'customerId']: userId } }) : [],
+      UserConsent.findAll({ where: { userId } })
+    ]);
+
+    const sanitizedProfile = profile.toJSON ? profile.toJSON() : { ...profile };
+    delete sanitizedProfile.password;
+    if (sanitizedProfile.governmentId) {
+      sanitizedProfile.governmentId = maskGovernmentId(sanitizedProfile.governmentId);
+    }
+
+    return res.status(200).json({
+      success: true,
+      exportTimestamp: new Date().toISOString(),
+      compliance: 'DPDP Act 2023 / GDPR Article 20',
+      data: {
+        profile: sanitizedProfile,
+        savedAddresses: addresses,
+        bookings,
+        wallet,
+        reviews,
+        consents
+      }
+    });
+  } catch (error) {
+    console.error('Export User Data Error:', error);
+    return res.status(500).json({ success: false, message: 'Failed to generate data export' });
+  }
+};
+
+// Anonymize and delete user data (DPDP Right to be Forgotten)
+const deleteUserData = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const { AddressBook } = require('../models');
+
+    if (req.user.role === 'driver') {
+      const driver = await Driver.findByPk(userId);
+      if (driver) {
+        driver.name = 'Anonymized Driver';
+        driver.phone = `DELETED_${Date.now()}`;
+        driver.status = 'inactive';
+        await driver.save();
+      }
+    } else {
+      const customer = await Customer.findByPk(userId);
+      if (customer) {
+        customer.name = 'Anonymized Customer';
+        customer.phone = `DELETED_${Date.now()}`;
+        customer.email = `anonymized_${userId}@eminence.local`;
+        customer.governmentId = null;
+        customer.address = null;
+        customer.city = null;
+        customer.state = null;
+        await customer.save();
+
+        if (AddressBook) {
+          await AddressBook.destroy({ where: { customerId: userId } });
+        }
+      }
+    }
+
+    // Clear session cookies
+    res.clearCookie('accessToken');
+
+    return res.status(200).json({
+      success: true,
+      message: 'Account personal data anonymized and erased successfully in compliance with DPDP guidelines'
+    });
+  } catch (error) {
+    console.error('Delete User Data Error:', error);
+    return res.status(500).json({ success: false, message: 'Failed to process account deletion request' });
+  }
+};
+
 module.exports = {
   googleLogin,
   updateProfile,
@@ -694,5 +799,7 @@ module.exports = {
   phoneLogin,
   phoneVerify,
   getTerms,
-  acceptTerms
+  acceptTerms,
+  exportUserData,
+  deleteUserData
 };
