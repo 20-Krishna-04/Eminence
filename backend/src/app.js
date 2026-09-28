@@ -40,6 +40,7 @@ app.use(cors({
 const csrfProtection = require('./middleware/csrfMiddleware');
 app.use(csrfProtection);
 app.use(express.json({
+  limit: '1mb',
   verify: (req, res, buf) => {
     const urlPath = req.originalUrl.split('?')[0];
     if (
@@ -50,7 +51,7 @@ app.use(express.json({
     }
   }
 }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // Basic route
 app.get('/api/health', (_req, res) => {
@@ -63,15 +64,17 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
-// Public white-label config (no auth required)
+// Public white-label config (no auth required, strictly read-only without side-effects)
 app.get('/api/config', async (_req, res) => {
   try {
     const { PlatformConfig } = require('./models');
-    let config = await PlatformConfig.findOne();
-    if (!config) config = await PlatformConfig.create({});
-    res.status(200).json({ success: true, config });
+    const config = await PlatformConfig.findOne();
+    if (config) {
+      return res.status(200).json({ success: true, config });
+    }
+    return res.status(200).json({ success: true, config: { brandName: 'Eminence Logistics', primaryColor: '#b87333' } });
   } catch {
-    res.status(200).json({ success: true, config: { brandName: 'Eminence Logistics', primaryColor: '#b87333' } });
+    return res.status(200).json({ success: true, config: { brandName: 'Eminence Logistics', primaryColor: '#b87333' } });
   }
 });
 

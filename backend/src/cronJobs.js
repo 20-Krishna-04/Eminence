@@ -9,15 +9,14 @@ const scheduleDriverAllocation = () => {
   cron.schedule('* * * * *', async () => {
     try {
       const now = new Date();
-      // Target time is exactly 30 minutes from now (checking between 30 and 31 minutes ahead)
-      const targetTimeStart = new Date(now.getTime() + 30 * 60000);
-      const targetTimeEnd = new Date(now.getTime() + 31 * 60000);
+      // Target time is up to 30 minutes ahead
+      const targetTimeEnd = new Date(now.getTime() + 30 * 60000);
 
       const upcomingBookings = await Booking.findAll({
         where: {
           status: 'pending',
           scheduledAt: {
-            [Op.between]: [targetTimeStart, targetTimeEnd]
+            [Op.lte]: targetTimeEnd
           }
         }
       });

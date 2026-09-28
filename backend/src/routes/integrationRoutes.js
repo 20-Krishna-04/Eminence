@@ -21,13 +21,17 @@ router.get('/invoice/:bookingId', protect, apiLimiter, generateInvoice);
 
 // WhatsApp Webhooks
 router.get('/whatsapp-webhook', (req, res) => {
-  const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || 'eminence_secret_token';
+  const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN;
+  if (!verifyToken && process.env.NODE_ENV === 'production') {
+    return res.status(500).json({ error: 'WHATSAPP_VERIFY_TOKEN required in production' });
+  }
+  const tokenToMatch = verifyToken || 'eminence_secret_token';
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
 
   if (mode && token) {
-    if (mode === 'subscribe' && token === verifyToken) {
+    if (mode === 'subscribe' && token === tokenToMatch) {
       if (typeof challenge !== 'string' || !/^[A-Za-z0-9_-]+$/.test(challenge)) {
         return res.status(400).send('Invalid challenge');
       }
