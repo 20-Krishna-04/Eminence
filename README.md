@@ -7,7 +7,7 @@
 [![React Native](https://img.shields.io/badge/React_Native-Expo_57-000020?logo=expo&logoColor=white)](https://expo.dev/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-NeonDB-4169E1?logo=postgresql&logoColor=white)](https://neon.tech/)
 [![Socket.io](https://img.shields.io/badge/Socket.io-v4-010101?logo=socketdotio&logoColor=white)](https://socket.io/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 [![Setup Guide](https://img.shields.io/badge/Setup-Guide-green.svg)](CONTRIBUTING.md)
 
 ---
@@ -28,7 +28,7 @@
 - [Running Automated Tests](#running-automated-tests)
 - [Security & Responsible Disclosure](#security--responsible-disclosure)
 - [Detailed Setup Guide](#detailed-setup-guide)
-- [License](#license)
+
 
 ---
 
@@ -241,6 +241,4 @@ For comprehensive installation instructions, zero-config SQLite mode, production
 
 ---
 
-## 📄 License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
