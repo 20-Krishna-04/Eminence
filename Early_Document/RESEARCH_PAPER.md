@@ -35,7 +35,7 @@ Eminence processes both Web and IVR bookings through the exact same backend engi
 Unlike standard consumer apps, Eminence is designed with corporate and bulk logistics in mind. It features dedicated endpoints for B2B contracts, CSV bulk booking uploads, and corporate invoicing, catering directly to businesses needing regular tempo transport.
 
 ### 2.4 Multi-Channel, App-less Notifications
-Customers receive real-time updates without needing push notifications. Eminence utilizes Twilio and WhatsApp Business APIs to deliver SMS, WhatsApp, and automated Voice Call confirmations, ensuring delivery regardless of internet connectivity.
+Customers receive real-time updates without needing push notifications. Eminence utilizes Fast2SMS and WhatsApp Business APIs to deliver SMS, WhatsApp, and automated Voice Call confirmations, ensuring delivery regardless of internet connectivity.
 
 ---
 
@@ -48,7 +48,8 @@ The platform is built using a modern, scalable architecture, separating the clie
 - **Backend:** Node.js, Express.js 4.x.
 - **Database:** PostgreSQL (hosted on NeonDB) via Sequelize ORM.
 - **External Integrations:** 
-  - *Twilio:* For IVR, Speech-to-Text, and SMS.
+  - *Fast2SMS:* For SMS confirmations.
+  - *PeerJS/WebRTC:* For the in-app Voice Helpline.
   - *Google Maps API:* For Geocoding, Distance Matrix, and Nearest Driver Allocation.
   - *WhatsApp Business API:* For notifications.
   - *Razorpay:* For payment gateways (Phase 2).
@@ -56,7 +57,7 @@ The platform is built using a modern, scalable architecture, separating the clie
 ### 3.2 Architectural Flow
 The architecture consists of distinct layers:
 1. **User Layer:** Accommodates new web users, repeat phone users, drivers, and admins.
-2. **Interface Layer:** React Website for visual interaction, Twilio IVR for voice interaction.
+2. **Interface Layer:** React Website for visual interaction, WebRTC for peer-to-peer voice interaction.
 3. **Service Layer (Node.js):** Handles authentication, IVR Caller Recognition, Booking Engine, Driver Allocation, and Notifications.
 4. **Data Layer (NeonDB):** A serverless PostgreSQL database ensuring ACID compliance for transactions.
 
@@ -83,7 +84,7 @@ Originally prototyping with MongoDB, the system was strategically migrated to **
 When a booking is initiated (from any channel), the Driver Allocation Service searches the database for all available drivers within a specific radius (e.g., 5km) using their most recently updated coordinates. It then utilizes the Google Maps Distance Matrix API to calculate actual route ETAs and assigns the ride to the nearest driver in under 500ms.
 
 ### 5.2 Interactive Voice Response (IVR) Module
-Powered by Twilio webhooks, the IVR system intercepts incoming calls, passes the caller ID to the Node.js backend to check against the database. If recognized, it uses Twilio's Speech and Keypad Gathering features to guide the user through a frictionless, automated booking flow.
+Powered by WebRTC and PeerJS, the voice helpline system connects the customer directly to the admin dashboard. It provides a frictionless, zero-latency peer-to-peer audio connection over the browser, entirely bypassing legacy telecom networks and costs.
 
 ### 5.3 Notification Pipeline
 Upon successful allocation, a multi-threaded notification pipeline triggers. It sequentially or concurrently dispatches an SMS, a WhatsApp message, and logs the communication in the database for auditing and customer support purposes.
