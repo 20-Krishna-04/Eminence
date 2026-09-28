@@ -17,7 +17,7 @@ const crypto = require('crypto');
 const protect = require('../middleware/authMiddleware');
 
 // Invoices (protected by authentication: requires valid bearer token, cookie, or query token)
-router.get('/invoice/:bookingId', protect, apiLimiter, generateInvoice);
+router.get('/invoice/:bookingId', apiLimiter, protect, generateInvoice);
 
 // WhatsApp Webhooks
 router.get('/whatsapp-webhook', (req, res) => {
