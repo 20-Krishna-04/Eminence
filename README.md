@@ -1,782 +1,250 @@
-# EMINENCE 🚗
+# Eminence 🚚
 
-### Smart Transport Booking & Helpline Management System
+> **Next-Generation Commercial Freight Logistics, Real-Time Fleet Telematics & B2B Transport Platform**
 
-[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
-[![React](https://img.shields.io/badge/React-18%2B-61dafb.svg)](https://react.dev/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-NeonDB-336791.svg)](https://neon.tech/)
-[![Fast2SMS](https://img.shields.io/badge/Fast2SMS-SMS-blue.svg)](https://www.fast2sms.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![React Native](https://img.shields.io/badge/React_Native-Expo_57-000020?logo=expo&logoColor=white)](https://expo.dev/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-NeonDB-4169E1?logo=postgresql&logoColor=white)](https://neon.tech/)
+[![Socket.io](https://img.shields.io/badge/Socket.io-v4-010101?logo=socketdotio&logoColor=white)](https://socket.io/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 ---
 
-## 📋 Table of Contents
+## 📑 Table of Contents
 
 - [Overview](#overview)
-- [Key Features](#key-features)
-- [Architecture](#architecture)
+- [Key Features & Capabilities](#key-features--capabilities)
+  - [1. Customer Booking & Dispatch Experience](#1-customer-booking--dispatch-experience)
+  - [2. Driver Companion & Smart Operations](#2-driver-companion--smart-operations)
+  - [3. Real-Time Telematics & Predictive Maintenance](#3-real-time-telematics--predictive-maintenance)
+  - [4. B2B Enterprise Logistics & Invoicing](#4-b2b-enterprise-logistics--invoicing)
+  - [5. Admin Fleet Management & Operations Intelligence](#5-admin-fleet-management--operations-intelligence)
+  - [6. Security & Data Protection](#6-security--data-protection)
 - [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Running the Application](#running-the-application)
-- [API Documentation](#api-documentation)
-- [Database Schema](#database-schema)
-- [Deployment](#deployment)
-- [Testing](#testing)
+- [Architecture & Monorepo Layout](#architecture--monorepo-layout)
+- [Getting Started & Local Setup](#getting-started--local-setup)
+  - [Prerequisites](#prerequisites)
+  - [1. Backend Setup](#1-backend-setup)
+  - [2. Frontend Web Setup](#2-frontend-web-setup)
+  - [3. Mobile App Setup](#3-mobile-app-setup)
+- [Running Automated Tests](#running-automated-tests)
+- [Security & Responsible Disclosure](#security--responsible-disclosure)
 - [Contributing](#contributing)
-- [Team](#team)
+- [License](#license)
 
 ---
 
 ## 🎯 Overview
 
-**EMINENCE** is an innovative dual-channel transport booking platform designed for tempo and local transport services in Pune. It revolutionizes how customers book rides by offering two seamless channels:
+**Eminence** is an end-to-end commercial freight dispatch, real-time vehicle telematics, and B2B enterprise logistics platform. Built to modernize intra-city freight, tempo transport, and commercial carrier fleets, Eminence bridges customers, drivers, and enterprise fleet dispatchers across web and mobile surfaces.
 
-### **The Problem**
-
-Local transport businesses rely on manual phone bookings with:
-
-- Repeated data entry (customers tell their address every booking)
-- No systematic record keeping
-- Inefficient fleet management
-- Poor customer experience
-
-### **The Solution**
-
-EMINENCE provides:
-
-- 🖥️ **Website Booking** — for new/casual customers
-- ☎️ **Voice IVR Helpline** — for repeat customers (no re-entry of details!)
-- 🚚 **Smart Driver Allocation** — nearest driver in <500ms
-- 📱 **Multi-channel Confirmations** — SMS, WhatsApp, Voice
-
-### **The Magic ✨**
-
-Repeat customers call a helpline number → System recognizes them by phone number → Auto-fetches their saved addresses → They complete booking via voice without repeating any information.
+### Core Value Proposition
+- **Dual-Surface Accessibility**: High-performance React web portal for dispatchers and enterprise customers, paired with a feature-complete React Native (Expo) mobile companion for drivers and field operations.
+- **Dynamic Demand & Surge Engine**: Real-time localized pricing multipliers based on vehicle supply-to-demand density ratios.
+- **IoT Telematics Dials**: Continuous low-latency streaming of vehicle speed, RPM, engine temperature, and fuel levels over authenticated WebSocket channels.
+- **Proof-of-Delivery (PoD) Cryptographic Chain**: Tamper-evident SHA-256 cryptographic hashes generated at cargo drop-off with simulation-ready WMS barcode scanning.
 
 ---
 
-## 🌟 Key Features
+## 🌟 Key Features & Capabilities
 
-### **Core Features (MVP)**
+### 1. Customer Booking & Dispatch Experience
+- **Multi-Stop Trip Builder**: Book pickups with arbitrary intermediate drop destinations, automatic route optimization, and vehicle payload matching (2W, 3W, Pickup, 14ft Commercial Truck).
+- **Live Driver GPS Tracking**: Real-time geospatial tracking powered by Socket.io and OpenStreetMap/Leaflet integration.
+- **ESG Emissions Intelligence**: Dynamic carbon offset and emissions savings computations displayed on ride receipts.
+- **Customer Address Book**: Instant auto-fill for frequent commercial drop locations.
+- **Dual Payment Rails**: Seamless checkout supporting cash-on-delivery and Razorpay payment integration.
 
-- ✅ **Dual-Channel Booking**
-  - React.js website for web bookings
-  - Fast2SMS integration for SMS alerts
-  - Real-time synchronization between channels
+### 2. Driver Companion & Smart Operations
+- **Duty State Toggle**: One-tap transition between active and inactive duty states broadcasting availability to dispatch engines.
+- **AI Demand Surge Heatmaps**: Visual hotspot discovery highlighting zones with surge multipliers and peak booking velocity.
+- **Trip Lifecycle Progression**: Deterministic stage workflow (`Accept` $\to$ `Arrive` $\to$ `In-Transit` $\to$ `Complete`).
+- **Warehouse Barcode Scanner**: In-app camera and simulated WMS barcode verification for cargo verification at pickup and unloading.
+- **Automated Digital Payslips**: Instant dynamic PDF payslip computation detailing base earnings, incentives, and net payouts.
 
-- ✅ **Caller Recognition Engine**
-  - Phone number-based customer identification
-  - Auto-fetch saved addresses and booking history
-  - Zero data re-entry for repeat customers
+### 3. Real-Time Telematics & Predictive Maintenance
+- **Streaming IoT Instrument Dials**: Live WebSocket streaming of operational vehicle telemetry (Speedometer, Tachometer RPM, Coolant Temperature, Fuel Reserve).
+- **Anomaly Detection**: Anomaly heuristics monitoring asset health degradation, alerting operators to overheating risks and mechanical anomalies.
+- **Role-Gated Background GPS**: Native background location tracking exclusively engaged when an authenticated user is on active driver duty, preventing unnecessary battery drain and protecting customer privacy.
 
-- ✅ **Intelligent Driver Allocation**
-  - Real-time nearest-driver matching (Google Maps API)
-  - Concurrent booking handling (no overbooking)
-  - Automatic fare estimation
+### 4. B2B Enterprise Logistics & Invoicing
+- **Corporate Account Onboarding**: Corporate registration pipeline with credit term verification and B2B contract lifecycle tracking.
+- **Automated Invoicing & Tax Computation**: Dynamic PDF invoice generation with automated GST breakdown and corporate cost-center assignments.
+- **Manager Expense Approvals**: Tiered approval flows for corporate ride requests exceeding departmental budget limits.
 
-- ✅ **Multi-Channel Confirmations**
-  - SMS confirmations (Fast2SMS)
-  - WhatsApp notifications
-  - Voice call confirmations
-  - Real-time booking status updates
+### 5. Admin Fleet Management & Operations Intelligence
+- **Modular Command Dashboard**: Dedicated management tabs for Drivers, Commercial Assets, Users, Corporate Contracts, Real-Time Telematics, Support Inbox, and System Audit Logs.
+- **Operational SLA & Health Dials**: Continuous infrastructure monitoring reporting system uptime, process memory footprints, and database connection pool health.
+- **Live Support Chat Inbox**: Multi-channel WebSocket customer support inbox connecting operators directly to customer threads.
 
-### **Enhancement Features (Phase 2)**
-
-- 📍 GPS Real-time Trip Tracking
-- 💳 Payment Integration (Razorpay)
-- 📊 Analytics & Reporting Dashboard
-- 🖥️ Admin Fleet Management Panel
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        USERS LAYER                               │
-│  New Customers │ Repeat Customers │ Drivers │ Admins            │
-└────────┬────────────────────┬──────────────────────┬────────────┘
-         │                    │                      │
-         ▼                    ▼                      ▼
-    ┌─────────────┐     ┌──────────────┐    ┌───────────────┐
-    │React Website│     │Fast2SMS API  │    │Admin Dashboard│
-    │(Vite)      │     │Helpline      │    │(React)       │
-    └──────┬──────┘     └──────┬───────┘    └───────┬───────┘
-           │                   │                    │
-           └───────────────────┼────────────────────┘
-                               ▼
-        ┌──────────────────────────────────────────┐
-        │   EXPRESS.JS BACKEND (Node.js)           │
-        ├──────────────────────────────────────────┤
-        │ Auth Service                             │
-        │ Caller Recognition Engine (IVR)          │
-        │ Booking Engine                           │
-        │ Driver Allocation Service                │
-        │ Notification Pipeline                    │
-        │ Payment Service                          │
-        │ Analytics Engine                         │
-        └──────────────────┬───────────────────────┘
-                           ▼
-        ┌──────────────────────────────────────────┐
-        │   NEONDB (PostgreSQL)                    │
-        │   Serverless, ACID Transactions          │
-        └──────────────────────────────────────────┘
-                           │
-                ┌──────────┼──────────┐
-                ▼          ▼          ▼
-            Customers  Bookings   Drivers
-            Addresses  Payments   Vehicles
-```
+### 6. Security & Data Protection
+- **Zero Insecure Fallbacks**: Strict startup validation preventing execution with default or missing secrets.
+- **PostgreSQL TLS Verification**: NeonDB connections strictly enforce TLS certificate verification (`rejectUnauthorized: true`).
+- **DPDP Act Compliance**: Government identification and credential hashes are scrubbed from user-facing API payloads.
+- **Scoped Cache Invalidation**: Multi-tenant Redis caching prefixed with application namespaces, eliminating destructive global flushes.
+- *(For in-depth security implementation details, review [SECURITY.md](SECURITY.md)).*
 
 ---
 
 ## 💻 Tech Stack
 
-### **Frontend**
+| Domain | Technologies Used |
+|---|---|
+| **Backend API** | Node.js (v18+), Express.js 4.x, Sequelize ORM |
+| **Databases** | PostgreSQL (NeonDB serverless) & Zero-Config SQLite (Local Development) |
+| **Real-Time Layer**| Socket.io (WebSocket), Redis / In-Memory LRU fallback |
+| **Frontend Web** | React 18, Vite, Tailwind CSS, Redux Toolkit, Leaflet / OpenStreetMap, Recharts |
+| **Mobile App** | React Native, Expo 57, Expo Router, Lucide Icons, Expo SecureStore, Expo Location |
+| **Security** | Helmet, Express Rate Limit, Cookie-Parser, Cryptographic HMAC-SHA256, DPDP Filtering |
+| **Third-Party APIs**| Razorpay (Payments), Fast2SMS (OTP Delivery), Groq Cloud AI |
+
+---
+
+## 🏗️ Architecture & Monorepo Layout
 
 ```
-React.js 18+ (Vite)       - UI Framework
-Redux Toolkit             - State Management
-Tailwind CSS              - Styling
-Axios                     - HTTP Client
-React Router v6           - Navigation
-Google Maps API           - Maps Integration
-Razorpay SDK              - Payment (Phase 2)
-```
-
-### **Backend**
-
-```
-Node.js 18+               - Runtime
-Express.js 4.x            - Web Framework
-Sequelize                 - ORM
-PostgreSQL (NeonDB)       - Database
-JWT                       - Authentication
-Bcrypt                    - Password Hashing
-Fast2SMS                  - SMS API
-Google Maps API           - Distance & Routing
-WhatsApp Business API     - Messaging (Phase 2)
-Socket.io                 - Real-time Updates (Phase 2)
-```
-
-### **External Services**
-
-```
-Fast2SMS                  - SMS
-Google Maps               - Distance Matrix & Geocoding
-Firebase                  - Authentication (Google Sign-In)
-SMTP                      - Email Notifications (Nodemailer)
-Razorpay                  - Payment Gateway
-WhatsApp Business API     - Messaging
-NeonDB                    - PostgreSQL Hosting
-Vercel                    - Frontend Deployment
-Render/Railway            - Backend Deployment
+Eminence/
+├── backend/                  # REST API, WebSocket Server & Background Cron Jobs
+│   ├── src/
+│   │   ├── config/           # Database pools, CORS, and runtime options
+│   │   ├── controllers/      # Business logic controllers
+│   │   ├── middleware/       # Auth guards, sanitizers, and audit logging
+│   │   ├── models/           # Sequelize database entities
+│   │   ├── routes/           # REST endpoint definitions
+│   │   └── services/         # Telematics simulator, pricing engine, notifications
+│   └── tests/                # Jest integration test suites
+├── frontend/                 # React 18 + Vite Web Application
+│   ├── src/
+│   │   ├── components/admin/ # Modular tab components (Overview, Telematics, Fleet)
+│   │   ├── hooks/            # Custom state & WebSocket subscription hooks
+│   │   ├── pages/            # Admin, Customer, Driver, and Booking pages
+│   │   └── services/         # Centralized Axios API configuration
+│   └── vite.config.js        # Vite compilation and code-splitting setup
+├── mobile/                   # React Native (Expo) Universal Application
+│   ├── src/
+│   │   ├── app/              # File-based routing for mobile screens
+│   │   └── services/         # SQLite offline sync, push notifications, GPS telemetry
+│   └── tests/                # 31-case automated mobile QA integration test suite
+├── run_all_tests.js          # Unified pre-commit test runner (Scorecard)
+├── CONTRIBUTING.md           # Contributor onboarding & PR standards
+├── SECURITY.md               # Security policy & defense architecture
+└── README.md                 # Project documentation
 ```
 
 ---
 
-## 📁 Project Structure
+## 🚀 Getting Started & Local Setup
 
-```
-eminence/
-├── frontend/                          # React.js Application
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Auth/
-│   │   │   ├── Booking/
-│   │   │   ├── Customer/
-│   │   │   ├── Driver/
-│   │   │   ├── Admin/
-│   │   │   ├── Maps/
-│   │   │   ├── Shared/
-│   │   │   └── Payment/
-│   │   ├── pages/
-│   │   ├── redux/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   ├── hooks/
-│   │   └── styles/
-│   ├── package.json
-│   └── .env.example
-│
-├── backend/                           # Express.js Application
-│   ├── src/
-│   │   ├── config/
-│   │   ├── models/                    # Sequelize Models
-│   │   ├── controllers/
-│   │   ├── routes/
-│   │   ├── middleware/
-│   │   ├── services/
-│   │   ├── migrations/
-│   │   ├── seeders/
-│   │   ├── utils/
-│   │   ├── app.js
-│   │   └── server.js
-│   ├── tests/
-│   ├── package.json
-│   ├── docker-compose.yml
-│   └── .env.example
-│
-├── mobile/                            # React Native (Expo) Mobile App
-│   ├── src/
-│   │   ├── app/                       # Expo Router Screens (Auth, Customer, Driver, Admin)
-│   │   ├── context/                   # AuthContext & State
-│   │   ├── services/                  # Platform-aware Axios API Client
-│   │   └── components/                # Reusable Native Components
-│   ├── tests/                         # Mobile Automated Test Suites
-│   ├── app.json
-│   └── package.json
-│
-├── docs/
-│   ├── API_DOCUMENTATION.md
-│   ├── DATABASE_SCHEMA.md
-│   ├── DEPLOYMENT.md
-│   └── TESTING_GUIDE.md
-│
-├── .github/workflows/
-│   ├── ci.yml
-│   └── deploy.yml
-│
-├── README.md
-└── .gitignore
-```
+### Prerequisites
+- **Node.js**: v18.0.0 or higher
+- **npm**: v9.0.0 or higher
+- **Git**: Installed on your system
 
 ---
 
-## 🚀 Getting Started
-
-### **Prerequisites**
-
-- Node.js v18+
-- npm or yarn
-- PostgreSQL (or NeonDB account)
-- Fast2SMS API Key (for SMS)
-- Google Maps API Key
-- Git
-
-### **Clone the Repository**
+### 1. Backend Setup
 
 ```bash
-git clone https://github.com/yourusername/eminence.git
-cd eminence
-```
-
----
-
-## 📦 Installation
-
-### **Backend Setup**
-
-1. Navigate to backend directory:
-
-```bash
+# Navigate to backend directory
 cd backend
-```
 
-2. Install dependencies:
-
-```bash
+# Install dependencies
 npm install
+
+# Configure environment variables
+cp .env.example .env
 ```
 
-3. Create `.env` file:
+> **Zero-Config Local Development**:  
+> In `backend/.env`, leave `USE_SQLITE=true` to immediately run using a local SQLite database with automatic table creation and demo seeding, without needing an external PostgreSQL instance.
 
+Start the backend server:
 ```bash
-cp .env.example .env.local
-```
-
-4. Configure environment variables (see [Configuration](#configuration) below)
-
-5. Run database migrations:
-
-```bash
-npx sequelize-cli db:migrate --env development
-```
-
-6. Seed sample data (users, drivers, vehicles):
-
-```bash
-npx sequelize-cli db:seed:all
-# To seed the admin user specifically:
-npx sequelize-cli db:seed --seed 20260824000000-demo-admin.js
-# Or for a specific environment:
-npx sequelize-cli db:seed:all --env development
-```
-
-### **Frontend Setup**
-
-1. Navigate to frontend directory:
-
-```bash
-cd ../frontend
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Create `.env.local` file:
-
-```bash
-cp .env.example .env.local
-```
-
-4. Configure environment variables (see [Configuration](#configuration) below)
-
-### **Mobile App Setup (React Native / Expo)**
-
-1. Navigate to mobile directory:
-
-```bash
-cd ../mobile
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
----
-
-## ⚙️ Configuration
-
-### **Backend Environment Variables** (`backend/.env.local`)
-
-```env
-# Server
-NODE_ENV=development
-PORT=3000
-
-# Database (NeonDB)
-DATABASE_URL=postgresql://user:password@ep-xyz.neon.tech/eminence_db
-
-# JWT
-JWT_SECRET=your_super_secret_key_here_min_32_chars
-JWT_EXPIRE=7d
-
-# Twilio
-TWILIO_ACCOUNT_SID=your_account_sid
-TWILIO_AUTH_TOKEN=your_auth_token
-TWILIO_PHONE_NUMBER=+1234567890
-TWILIO_IVR_NUMBER=+1234567890
-
-# Google Maps
-GOOGLE_MAPS_API_KEY=your_google_maps_key
-
-# Razorpay (Phase 2)
-RAZORPAY_KEY_ID=your_key_id
-RAZORPAY_KEY_SECRET=your_key_secret
-
-# WhatsApp (Phase 2)
-WHATSAPP_BUSINESS_PHONE_ID=your_phone_id
-WHATSAPP_ACCESS_TOKEN=your_token
-
-# Email (for notifications)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your_email@gmail.com
-SMTP_PASS=your_app_password
-
-# Frontend URL
-FRONTEND_URL=http://localhost:5173
-```
-
-### **Frontend Environment Variables** (`frontend/.env.local`)
-
-```env
-VITE_API_URL=http://localhost:3000/api
-VITE_GOOGLE_MAPS_API_KEY=your_google_maps_key
-VITE_RAZORPAY_KEY_ID=your_key_id
-```
-
-### **Mobile App Environment Variables** (`mobile/.env`) *(Optional)*
-
-```env
-# By default, mobile automatically detects localhost for iOS/Web and 10.0.2.2 for Android emulator
-EXPO_PUBLIC_API_URL=http://localhost:3000
-```
-
----
-
-## ▶️ Running the Application
-
-### **Development Mode**
-
-**Terminal 1: Backend**
-
-```bash
-cd backend
 npm run dev
-# Server runs on http://localhost:3000
 ```
+*Backend runs on `http://localhost:3000` (or `PORT` specified in `.env`).*
 
-**Terminal 2: Frontend Web**
+---
+
+### 2. Frontend Web Setup
 
 ```bash
+# In a new terminal, navigate to frontend
 cd frontend
+
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
-# App runs on http://localhost:5173
 ```
+*Frontend runs on `http://localhost:5173`.*
 
-**Terminal 3: Mobile App (React Native / Expo)**
+---
+
+### 3. Mobile App Setup
 
 ```bash
+# In a new terminal, navigate to mobile
 cd mobile
-npx expo start
+
+# Install dependencies
+npm install
+
+# Start the Expo development bundler
+npm start
 ```
-
-*Inside the Expo interactive terminal:*
-- Press `a` — Open on connected **Android Emulator** or device
-- Press `i` — Open on **iOS Simulator** (macOS)
-- Press `w` — Open in **Web Browser**
-- Scan the printed QR code using the **Expo Go** app on your physical Android / iPhone
-
-**Running Mobile Test Suite:**
-
-```bash
-cd mobile
-node tests/phase1_auth_tests.js
-# Runs automated Phase 1 test cases (TC-001 through TC-004)
-```
-
-**Terminal 4: Database (if using local PostgreSQL)**
-
-```bash
-cd backend
-docker-compose up
-# PostgreSQL runs on localhost:5432
-```
-
-### **Production Mode**
-
-**Build Frontend:**
-
-```bash
-cd frontend
-npm run build
-# Creates optimized build in dist/
-```
-
-**Start Backend (Production):**
-
-```bash
-cd backend
-NODE_ENV=production npm start
-```
+- Press `w` to open in your desktop browser.
+- Scan the terminal QR code using **Expo Go** on Android or iOS.
 
 ---
 
-## 📚 API Documentation
+## 🧪 Running Automated Tests
 
-### **Authentication Endpoints**
+Eminence includes a comprehensive five-stage validation pipeline that guarantees code quality, type safety, and integration reliability.
 
-| Method | Endpoint               | Description               |
-| ------ | ---------------------- | ------------------------- |
-| POST   | `/api/auth/register`   | Register new customer     |
-| POST   | `/api/auth/login`      | Send OTP to phone         |
-| POST   | `/api/auth/verify-otp` | Verify OTP, return JWT    |
-| POST   | `/api/auth/complete-profile` | Complete user profile |
-| POST   | `/api/auth/logout`     | Logout & invalidate token |
-| GET    | `/api/auth/me`         | Get current user profile  |
+Execute the entire test scorecard from the repository root:
 
-### **Booking Endpoints**
+```bash
+node run_all_tests.js
+```
 
-| Method | Endpoint                 | Description         |
-| ------ | ------------------------ | ------------------- |
-| POST   | `/api/bookings`          | Create new booking  |
-| GET    | `/api/bookings`          | Get user's bookings |
-| GET    | `/api/bookings/:id`      | Get booking details |
-| PUT    | `/api/bookings/:id`      | Update booking      |
-| POST   | `/api/bookings/:id/rate` | Rate a booking      |
+### Monorepo Validation Scorecard
+```
+========================================================================
+                       PRE-COMMIT SCORECARD                             
+========================================================================
+ [ PASS ] Backend: Jest Unit & Integration Tests (25 Test Cases)
+ [ PASS ] Frontend: Oxlint Static Analysis
+ [ PASS ] Frontend: Production Bundle Compilation (Vite)
+ [ PASS ] Mobile: TypeScript Typecheck (tsc --noEmit)
+ [ PASS ] Mobile: Full QA Integration Test Suite (31 Test Cases across 5 Phases)
+========================================================================
+```
 
-### **Address Endpoints**
-
-| Method | Endpoint             | Description         |
-| ------ | -------------------- | ------------------- |
-| GET    | `/api/addresses`     | Get saved addresses |
-| POST   | `/api/addresses`     | Save new address    |
-| PUT    | `/api/addresses/:id` | Update address      |
-| DELETE | `/api/addresses/:id` | Delete address      |
-
-### **B2B / Enterprise Endpoints**
-
-| Method | Endpoint                 | Description         |
-| ------ | ------------------------ | ------------------- |
-| POST   | `/api/b2b/register`      | Upgrade account to B2B |
-| POST   | `/api/b2b/contracts`     | Request dedicated contract |
-| GET    | `/api/b2b/contracts`     | View active business contracts |
-| POST   | `/api/b2b/batch-bookings`| Schedule bulk booking via CSV |
-| GET    | `/api/b2b/invoices`      | View corporate invoices |
-
-### **Admin Endpoints**
-
-| Method | Endpoint                    | Description         |
-| ------ | --------------------------- | ------------------- |
-| GET    | `/api/admin/contracts`      | List all B2B contracts |
-| PUT    | `/api/admin/contracts/:id`  | Approve/Reject B2B contract |
-| GET    | `/api/admin/stats`          | Get overall platform stats |
-
-### **IVR Endpoints**
-
-| Method | Endpoint                  | Description                  |
-| ------ | ------------------------- | ---------------------------- |
-| POST   | `/api/ivr/webhook`        | Incoming call webhook (Deprecated) |
-| POST   | `/api/ivr/gather-speech`  | Process speech input         |
-| POST   | `/api/ivr/create-booking` | Create booking via IVR       |
-
-For complete API documentation, see [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)
+Individual test targets can also be run directly:
+- **Backend Tests**: `cd backend && npm test`
+- **Frontend Linting**: `cd frontend && npm run lint`
+- **Frontend Build**: `cd frontend && npm run build`
+- **Mobile Typecheck**: `cd mobile && npm run typecheck`
+- **Mobile QA Suite**: `cd mobile && npm test`
 
 ---
 
-## 🗄️ Database Schema
+## 🛡️ Security & Responsible Disclosure
 
-### **Core Tables**
-
-- **customers** — User accounts with phone-based identification
-- **addresses** — Saved addresses for customers
-- **drivers** — Driver profiles and availability
-- **vehicles** — Vehicle information
-- **bookings** — All bookings (web & IVR)
-- **payments** — Payment records
-- **notifications** — SMS/WhatsApp/Voice delivery logs
-
-### **Key Relationships**
-
-```
-customers ──1:N──> addresses
-customers ──1:N──> bookings
-drivers ──1:N──> bookings
-drivers ──1:1──> vehicles
-bookings ──1:1──> payments
-bookings ──1:N──> notifications
-```
-
-For detailed schema, see [DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md)
-
----
-
-## 🌐 Deployment
-
-### **Frontend Deployment (Vercel)**
-
-```bash
-# Connect GitHub repo to Vercel
-# Auto-deploy on every push to main
-vercel link
-vercel deploy --prod
-```
-
-### **Backend Deployment (Render.com)**
-
-```bash
-# Create new web service on Render
-# Connect GitHub repo
-# Set environment variables in Render dashboard
-# Deploy with: git push origin main
-```
-
-### **Database Deployment (NeonDB)**
-
-```bash
-# Create project on NeonDB (https://neon.tech)
-# Get connection string
-# Set DATABASE_URL in backend environment
-# Run migrations: npx sequelize-cli db:migrate --env production
-```
-
-For detailed deployment guide, see [DEPLOYMENT.md](docs/DEPLOYMENT.md)
-
----
-
-## 🧪 Testing
-
-### **Run Unit Tests**
-
-```bash
-cd backend
-npm run test:unit
-```
-
-### **Run Integration Tests**
-
-```bash
-cd backend
-npm run test:integration
-```
-
-### **Run E2E Tests**
-
-```bash
-cd backend
-npm run test:e2e
-```
-
-### **Load Testing**
-
-```bash
-npm install -g artillery
-artillery run load-test.yml
-```
-
-For testing guide, see [TESTING_GUIDE.md](docs/TESTING_GUIDE.md)
-
----
-
-## 🔒 Security
-
-### **Implemented Security Measures**
-
-- ✅ Passwords hashed with bcrypt (cost 10+)
-- ✅ JWT-based authentication
-- ✅ Rate limiting on login attempts
-- ✅ SQL injection prevention (Sequelize)
-- ✅ CSRF protection
-- ✅ Phone number encryption
-- ✅ HTTPS enforced (production)
-- ✅ API key rotation
-- ✅ Input validation on all endpoints
-- ✅ Secure session handling
-
----
-
-## 📊 Project Timeline
-
-| Phase                     | Duration    | Features                                            |
-| ------------------------- | ----------- | --------------------------------------------------- |
-| **Phase 1 (MVP)**         | Weeks 1-6   | Core booking, IVR, driver allocation, notifications |
-| **Phase 2 (Enhancement)** | Weeks 7-10  | GPS tracking, payments, admin dashboard             |
-| **Phase 3 (Final)**       | Weeks 10-12 | Testing, optimization, documentation, demo          |
+Security is fundamental to Eminence. Please report any potential vulnerabilities responsibly via private disclosure. For our vulnerability response SLAs, scope, and defense-in-depth architecture, please read our [SECURITY.md](SECURITY.md).
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how to get started:
-
-1. **Fork the repository**
-
-```bash
-git clone https://github.com/yourusername/eminence.git
-```
-
-2. **Create a feature branch**
-
-```bash
-git checkout -b feature/your-feature-name
-```
-
-3. **Make your changes**
-
-```bash
-git add .
-git commit -m "Add your feature description"
-```
-
-4. **Push to the branch**
-
-```bash
-git push origin feature/your-feature-name
-```
-
-5. **Open a Pull Request**
-   - Describe your changes
-   - Reference any related issues
-   - Wait for code review
-
-### **Code Style**
-
-- Use ESLint for JavaScript
-- Follow Prettier formatting
-- Write meaningful commit messages
-- Add tests for new features
-
-
-
-## 👥 Team
-
-**EMINENCE** is developed by a team of computer science students from Deccan Education Society, Pune:
-
-| Name                           | Role                 | GitHub                          |
-| ------------------------------ | -------------------- | ------------------------------- |
-| Ridhesh Mahajan (1012412023)   | Full Stack Developer | [@Ridhesh927](https://github.com/Ridhesh927) |
-| Krishna Dhamdhere (1012412008) | Full Stack Developer | [@20-Krishna-04](https://github.com/20-Krishna-04) |
-| Sanket Devkar (1012412002)     | Full Stack Developer | [@sanket-devkar](https://github.com/sanketdevkar)  |
-| Pranay Khodake (1012412009)    | Full Stack Developer | [@pranay-cyberguy](https://github.com/pranay-cyberguy)  |
-
-**Mentor:** [Your Professor Name]  
-**University:** Des Pune University, Pune , Maharashtra, India
+We welcome contributions from the community! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on code style, branch naming conventions, and the pull request submission process.
 
 ---
 
-## 📞 Support & Contact
+## 📄 License
 
-- **Issues:** Please use GitHub Issues for bug reports and feature requests
-- **Discussions:** Join our GitHub Discussions for questions and ideas
-- **Email:** eminence.support.helpline@gmail.com 
-
----
-
-## 🙏 Acknowledgments
-
-- Fast2SMS for SMS APIs
-- Google Maps for location services
-- NeonDB for serverless PostgreSQL
-- Vercel & Render for deployment platforms
-- React.js and Node.js communities
-- Our mentors and advisors
-
----
-
-## 📈 Future Roadmap
-
-- [ ] Scheduled bookings (book in advance)
-- [ ] Driver ratings & reviews
-- [ ] In-app customer support chat
-- [ ] Multi-language support (Hindi, Marathi)
-- [ ] Franchise management system
-- [ ] Advanced analytics & reporting
-- [ ] Mobile app (React Native)
-- [ ] Expansion to other cities
-
----
-
-## 🔗 Useful Links
-
-- **Live Demo:** [Coming Soon]
-- **Project Board:** [GitHub Projects](https://github.com/users/Ridhesh927/projects/7)
-- **Documentation:** [docs/](docs/)
-- **Bug Tracker:** [Issues](https://github.com/Ridhesh927/Eminence/issues)
-- **Pull Request:** [GitHub Pull Request](https://github.com/Ridhesh927/Eminence/pulls)
-
----
-
-## 📄 Additional Documentation
-
-- [Architecture Overview](docs/ARCHITECTURE.md)
-- [API Documentation](docs/API_DOCUMENTATION.md)
-- [Database Schema](docs/DATABASE_SCHEMA.md)
-- [Deployment Guide](docs/DEPLOYMENT.md)
-- [Testing Guide](docs/TESTING_GUIDE.md)
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
-
----
-
-<div align="center">
-
-**Made with ❤️ by the EMINENCE Team**
-
-⭐ If you find this project useful, please consider giving it a star!
-
-[Report Bug](https://github.com/yourusername/eminence/issues) • [Request Feature](https://github.com/yourusername/eminence/issues) • [View Docs](docs/)
-
-</div>
-
----
-
-**Last Updated:** September 2026  
-**Version:** 1.0.0 (MVP)
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
