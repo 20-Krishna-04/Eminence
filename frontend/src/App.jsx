@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { setAuthInitialized } from './redux/slices/authSlice';
 import MainLayout from './components/Shared/MainLayout';
 import { lazy, Suspense } from 'react';
 import ErrorBoundary from './components/Shared/ErrorBoundary';
@@ -54,6 +56,14 @@ const ProfileModalWrapper = () => {
 };
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // In a real application, you would check tokens or fetch /auth/me here
+    // We explicitly mark auth initialization as complete to avoid race conditions.
+    dispatch(setAuthInitialized());
+  }, [dispatch]);
+
   return (
     <Router>
       <MainLayout>
