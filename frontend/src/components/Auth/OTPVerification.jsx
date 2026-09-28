@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../redux/slices/authSlice';
-import { setToken } from '../../services/tokenService';
+
 import api from '../../services/api';
 
 const OTPVerification = () => {

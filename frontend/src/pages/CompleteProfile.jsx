@@ -119,7 +119,10 @@ const CompleteProfile = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await api.post('/api/auth/verify-otp', { type: otpType, code: otpCode });
+      const res = await api.post(
+        '/api/auth/verify-otp',
+        { type: otpType, code: otpCode }
+      );
       dispatch(updateProfileSuccess(res.data.user));
       setOtpType(null);
       setOtpCode('');

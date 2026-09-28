@@ -17,7 +17,8 @@ const ReviewModal = ({ isOpen, onClose, bookingId, driverId, driverName = "Drive
     
     setIsSubmitting(true);
     try {
-      await api.post('/reviews',
+      await api.post(
+        '/api/reviews',
         {
           bookingId,
           driverId,

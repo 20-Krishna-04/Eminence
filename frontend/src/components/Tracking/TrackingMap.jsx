@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { io } from 'socket.io-client';
-import { getToken } from '../../services/tokenService';
+
 import api from '../../services/api';
 
 // Fix for default marker icon in react-leaflet
