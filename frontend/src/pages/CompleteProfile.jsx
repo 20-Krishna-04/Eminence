@@ -18,9 +18,18 @@ const CompleteProfile = () => {
   const [location, setLocation] = useState(user?.location || null);
   const [otpType, setOtpType] = useState(null); // 'email' or 'phone'
   const [otpCode, setOtpCode] = useState('');
+  const [otpCooldown, setOtpCooldown] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (otpCooldown <= 0) return;
+    const interval = setInterval(() => {
+      setOtpCooldown(prev => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [otpCooldown]);
 
   // OCR Verification State
   const [documentFile, setDocumentFile] = useState(null);
@@ -89,12 +98,14 @@ const CompleteProfile = () => {
   };
 
   const handleSendOtp = async (type) => {
+    if (otpCooldown > 0) return;
     setLoading(true);
     setError('');
     setMessage('');
     try {
       await api.post('/api/auth/send-otp', { type });
       setOtpType(type);
+      setOtpCooldown(60);
       setMessage(`OTP sent to your ${type}`);
     } catch (err) {
       setError(err.response?.data?.message || `Error sending ${type} OTP`);
@@ -195,28 +206,32 @@ const CompleteProfile = () => {
           <div className="flex justify-between items-center bg-gray-50 p-3 rounded border">
             <span>Email: {user.email}</span>
             {user.isEmailVerified ? (
-              <span className="text-green-600 font-semibold">Verified</span>
-            ) : (
-              <button onClick={() => handleSendOtp('email')} className="text-blue-600 underline text-sm">
-                Verify
-              </button>
-            )}
-          </div>
+               <span className="text-green-600 font-semibold">Verified</span>
+             ) : (
+               <button 
+                 onClick={() => handleSendOtp('email')} 
+                 disabled={loading || otpCooldown > 0}
+                 className="text-blue-600 underline text-sm disabled:text-gray-400"
+               >
+                 {otpCooldown > 0 ? `Resend in ${otpCooldown}s` : 'Verify'}
+               </button>
+             )}
+           </div>
 
-          <div className="flex justify-between items-center bg-gray-50 p-3 rounded border">
-            <span>Phone: {user.phone || 'Not provided'}</span>
-            {user.isPhoneVerified ? (
-              <span className="text-green-600 font-semibold">Verified</span>
-            ) : (
-              <button 
-                onClick={() => handleSendOtp('phone')} 
-                disabled={!user.phone}
-                className="text-blue-600 underline text-sm disabled:text-gray-400"
-              >
-                Verify
-              </button>
-            )}
-          </div>
+           <div className="flex justify-between items-center bg-gray-50 p-3 rounded border">
+             <span>Phone: {user.phone || 'Not provided'}</span>
+             {user.isPhoneVerified ? (
+               <span className="text-green-600 font-semibold">Verified</span>
+             ) : (
+               <button 
+                 onClick={() => handleSendOtp('phone')} 
+                 disabled={!user.phone || loading || otpCooldown > 0}
+                 className="text-blue-600 underline text-sm disabled:text-gray-400"
+               >
+                 {otpCooldown > 0 ? `Resend in ${otpCooldown}s` : 'Verify'}
+               </button>
+             )}
+           </div>
         </div>
 
         {/* OCR Verification Section */}
