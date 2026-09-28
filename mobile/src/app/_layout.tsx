@@ -3,6 +3,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { View, ActivityIndicator, StatusBar, Platform } from 'react-native';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import '../services/LocationTracking'; // Initialize global task manager
+import { stopBackgroundLocation } from '../services/LocationTracking';
 import { initOfflineDB, syncOfflineQueue } from '../services/OfflineSync';
 import { registerForPushNotificationsAsync } from '../services/PushNotifications';
 import NetInfo from '@react-native-community/netinfo';
@@ -11,6 +12,13 @@ function RootNavigationLayout() {
   const { user, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+
+  // Enforce background location isolation: never allow non-driver roles to run background tracking
+  useEffect(() => {
+    if (user && user.role !== 'driver' && Platform.OS !== 'web') {
+      stopBackgroundLocation();
+    }
+  }, [user]);
 
   // Initialize features once on mount
   useEffect(() => {

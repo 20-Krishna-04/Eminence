@@ -1,5 +1,6 @@
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
+import * as SecureStore from 'expo-secure-store';
 import api from './api';
 
 const LOCATION_TASK_NAME = 'BACKGROUND_LOCATION_TASK';
@@ -17,10 +18,17 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
       const { latitude, longitude } = locations[0].coords;
       
       try {
-        // We do not have user.id here contextually, so we rely on the JWT token 
-        // stored in SecureStore to identify the driver on the backend.
-        // We'll call a location update endpoint. 
-        // In this demo, we'll hit /api/drivers/location 
+        // Enforce driver check: verify that the authenticated mobile role is driver
+        const token = await SecureStore.getItemAsync('user_token');
+        if (!token) return;
+
+        const role = await SecureStore.getItemAsync('user_role');
+        if (role && role !== 'driver') {
+          // Immediately unregister background location updates for non-driver roles
+          await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+          return;
+        }
+
         await api.post('/api/drivers/location', {
           lat: latitude,
           lng: longitude,
@@ -36,8 +44,13 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 
 /**
  * Request permissions and start tracking the location in the background
+ * Only permissible for verified driver accounts
  */
-export const startBackgroundLocation = async () => {
+export const startBackgroundLocation = async (role?: string) => {
+  if (role && role !== 'driver') {
+    console.warn('[LocationTracking] Non-driver role blocked from initiating background GPS');
+    return false;
+  }
   const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
   if (foregroundStatus !== 'granted') {
     console.warn('Foreground location permission denied');
