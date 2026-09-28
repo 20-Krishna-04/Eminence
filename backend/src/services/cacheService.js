@@ -9,6 +9,8 @@ const Redis = require('ioredis');
 const DEFAULT_TTL_MS = 60 * 1000;
 const MAX_CACHE_SIZE = 100;
 
+const KEY_PREFIX = 'eminence:';
+
 let redisClient = null;
 const memoryCache = new Map();
 
@@ -29,7 +31,7 @@ if (process.env.REDIS_URL) {
 const set = async (key, value, ttl = DEFAULT_TTL_MS) => {
   try {
     if (redisClient) {
-      await redisClient.set(key, JSON.stringify(value), 'PX', ttl);
+      await redisClient.set(`${KEY_PREFIX}${key}`, JSON.stringify(value), 'PX', ttl);
       return;
     }
   } catch (err) {
@@ -50,7 +52,7 @@ const set = async (key, value, ttl = DEFAULT_TTL_MS) => {
 const get = async (key) => {
   try {
     if (redisClient) {
-      const val = await redisClient.get(key);
+      const val = await redisClient.get(`${KEY_PREFIX}${key}`);
       if (val) return JSON.parse(val);
       return null;
     }
@@ -71,7 +73,7 @@ const get = async (key) => {
 const del = async (key) => {
   try {
     if (redisClient) {
-      await redisClient.del(key);
+      await redisClient.del(`${KEY_PREFIX}${key}`);
       return;
     }
   } catch (err) {
@@ -83,8 +85,15 @@ const del = async (key) => {
 const flush = async () => {
   try {
     if (redisClient) {
-      await redisClient.flushall();
-      return;
+      const stream = redisClient.scanStream({
+        match: `${KEY_PREFIX}*`,
+        count: 100
+      });
+      for await (const resultKeys of stream) {
+        if (resultKeys.length > 0) {
+          await redisClient.del(...resultKeys);
+        }
+      }
     }
   } catch (err) {
     console.error('Redis flush error:', err.message);
@@ -96,7 +105,12 @@ const stats = async () => {
   let size = memoryCache.size;
   if (redisClient) {
     try {
-      size = await redisClient.dbsize();
+      let count = 0;
+      const stream = redisClient.scanStream({ match: `${KEY_PREFIX}*`, count: 100 });
+      for await (const resultKeys of stream) {
+        count += resultKeys.length;
+      }
+      size = count;
     } catch (err) {
       console.error('Redis stats error:', err.message);
     }
