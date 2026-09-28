@@ -135,18 +135,18 @@ const DriverDashboard = () => {
     setIsLoading(true);
 
     try {
-      // Note: Assuming driver ID is managed via token on backend
       const response = await api.put(`/api/bookings/${activeRide.bookingId}/status`, 
         { status: 'driver_assigned' }
       );
 
       if (!response.data?.success) {
-        throw new Error('Trip assignment failed');
+        throw new Error(response.data?.message || 'Trip assignment failed');
       }
 
       setIsNavigating(true);
     } catch (err) {
       console.error('Error accepting trip:', err);
+      alert(err.response?.data?.message || err.message || 'Unable to accept trip.');
     } finally {
       setIsLoading(false);
     }
@@ -156,12 +156,17 @@ const DriverDashboard = () => {
     if (!activeRide) return;
     setIsLoading(true);
     try {
-      await api.put(`/api/bookings/${activeRide.bookingId}/status`,
+      const response = await api.put(`/api/bookings/${activeRide.bookingId}/status`,
         { status: 'rejected' }
       );
-      setActiveRide(null);
+      if (response.data?.success) {
+        setActiveRide(null);
+      } else {
+        throw new Error(response.data?.message || 'Failed to decline trip');
+      }
     } catch (err) {
       console.error('Error declining trip:', err);
+      alert(err.response?.data?.message || err.message || 'Error declining trip.');
     } finally {
       setIsLoading(false);
     }
