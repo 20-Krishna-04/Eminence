@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import api from './api';
 
@@ -37,11 +38,14 @@ export const registerForPushNotificationsAsync = async () => {
       return;
     }
     try {
-      const projectId = 'eminence-project';
+      const projectId =
+        Constants?.expoConfig?.extra?.eas?.projectId ??
+        Constants?.easConfig?.projectId;
+
       token = (
-        await Notifications.getExpoPushTokenAsync({
-          projectId,
-        })
+        await Notifications.getExpoPushTokenAsync(
+          projectId ? { projectId } : undefined
+        )
       ).data;
       console.log('Push Token Generated:', token);
       
