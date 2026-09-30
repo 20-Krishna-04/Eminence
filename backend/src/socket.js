@@ -189,6 +189,7 @@ const initSocket = (httpServer) => {
       }
       
       socket.join('admin_telemetry');
+      socket.emit('joined_admin_telemetry');
       console.log(`[Socket] Admin ${socket.id} joined admin_telemetry`);
       
       // We start a mock simulation for a dummy vehicle ID when an admin connects

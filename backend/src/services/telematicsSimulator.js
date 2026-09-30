@@ -80,6 +80,8 @@ const startTelemetrySimulation = (vehicleId) => {
         timestamp: new Date().toISOString(),
         speed: Math.round(currentSpeed), // km/h
         engineTemp: Math.round(engineTemp), // Celsius
+        temperature: Math.round(engineTemp), // Celsius (TC-KRI-004 & Mobile HUD alias)
+        coolantAlert: engineTemp >= 100 ? 'Coolant Overheating Risk' : null,
         fuelLevel: parseFloat(fuelLevel.toFixed(1)), // %
         rpm: Math.round(rpm),
         healthScore: parseFloat(healthScore.toFixed(1)), // %

@@ -294,6 +294,14 @@ const aiVoiceBooking = async (req, res) => {
   try {
     const { transcript } = req.body;
     
+    // Guard against empty or missing transcripts (TC-KRI-001)
+    if (!transcript || typeof transcript !== 'string' || !transcript.trim()) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Speech transcript is required.' 
+      });
+    }
+
     // Simulate NLP Parsing of Transcript
     console.log(`[AI Agent] Received Voice Transcript: "${transcript}"`);
     
@@ -313,18 +321,32 @@ const aiVoiceBooking = async (req, res) => {
     const emissionRate = tempoType === 'large' ? 350 : (tempoType === 'medium' ? 200 : 120);
     const esgEmissions = parseFloat(((distance * emissionRate) / 1000).toFixed(2));
 
+    let pickupAddress = 'Eminence Hub, Pune';
+    let dropAddress = 'Destination (Extracted from Voice)';
+    const locMatch = transcript.match(/(?:from|for)\s+([^to]+?)\s+to\s+([^,\n\.]+)/i);
+    if (locMatch) {
+      pickupAddress = locMatch[1].trim();
+      dropAddress = locMatch[2].replace(/\s+(tomorrow|today|morning|evening|night|now|afternoon)/i, '').trim();
+    }
+
+    let bookingDate = new Date();
+    if (/tomorrow/i.test(transcript)) {
+      bookingDate.setDate(bookingDate.getDate() + 1);
+    }
+    const dateStr = bookingDate.toISOString().split('T')[0];
+
     const mockExtractedData = {
       customerId,
-      pickupAddress: 'Eminence Hub, Pune',
-      dropAddress: 'Destination (Extracted from Voice)',
-      date: new Date().toISOString().split('T')[0],
+      pickupAddress,
+      dropAddress,
+      date: dateStr,
       time: '10:00:00',
       goodsType: 'Voice Booking Cargo',
       weight: 100,
       tempoType,
       totalDistance: distance,
       esgEmissions,
-      estimatedFare: tempoType === 'large' ? 1200 : 500,
+      estimatedFare: tempoType === 'large' ? 1200 : (tempoType === 'medium' ? 750 : 500),
       paymentMethod: 'cash',
       status: 'pending'
     };
