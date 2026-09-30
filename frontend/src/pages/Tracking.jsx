@@ -62,7 +62,8 @@ const Tracking = () => {
       loadBooking();
     }
 
-    const socketUrl = import.meta.env.VITE_API_URL || api.defaults.baseURL || 'http://localhost:5000';
+    const rawSocketUrl = import.meta.env.VITE_API_URL || api.defaults.baseURL || 'http://localhost:3000';
+    const socketUrl = rawSocketUrl.replace(/\/api\/?$/, '');
     const socket = io(socketUrl, {
       reconnection: true,
       reconnectionAttempts: Infinity,
@@ -193,10 +194,10 @@ const Tracking = () => {
       <div className="flex-1 relative bg-loft-900 border-r border-loft-800 hidden md:block z-0">
         <TrackingMap 
           bookingId={bookingId} 
-          initialLat={punePosition[0]} 
-          initialLng={punePosition[1]} 
+          initialLat={PUNE_POSITION[0]} 
+          initialLng={PUNE_POSITION[1]} 
           isReconnecting={isReconnecting}
-          currentPosition={[telemetry.lat || punePosition[0], telemetry.lng || punePosition[1]]}
+          currentPosition={[telemetry.lat || PUNE_POSITION[0], telemetry.lng || PUNE_POSITION[1]]}
         />
       </div>
 
@@ -262,7 +263,7 @@ const Tracking = () => {
             <div className="p-3 bg-loft-950/80 rounded-lg border border-loft-800">
               <span className="text-[11px] text-loft-400 block mb-1">Location</span>
               <span data-testid="telemetry-location" className="text-xs font-mono font-semibold text-copper-300 block truncate">
-                {(telemetry.lat || punePosition[0]).toFixed(4)}°, {(telemetry.lng || punePosition[1]).toFixed(4)}°
+                {(telemetry.lat || PUNE_POSITION[0]).toFixed(4)}°, {(telemetry.lng || PUNE_POSITION[1]).toFixed(4)}°
               </span>
             </div>
           </div>
