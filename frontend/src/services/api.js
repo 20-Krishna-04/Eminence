@@ -8,4 +8,15 @@ const api = axios.create({
   xsrfHeaderName: 'X-XSRF-TOKEN',
 });
 
+// Interceptor to ensure x-xsrf-token is sent across local ports (5173 -> 3000)
+api.interceptors.request.use((config) => {
+  if (typeof document !== 'undefined' && document.cookie) {
+    const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
+    if (match) {
+      config.headers['x-xsrf-token'] = decodeURIComponent(match[1]);
+    }
+  }
+  return config;
+});
+
 export default api;
