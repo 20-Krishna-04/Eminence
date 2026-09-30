@@ -1,4 +1,4 @@
-const { Booking, Customer, Driver, Vehicle } = require('../models');
+const { Booking, Customer, Driver, Vehicle, B2BContract } = require('../models');
 const { optimizeRoute } = require('../services/routeOptimizer');
 const { findPoolMatch } = require('../services/poolingEngine');
 const crypto = require('crypto');
@@ -113,7 +113,6 @@ const createBooking = async (req, res) => {
       bookingData.isB2B = true;
 
       // Deduct negotiated B2B contract discount if active contract exists
-      const { B2BContract } = require('../models');
       const activeContract = await B2BContract.findOne({
         where: { customerId: customer.id, status: 'active' },
         order: [['createdAt', 'DESC']]

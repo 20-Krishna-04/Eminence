@@ -449,17 +449,26 @@ const getDriverUtilization = async (req, res) => {
     const onTripDrivers = await Driver.count({ where: { status: 'on_trip' } });
     const utilizationRate = totalDrivers > 0 ? ((onTripDrivers / totalDrivers) * 100).toFixed(1) : 0;
 
-    const allBookings = await Booking.findAll({ attributes: ['time'], raw: true });
-    const hourCounts = {};
-    for (const b of allBookings) {
-      if (!b.time) continue;
-      const hour = String(b.time).split(':')[0].padStart(2, '0') + ':00';
-      hourCounts[hour] = (hourCounts[hour] || 0) + 1;
-    }
-    const peakHours = Object.keys(hourCounts)
-      .map(hour => ({ hour, bookings: hourCounts[hour] }))
+    // Efficiently count bookings grouped by the hour part of the 'time' column
+    const hourGroupQuery = await Booking.findAll({
+      attributes: [
+        [sequelize.fn('substr', sequelize.col('time'), 1, 2), 'hourStr'],
+        [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+      ],
+      where: {
+        time: { [Op.not]: null }
+      },
+      group: [sequelize.fn('substr', sequelize.col('time'), 1, 2)],
+      raw: true
+    });
+
+    const peakHours = hourGroupQuery
+      .map(row => ({
+        hour: `${row.hourStr}:00`,
+        bookings: parseInt(row.count, 10) || 0
+      }))
       .sort((a, b) => b.bookings - a.bookings)
-      .slice(0, 8); // top 8 peak hours
+      .slice(0, 8);
 
     const data = { totalDrivers, activeDrivers, onTripDrivers, utilizationRate, peakHours };
     await cache.set(cacheKey, data, 30000); // Cache 30 seconds
