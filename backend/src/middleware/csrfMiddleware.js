@@ -45,7 +45,7 @@ const csrfProtection = (req, res, next) => {
   if (process.env.NODE_ENV === 'development' && (
     origin === 'http://localhost:8081' || origin === 'http://127.0.0.1:8081' ||
     origin === 'http://localhost:5173' || origin === 'http://127.0.0.1:5173' ||
-    (referer && (referer.startsWith('http://localhost:5173') || referer.startsWith('http://127.0.0.1:5173') || referer.startsWith('http://localhost:8081') || referer.startsWith('http://127.0.0.1:8081')))
+    (referer && ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:8081', 'http://127.0.0.1:8081'].some((allowed) => referer === allowed || referer.startsWith(`${allowed}/`)))
   )) {
     return next();
   }
