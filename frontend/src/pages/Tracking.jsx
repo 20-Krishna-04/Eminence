@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Phone, MessageSquare, ShieldCheck, Check, Copy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import TrackingMap from '../components/Tracking/TrackingMap';
 import ReviewModal from '../components/Customer/ReviewModal';
 import api from '../services/api';
+import { getToken } from '../services/tokenService';
 import { io } from 'socket.io-client';
 
 // Pune coordinates for default mock telemetry
@@ -12,6 +14,7 @@ const PUNE_POSITION = [18.5204, 73.8567];
 
 const Tracking = () => {
   const { bookingId } = useParams();
+  const { user } = useSelector((state) => state.auth);
   const [booking, setBooking] = useState(null);
   const [status, setStatus] = useState('searching'); // searching, driver_assigned, arrived, in_transit, completed
   const [_loading, setLoading] = useState(true);
@@ -62,6 +65,7 @@ const Tracking = () => {
       loadBooking();
     }
 
+    const token = user?.token || getToken();
     const rawSocketUrl = import.meta.env.VITE_API_URL || api.defaults.baseURL || 'http://localhost:3000';
     const socketUrl = rawSocketUrl.replace(/\/api\/?$/, '');
     const socket = io(socketUrl, {
@@ -69,6 +73,8 @@ const Tracking = () => {
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
+      withCredentials: true,
+      auth: { token }
     });
 
     socket.emit('join_booking', { bookingId });
@@ -257,7 +263,7 @@ const Tracking = () => {
             <div className="p-3 bg-loft-950/80 rounded-lg border border-loft-800">
               <span className="text-[11px] text-loft-400 block mb-1">Speed</span>
               <span data-testid="telemetry-speed" className="text-lg font-mono font-bold text-loft-100">
-                {telemetry.speed || (status === 'in_transit' ? 44 : (status === 'driver_assigned' ? 28 : 0))} km/h
+                {typeof telemetry.speed === 'number' ? telemetry.speed : (status === 'in_transit' ? 44 : (status === 'driver_assigned' ? 28 : 0))} km/h
               </span>
             </div>
             <div className="p-3 bg-loft-950/80 rounded-lg border border-loft-800">

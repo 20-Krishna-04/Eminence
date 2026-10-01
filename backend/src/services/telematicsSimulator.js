@@ -88,8 +88,9 @@ const startTelemetrySimulation = (vehicleId) => {
         alert: alertType
       };
 
-      // Broadcast to the admin telemetry room
+      // Broadcast to the admin telemetry room and vehicle telemetry room
       io.to('admin_telemetry').emit('telemetry_update', telemetryData);
+      io.to(`vehicle_${vehicleId}`).emit('telemetry_update', telemetryData);
       
     } catch (err) {
       // socket might not be initialized yet, ignore

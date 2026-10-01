@@ -25,7 +25,7 @@ const truckIcon = new L.Icon({
 
 const TrackingMap = ({ bookingId, initialLat = 18.5204, initialLng = 73.8567, isReconnecting = false, currentPosition = null }) => {
   const [driverPosition, setDriverPosition] = useState([initialLat, initialLng]);
-  const [isConnected, setIsConnected] = useState(true);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     if (currentPosition && Array.isArray(currentPosition) && currentPosition.length === 2) {
@@ -46,6 +46,10 @@ const TrackingMap = ({ bookingId, initialLat = 18.5204, initialLng = 73.8567, is
       if (bookingId) {
         socket.emit('join_trip', bookingId);
       }
+    });
+
+    socket.on('connect_error', () => {
+      setIsConnected(false);
     });
 
     socket.on('trip:location_update', (data) => {

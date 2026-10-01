@@ -160,7 +160,7 @@ const Booking = () => {
     else if (lower.includes('medium')) detectedType = 'medium';
     else if (lower.includes('small')) detectedType = 'small';
 
-    const match = voiceTranscript.match(/(?:from|for)\s+([^to]+?)\s+to\s+(.+)/i);
+    const match = voiceTranscript.match(/(?:from|for)\s+(.+?)\s+to\s+(.+)/i);
     if (match) {
       const cleanDrop = match[2].replace(/\s+(tomorrow|today|morning|evening|night|now|afternoon)/i, '').trim();
       setFormData(prev => ({

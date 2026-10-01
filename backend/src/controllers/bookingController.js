@@ -352,12 +352,10 @@ const aiVoiceBooking = async (req, res) => {
           const parsedPickup = cleaned.slice(startIdx, toIdx).trim();
           let parsedDrop = cleaned.slice(toIdx + 4).trim();
 
-          // Stop at punctuation if present
-          for (let i = 0; i < parsedDrop.length; i++) {
-            if (parsedDrop[i] === ',' || parsedDrop[i] === '.' || parsedDrop[i] === '\n') {
-              parsedDrop = parsedDrop.slice(0, i).trim();
-              break;
-            }
+          // Stop at newline if multiline
+          const newlineIdx = parsedDrop.indexOf('\n');
+          if (newlineIdx !== -1) {
+            parsedDrop = parsedDrop.slice(0, newlineIdx).trim();
           }
 
           // Strip trailing time keywords
@@ -371,9 +369,9 @@ const aiVoiceBooking = async (req, res) => {
               break;
             }
           }
-          parsedDrop = dropWords.join(' ').trim();
+          parsedDrop = dropWords.join(' ').replace(/[.,;]+$/, '').trim();
 
-          if (parsedPickup) pickupAddress = parsedPickup;
+          if (parsedPickup) pickupAddress = parsedPickup.replace(/[.,;]+$/, '').trim();
           if (parsedDrop) dropAddress = parsedDrop;
         }
       }

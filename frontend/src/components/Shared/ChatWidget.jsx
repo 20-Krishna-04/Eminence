@@ -4,6 +4,7 @@ import { io } from 'socket.io-client';
 import { MessageCircle, X, Send } from 'lucide-react';
 
 
+import { getToken } from '../../services/tokenService';
 import api from '../../services/api';
 
 const ChatWidget = () => {
@@ -35,7 +36,8 @@ const ChatWidget = () => {
     // Connect to Socket.io server
     const rawSocketUrl = import.meta.env.VITE_API_URL || api.defaults.baseURL || 'http://localhost:3000';
     const socket = io(rawSocketUrl.replace(/\/api\/?$/, ''), {
-      withCredentials: true
+      withCredentials: true,
+      auth: { token: token || user?.token || getToken() }
     });
     socketRef.current = socket;
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -22,7 +22,7 @@ import { io } from 'socket.io-client';
 
 export default function DriverDashboard() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, token, logout } = useAuth();
 
   const [isOnline, setIsOnline] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -68,13 +68,16 @@ export default function DriverDashboard() {
         .then(() => setIsWakeLockActive(true))
         .catch((err) => console.log('WakeLock activation note:', err?.message));
     } else {
-      deactivateKeepAwake('active_trip_navigation')
-        .then(() => setIsWakeLockActive(false))
-        .catch(() => setIsWakeLockActive(false));
+      try {
+        deactivateKeepAwake('active_trip_navigation');
+      } catch (_e) {}
+      setIsWakeLockActive(false);
     }
 
     return () => {
-      deactivateKeepAwake('active_trip_navigation').catch(() => {});
+      try {
+        deactivateKeepAwake('active_trip_navigation');
+      } catch (_e) {}
     };
   }, [activeTrip, tripStep]);
 
@@ -85,6 +88,7 @@ export default function DriverDashboard() {
     title: string;
     message: string;
   } | null>(null);
+  const socketRef = useRef<any>(null);
 
   const handleThermalDegradation = (temp: number) => {
     if (temp >= 100) {
@@ -105,10 +109,14 @@ export default function DriverDashboard() {
   };
 
   useEffect(() => {
-    const socketUrl = api.defaults.baseURL || 'http://localhost:5000';
+    const socketUrl = api.defaults.baseURL || 'http://localhost:3000';
     const socket = io(socketUrl, {
       transports: ['websocket'],
+      auth: { token },
     });
+    socketRef.current = socket;
+
+    socket.emit('join_vehicle_telemetry', 'VEH-1234');
 
     socket.on('telemetry_update', (packet: any) => {
       if (packet && packet.temperature !== undefined) {
@@ -124,8 +132,9 @@ export default function DriverDashboard() {
 
     return () => {
       socket.disconnect();
+      socketRef.current = null;
     };
-  }, []);
+  }, [token]);
 
   const fetchDriverData = async () => {
     try {
@@ -524,25 +533,37 @@ export default function DriverDashboard() {
           </TouchableOpacity>
         </View>
 
-        {/* TC-KRI-004: QA Hardware & IoT Telemetry Simulator Panel */}
-        <View style={styles.simPanel}>
-          <Text style={styles.simPanelTitle}>🧪 QA SENSOR & TELEMETRY SIMULATION</Text>
-          <Text style={styles.simPanelDesc}>Inject mock telemetry packets into WebSocket / device drivers</Text>
-          <View style={styles.simBtnRow}>
-            <TouchableOpacity 
-              style={[styles.simBtn, { backgroundColor: '#ef4444' }]} 
-              onPress={() => handleThermalDegradation(110)}
-            >
-              <Text style={styles.simBtnText}>🔥 Inject Telemetry (110°C Overheat)</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.simBtn, { backgroundColor: '#10b981' }]} 
-              onPress={() => handleThermalDegradation(85)}
-            >
-              <Text style={styles.simBtnText}>💧 Normal Temp (85°C)</Text>
-            </TouchableOpacity>
+        {/* TC-KRI-004: QA Hardware & IoT Telemetry Simulator Panel (Gated to development/QA builds) */}
+        {__DEV__ && (
+          <View style={styles.simPanel}>
+            <Text style={styles.simPanelTitle}>🧪 QA SENSOR & TELEMETRY SIMULATION</Text>
+            <Text style={styles.simPanelDesc}>Inject mock telemetry packets into WebSocket / device drivers</Text>
+            <View style={styles.simBtnRow}>
+              <TouchableOpacity 
+                style={[styles.simBtn, { backgroundColor: '#ef4444' }]} 
+                onPress={() => {
+                  handleThermalDegradation(110);
+                  if (socketRef.current?.connected) {
+                    socketRef.current.emit('qa:inject_telemetry', { vehicleId: 'VEH-1234', temperature: 110 });
+                  }
+                }}
+              >
+                <Text style={styles.simBtnText}>🔥 Inject Telemetry (110°C Overheat)</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.simBtn, { backgroundColor: '#10b981' }]} 
+                onPress={() => {
+                  handleThermalDegradation(85);
+                  if (socketRef.current?.connected) {
+                    socketRef.current.emit('qa:inject_telemetry', { vehicleId: 'VEH-1234', temperature: 85 });
+                  }
+                }}
+              >
+                <Text style={styles.simBtnText}>💧 Normal Temp (85°C)</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        )}
       </ScrollView>
 
       {/* TC-KRI-004: High-Priority Thermal Degradation Alert Modal Overlay */}
