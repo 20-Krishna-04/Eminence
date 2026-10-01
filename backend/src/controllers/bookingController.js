@@ -323,14 +323,64 @@ const aiVoiceBooking = async (req, res) => {
 
     let pickupAddress = 'Eminence Hub, Pune';
     let dropAddress = 'Destination (Extracted from Voice)';
-    const locMatch = transcript.match(/(?:from|for)\s+([^to]+?)\s+to\s+([^,\n\.]+)/i);
-    if (locMatch) {
-      pickupAddress = locMatch[1].trim();
-      dropAddress = locMatch[2].replace(/\s+(tomorrow|today|morning|evening|night|now|afternoon)/i, '').trim();
+
+    // Deterministic, ReDoS-safe linear parsing for locations from transcript
+    if (typeof transcript === 'string') {
+      const cleaned = transcript.slice(0, 500).trim();
+      const lower = cleaned.toLowerCase();
+
+      let startIdx = -1;
+      const markers = [' from ', ' for '];
+      for (const marker of markers) {
+        const idx = lower.indexOf(marker);
+        if (idx !== -1 && (startIdx === -1 || idx < startIdx)) {
+          startIdx = idx + marker.length;
+        }
+      }
+
+      if (startIdx === -1) {
+        if (lower.startsWith('from ')) {
+          startIdx = 5;
+        } else if (lower.startsWith('for ')) {
+          startIdx = 4;
+        }
+      }
+
+      if (startIdx !== -1) {
+        const toIdx = lower.indexOf(' to ', startIdx);
+        if (toIdx !== -1) {
+          const parsedPickup = cleaned.slice(startIdx, toIdx).trim();
+          let parsedDrop = cleaned.slice(toIdx + 4).trim();
+
+          // Stop at punctuation if present
+          for (let i = 0; i < parsedDrop.length; i++) {
+            if (parsedDrop[i] === ',' || parsedDrop[i] === '.' || parsedDrop[i] === '\n') {
+              parsedDrop = parsedDrop.slice(0, i).trim();
+              break;
+            }
+          }
+
+          // Strip trailing time keywords
+          const timeKeywords = ['tomorrow', 'today', 'morning', 'evening', 'night', 'now', 'afternoon'];
+          const dropWords = parsedDrop.split(/\s+/);
+          while (dropWords.length > 0) {
+            const lastWord = dropWords[dropWords.length - 1].toLowerCase().replace(/[^a-z]/g, '');
+            if (timeKeywords.includes(lastWord)) {
+              dropWords.pop();
+            } else {
+              break;
+            }
+          }
+          parsedDrop = dropWords.join(' ').trim();
+
+          if (parsedPickup) pickupAddress = parsedPickup;
+          if (parsedDrop) dropAddress = parsedDrop;
+        }
+      }
     }
 
     let bookingDate = new Date();
-    if (/tomorrow/i.test(transcript)) {
+    if (typeof transcript === 'string' && transcript.toLowerCase().includes('tomorrow')) {
       bookingDate.setDate(bookingDate.getDate() + 1);
     }
     const dateStr = bookingDate.toISOString().split('T')[0];

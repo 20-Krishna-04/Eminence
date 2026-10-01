@@ -160,13 +160,61 @@ const Booking = () => {
     else if (lower.includes('medium')) detectedType = 'medium';
     else if (lower.includes('small')) detectedType = 'small';
 
-    const match = voiceTranscript.match(/(?:from|for)\s+([^to]+?)\s+to\s+(.+)/i);
-    if (match) {
-      const cleanDrop = match[2].replace(/\s+(tomorrow|today|morning|evening|night|now|afternoon)/i, '').trim();
+    let parsedPickup = '';
+    let parsedDrop = '';
+
+    const cleaned = voiceTranscript.slice(0, 500).trim();
+    let startIdx = -1;
+    const markers = [' from ', ' for '];
+    for (const marker of markers) {
+      const idx = lower.indexOf(marker);
+      if (idx !== -1 && (startIdx === -1 || idx < startIdx)) {
+        startIdx = idx + marker.length;
+      }
+    }
+
+    if (startIdx === -1) {
+      if (lower.startsWith('from ')) {
+        startIdx = 5;
+      } else if (lower.startsWith('for ')) {
+        startIdx = 4;
+      }
+    }
+
+    if (startIdx !== -1) {
+      const toIdx = lower.indexOf(' to ', startIdx);
+      if (toIdx !== -1) {
+        parsedPickup = cleaned.slice(startIdx, toIdx).trim();
+        let remainingDrop = cleaned.slice(toIdx + 4).trim();
+
+        // Stop at punctuation if present
+        for (let i = 0; i < remainingDrop.length; i++) {
+          if (remainingDrop[i] === ',' || remainingDrop[i] === '.' || remainingDrop[i] === '\n') {
+            remainingDrop = remainingDrop.slice(0, i).trim();
+            break;
+          }
+        }
+
+        // Strip trailing time keywords
+        const timeKeywords = ['tomorrow', 'today', 'morning', 'evening', 'night', 'now', 'afternoon'];
+        const dropWords = remainingDrop.split(/\s+/);
+        while (dropWords.length > 0) {
+          const lastWord = dropWords[dropWords.length - 1].toLowerCase().replace(/[^a-z]/g, '');
+          if (timeKeywords.includes(lastWord)) {
+            dropWords.pop();
+          } else {
+            break;
+          }
+        }
+        parsedDrop = dropWords.join(' ').trim();
+      }
+    }
+
+    if (parsedPickup && parsedDrop) {
       setFormData(prev => ({
         ...prev,
-        pickup: match[1].trim(),
-        drops: [cleanDrop || match[2].trim()],
+        pickup: parsedPickup,
+        drops: [parsedDrop],
         tempoType: detectedType
       }));
     } else {
