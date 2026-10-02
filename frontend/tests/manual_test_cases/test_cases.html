@@ -502,10 +502,10 @@
       </div>
 
       <div class="stats-group">
-        <span class="stat-badge">Total: <strong id="total-count">42</strong></span>
+        <span class="stat-badge">Total: <strong id="total-count">38</strong></span>
         <span class="stat-badge pass">Pass: <strong id="pass-count">0</strong></span>
         <span class="stat-badge fail">Fail: <strong id="fail-count">0</strong></span>
-        <span class="stat-badge pending">Pending: <strong id="pending-count">42</strong></span>
+        <span class="stat-badge pending">Pending: <strong id="pending-count">38</strong></span>
         <div class="progress-track">
           <div class="progress-fill" id="progress-bar"></div>
         </div>
@@ -545,7 +545,7 @@
     <!-- Filter & Search Bar -->
     <div class="filter-bar">
       <input type="text" id="search-box" class="search-input" placeholder="🔍 Search test cases by TC-ID, keyword, URL..." oninput="handleSearch()">
-      <button class="filter-pill active" onclick="setFilter('all', this)">All (42)</button>
+      <button class="filter-pill active" onclick="setFilter('all', this)">All (38)</button>
       <button class="filter-pill" onclick="setFilter('pending', this)">Pending</button>
       <button class="filter-pill" onclick="setFilter('pass', this)">Passed</button>
       <button class="filter-pill" onclick="setFilter('fail', this)">Failed</button>
@@ -2280,219 +2280,6 @@
             </article>
           
         </section>
-
-        <!-- MODULE 9: FULL STACK ENGINEERING QA (KRISHNA) -->
-        <section class="module-section" data-module="mod-9">
-          <h2 class="module-title">⚡ MODULE 9: Full Stack Engineering QA — Assigned to Krishna</h2>
-          
-            <article class="test-case" id="TC-KRI-001" data-tc-id="TC-KRI-001">
-              <div class="tc-title">
-                <span class="tc-id-tag">TC-KRI-001 — Web Speech API Interruption</span>
-              </div>
-              
-              <table class="tc-table">
-                <thead>
-                  <tr>
-                    <th>Field</th>
-                    <th>Details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Objective</td>
-                    <td>Verify AI voice booking logic handles abrupt interruptions or mic permission denials.</td>
-                  </tr>
-                  <tr>
-                    <td>Precondition</td>
-                    <td>Web portal running on <code>http://localhost:5173</code></td>
-                  </tr>
-                  <tr>
-                    <td>Steps</td>
-                    <td>
-                      <div class="steps-list">
-                        <div class="step-item">1. Navigate to Booking Page on the Web Portal (<code>/booking</code>).</div>
-                        <div class="step-item">2. Click "Start Voice Booking" (<code>#ai-voice-booking-btn</code>).</div>
-                        <div class="step-item">3. Deny Microphone permission in the browser.</div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Expected Result</td>
-                    <td>✅ Graceful error message ("Microphone access denied. UI fallback to manual text entry."). UI fallback to manual text entry.</td>
-                  </tr>
-                  <tr>
-                    <td>Status</td>
-                    <td>
-                      <div class="status-group">
-                        <button class="status-pill" data-type="pass" onclick="toggleStatus('TC-KRI-001', 'pass')">
-                          <span class="status-icon">[ ]</span> Pass
-                        </button>
-                        <button class="status-pill" data-type="fail" onclick="toggleStatus('TC-KRI-001', 'fail')">
-                          <span class="status-icon">[ ]</span> Fail
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </article>
-
-            <article class="test-case" id="TC-KRI-002" data-tc-id="TC-KRI-002">
-              <div class="tc-title">
-                <span class="tc-id-tag">TC-KRI-002 — Socket Reconnection Strategy</span>
-              </div>
-              
-              <table class="tc-table">
-                <thead>
-                  <tr>
-                    <th>Field</th>
-                    <th>Details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Objective</td>
-                    <td>Ensure UI reflects correct state if Socket.io disconnects and re-fetches latest telemetry upon reconnect.</td>
-                  </tr>
-                  <tr>
-                    <td>Precondition</td>
-                    <td>Active booking created, navigate to tracking page</td>
-                  </tr>
-                  <tr>
-                    <td>Steps</td>
-                    <td>
-                      <div class="steps-list">
-                        <div class="step-item">1. Navigate to Live Tracking (<code>/tracking/:id</code>).</div>
-                        <div class="step-item">2. Simulate offline mode in Chrome DevTools Network Tab.</div>
-                        <div class="step-item">3. Observe UI.</div>
-                        <div class="step-item">4. Disable offline mode.</div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Expected Result</td>
-                    <td>✅ Web UI shows "Reconnecting..." spinner when offline. Re-fetches latest telemetry state (Speed, Location) upon reconnection without requiring manual refresh.</td>
-                  </tr>
-                  <tr>
-                    <td>Status</td>
-                    <td>
-                      <div class="status-group">
-                        <button class="status-pill" data-type="pass" onclick="toggleStatus('TC-KRI-002', 'pass')">
-                          <span class="status-icon">[ ]</span> Pass
-                        </button>
-                        <button class="status-pill" data-type="fail" onclick="toggleStatus('TC-KRI-002', 'fail')">
-                          <span class="status-icon">[ ]</span> Fail
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </article>
-
-            <article class="test-case" id="TC-KRI-003" data-tc-id="TC-KRI-003">
-              <div class="tc-title">
-                <span class="tc-id-tag">TC-KRI-003 — Device Wake Lock Management</span>
-              </div>
-              
-              <table class="tc-table">
-                <thead>
-                  <tr>
-                    <th>Field</th>
-                    <th>Details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Objective</td>
-                    <td>Verify that the screen stays awake while the driver is actively navigating an ongoing trip.</td>
-                  </tr>
-                  <tr>
-                    <td>Precondition</td>
-                    <td>Driver companion mobile app logged in</td>
-                  </tr>
-                  <tr>
-                    <td>Steps</td>
-                    <td>
-                      <div class="steps-list">
-                        <div class="step-item">1. Start an active trip in the Mobile app.</div>
-                        <div class="step-item">2. Leave the device untouched for 5 minutes.</div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Expected Result</td>
-                    <td>✅ Screen does not turn off or dim. <code>expo-keep-awake</code> correctly maintains the wake lock during the trip, but releases it when the trip finishes.</td>
-                  </tr>
-                  <tr>
-                    <td>Status</td>
-                    <td>
-                      <div class="status-group">
-                        <button class="status-pill" data-type="pass" onclick="toggleStatus('TC-KRI-003', 'pass')">
-                          <span class="status-icon">[ ]</span> Pass
-                        </button>
-                        <button class="status-pill" data-type="fail" onclick="toggleStatus('TC-KRI-003', 'fail')">
-                          <span class="status-icon">[ ]</span> Fail
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </article>
-
-            <article class="test-case" id="TC-KRI-004" data-tc-id="TC-KRI-004">
-              <div class="tc-title">
-                <span class="tc-id-tag">TC-KRI-004 — Thermal Degradation Warnings (Simulated)</span>
-              </div>
-              
-              <table class="tc-table">
-                <thead>
-                  <tr>
-                    <th>Field</th>
-                    <th>Details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Objective</td>
-                    <td>Ensure the app warns the driver if the simulated IoT engine temperature goes above safe thresholds.</td>
-                  </tr>
-                  <tr>
-                    <td>Precondition</td>
-                    <td>Driver app connected to WebSocket or simulated telemetry</td>
-                  </tr>
-                  <tr>
-                    <td>Steps</td>
-                    <td>
-                      <div class="steps-list">
-                        <div class="step-item">1. Connect to WebSocket as driver via Mobile App.</div>
-                        <div class="step-item">2. Inject a mock telemetry packet with <code>temperature: 110</code> (Celsius).</div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Expected Result</td>
-                    <td>✅ A high-priority red alert overlay appears on the driver's screen warning of "Coolant Overheating Risk", with a distinct haptic vibration.</td>
-                  </tr>
-                  <tr>
-                    <td>Status</td>
-                    <td>
-                      <div class="status-group">
-                        <button class="status-pill" data-type="pass" onclick="toggleStatus('TC-KRI-004', 'pass')">
-                          <span class="status-icon">[ ]</span> Pass
-                        </button>
-                        <button class="status-pill" data-type="fail" onclick="toggleStatus('TC-KRI-004', 'fail')">
-                          <span class="status-icon">[ ]</span> Fail
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </article>
-
-        </section>
       
     </div>
 
@@ -2574,21 +2361,13 @@
               <td class="fail-val">0</td>
               <td class="pending-val">3</td>
             </tr>
-
-            <tr data-summary-module="mod-9">
-              <td>MODULE 9: Full Stack Engineering QA (Krishna)</td>
-              <td>4</td>
-              <td class="pass-val">0</td>
-              <td class="fail-val">0</td>
-              <td class="pending-val">4</td>
-            </tr>
           
           <tr style="border-top: 2px solid var(--border-light);">
             <td><strong>TOTAL</strong></td>
-            <td><strong id="summary-total-cases">42</strong></td>
+            <td><strong id="summary-total-cases">38</strong></td>
             <td><strong id="summary-total-pass" style="color: var(--accent-green);">0</strong></td>
             <td><strong id="summary-total-fail" style="color: var(--accent-red);">0</strong></td>
-            <td><strong id="summary-total-pending" style="color: #f59e0b;">42</strong></td>
+            <td><strong id="summary-total-pending" style="color: #f59e0b;">38</strong></td>
           </tr>
         </tbody>
       </table>
