@@ -26,17 +26,17 @@ const findPoolMatch = async (newBookingData) => {
         bookingMode: 'shared',
         status: {
           [Op.in]: ['pending', 'driver_assigned']
-        }
+        },
+        date: newBookingData.date,
+        pickupAddress: newBookingData.pickupAddress,
+        dropAddress: newBookingData.dropAddress
       },
       limit: 10
     });
 
     for (let pool of activePools) {
-      // 1. Compare route geometry (simplified as exact address match for MVP)
-      const isSameRoute = 
-        pool.pickupAddress === newBookingData.pickupAddress && 
-        pool.dropAddress === newBookingData.dropAddress;
-
+      // 1. Route geometry and date is already verified by the database query above
+      
       // 2. Check remaining capacity
       // Determine max capacity based on tempoType
       let maxCapacity = 500; // default
@@ -46,8 +46,8 @@ const findPoolMatch = async (newBookingData) => {
 
       const isCapacityAvailable = (pool.weight + newBookingData.weight) <= maxCapacity;
 
-      // 3. Match if date, route, and capacity constraints are all satisfied
-      if (pool.date === newBookingData.date && isSameRoute && isCapacityAvailable) {
+      // 3. Match if capacity constraints are satisfied
+      if (isCapacityAvailable) {
         return pool.id;
       }
     }
