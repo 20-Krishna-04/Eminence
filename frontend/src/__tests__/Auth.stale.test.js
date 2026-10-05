@@ -5,7 +5,6 @@ describe('TC-PRA-002: Stale State Invalidation', () => {
   it('should clear all user data upon logout', () => {
     const initialState = {
       user: { id: 1, name: 'Alice', role: 'customer' },
-      token: 'token-123',
       isAuthenticated: true,
       loading: false,
       error: null
@@ -15,7 +14,6 @@ describe('TC-PRA-002: Stale State Invalidation', () => {
     const nextState = authReducer(initialState, action);
 
     expect(nextState.user).toBeNull();
-    expect(nextState.token).toBeNull();
     expect(nextState.isAuthenticated).toBe(false);
   });
 
@@ -23,7 +21,6 @@ describe('TC-PRA-002: Stale State Invalidation', () => {
     // Initial user logs out
     const initialState = {
       user: { id: 1, name: 'Alice', role: 'customer' },
-      token: 'token-123',
       isAuthenticated: true,
       loading: false,
       error: null
@@ -33,11 +30,9 @@ describe('TC-PRA-002: Stale State Invalidation', () => {
     
     // New user logs in
     const newUser = { id: 2, name: 'Bob', role: 'customer' };
-    const newToken = 'token-456';
-    const loggedInState = authReducer(loggedOutState, loginSuccess({ user: newUser, token: newToken }));
+    const loggedInState = authReducer(loggedOutState, loginSuccess(newUser));
 
     expect(loggedInState.user).toEqual(newUser);
-    expect(loggedInState.token).toEqual('token-456');
     expect(loggedInState.user.name).not.toBe('Alice');
     expect(loggedInState.isAuthenticated).toBe(true);
   });
