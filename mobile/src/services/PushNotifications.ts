@@ -1,20 +1,30 @@
-import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import api from './api';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+let Notifications: any = null;
+try {
+  Notifications = require('expo-notifications');
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+} catch (error) {
+  console.warn('expo-notifications is not available in Expo Go SDK 53+:', error);
+}
 
 export const registerForPushNotificationsAsync = async () => {
+  if (!Notifications) {
+    console.warn('Push notifications are not available in this environment.');
+    return;
+  }
+
   let token;
 
   if (Platform.OS === 'android') {
