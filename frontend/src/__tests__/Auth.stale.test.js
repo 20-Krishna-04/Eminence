@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import authReducer, { loginSuccess, logout } from '../store/authSlice';
+import authReducer, { loginSuccess, logout } from '../redux/slices/authSlice';
 
 describe('TC-PRA-002: Stale State Invalidation', () => {
   it('should clear all user data upon logout', () => {
