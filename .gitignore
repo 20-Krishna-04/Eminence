@@ -136,3 +136,7 @@ dist
 *.sqlite3
 backend/*.sqlite
 backend/*.sqlite3
+
+# Firebase credentials
+firebase-service-account*.json*
+backend/firebase-service-account*.json*

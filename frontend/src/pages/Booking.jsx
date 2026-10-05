@@ -292,6 +292,10 @@ const Booking = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      setError('You must be logged in to create a booking. Please sign in first.');
+      return;
+    }
     setIsSubmitting(true);
     setError('');
     try {
@@ -323,7 +327,7 @@ const Booking = () => {
           return;
         }
 
-        const orderRes = await api.post('/api/integrations/razorpay-order', { bookingId });
+        const orderRes = await api.post('/api/integrations/payment/create-order', { bookingId });
         const { order } = orderRes.data;
 
         const options = {
@@ -335,7 +339,7 @@ const Booking = () => {
           order_id: order.id,
           handler: async function (response) {
             try {
-              await api.post('/api/integrations/razorpay-verify', {
+              await api.post('/api/integrations/payment/verify', {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature
@@ -411,6 +415,11 @@ const Booking = () => {
         </div>
 
         <motion.div className="card p-8 md:p-10">
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl mb-6 text-sm font-medium">
+              {error}
+            </div>
+          )}
           <form onSubmit={step === 3 ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }}>
             
             {/* Step 1: Locations */}

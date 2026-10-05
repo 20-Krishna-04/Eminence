@@ -15,10 +15,12 @@ const WebRTCCaller = () => {
 
   useEffect(() => {
     // Connect to our own Node.js backend PeerServer
+    const isDev = import.meta.env.DEV;
     const newPeer = new Peer({
       host: window.location.hostname,
-      port: 3000,
-      path: '/peerjs'
+      port: isDev ? 5000 : 443,
+      path: '/peerjs',
+      secure: !isDev
     });
 
     newPeer.on('open', (id) => {

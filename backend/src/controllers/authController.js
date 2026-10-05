@@ -51,14 +51,15 @@ const googleLogin = async (req, res) => {
     
     try {
       // Enforce official Firebase Admin verification
-      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      const { getAuth } = require('firebase-admin/auth');
+      const decodedToken = await getAuth().verifyIdToken(idToken);
       uid = decodedToken.uid;
       email = decodedToken.email;
       name = decodedToken.name;
       picture = decodedToken.picture;
     } catch (adminError) {
-      console.error('Firebase Admin verification failed:', adminError.message);
-      return res.status(401).json({ success: false, message: 'Invalid or unverified Google ID token' });
+      console.error('Firebase Admin verification failed:', adminError);
+      return res.status(401).json({ success: false, message: `Invalid or unverified Google ID token: ${adminError.message || adminError}` });
     }
 
     if (!email) {
