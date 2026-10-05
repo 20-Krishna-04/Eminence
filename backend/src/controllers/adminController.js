@@ -302,16 +302,18 @@ const deleteVehicle = async (req, res) => {
 // Get Overview Stats
 const getOverviewStats = async (req, res) => {
   try {
-    const totalRevenue = await Booking.sum('estimatedFare', { where: { status: 'completed' } }) || 0;
-    const activeDrivers = await Driver.count({ where: { status: 'active' } }) || 0;
-    const totalVehicles = await Vehicle.count() || 0;
-    const totalCustomers = await Customer.count() || 0;
+    const [totalRevenue, activeDrivers, totalVehicles, totalCustomers] = await Promise.all([
+      Booking.sum('estimatedFare', { where: { status: 'completed' } }),
+      Driver.count({ where: { status: 'active' } }),
+      Vehicle.count(),
+      Customer.count()
+    ]);
 
     res.status(200).json({
       success: true,
       stats: {
-        revenue: `₹${parseFloat(totalRevenue).toLocaleString()}`,
-        rawRevenue: parseFloat(totalRevenue) || 0,
+        revenue: `₹${parseFloat(totalRevenue || 0).toLocaleString()}`,
+        rawRevenue: parseFloat(totalRevenue || 0),
         activeDrivers: activeDrivers.toString(),
         totalVehicles: totalVehicles.toString(),
         totalCustomers: totalCustomers.toString(),
@@ -444,23 +446,24 @@ const getDriverUtilization = async (req, res) => {
     const cached = await cache.get(cacheKey);
     if (cached) return res.status(200).json({ success: true, ...cached, fromCache: true });
 
-    const totalDrivers = await Driver.count();
-    const activeDrivers = await Driver.count({ where: { status: 'active' } });
-    const onTripDrivers = await Driver.count({ where: { status: 'on_trip' } });
-    const utilizationRate = totalDrivers > 0 ? ((onTripDrivers / totalDrivers) * 100).toFixed(1) : 0;
+    const [totalDrivers, activeDrivers, onTripDrivers, hourGroupQuery] = await Promise.all([
+      Driver.count(),
+      Driver.count({ where: { status: 'active' } }),
+      Driver.count({ where: { status: 'on_trip' } }),
+      Booking.findAll({
+        attributes: [
+          [sequelize.fn('substr', sequelize.col('time'), 1, 2), 'hourStr'],
+          [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+        ],
+        where: {
+          time: { [Op.not]: null }
+        },
+        group: [sequelize.fn('substr', sequelize.col('time'), 1, 2)],
+        raw: true
+      })
+    ]);
 
-    // Efficiently count bookings grouped by the hour part of the 'time' column
-    const hourGroupQuery = await Booking.findAll({
-      attributes: [
-        [sequelize.fn('substr', sequelize.col('time'), 1, 2), 'hourStr'],
-        [sequelize.fn('COUNT', sequelize.col('id')), 'count']
-      ],
-      where: {
-        time: { [Op.not]: null }
-      },
-      group: [sequelize.fn('substr', sequelize.col('time'), 1, 2)],
-      raw: true
-    });
+    const utilizationRate = totalDrivers > 0 ? ((onTripDrivers / totalDrivers) * 100).toFixed(1) : 0;
 
     const peakHours = hourGroupQuery
       .map(row => ({
