@@ -141,6 +141,18 @@ Eminence/
 
 ---
 
+### ⚡ One-Click Startup (Windows)
+
+For a fast and fully automated startup experience on Windows, simply double-click the `startup.bat` file located in the root of the project directory.
+
+Alternatively, run it from your command prompt:
+```cmd
+.\startup.bat
+```
+This script will automatically open three separate terminal windows and launch the backend API, frontend web app, and mobile Expo server simultaneously. You don't need to manually run any of the individual start commands below if you use this script!
+
+---
+
 ### 1. Backend Setup
 
 ```bash
