@@ -21,8 +21,6 @@ const Booking = () => {
   const [discount, setDiscount] = useState(0);
   const [promoMessage, setPromoMessage] = useState(null);
   
-  // Smart Pricing Engine (Simulated Surge)
-  const [surgeMultiplier] = useState(1.4); // e.g. 1.4x due to Rush Hour
 
   // Gamification States
   const [hasInsurance, setHasInsurance] = useState(false);
@@ -51,6 +49,22 @@ const Booking = () => {
     phone: '',
     paymentMethod: 'online'
   });
+
+  // Smart Pricing Engine (Dynamic Surge)
+  const calculateSurge = () => {
+    if (formData.date && formData.time) {
+      const dateObj = new Date(formData.date);
+      const day = dateObj.getDay(); // 5 = Friday
+      const hour = parseInt(formData.time.split(':')[0], 10);
+      
+      // Friday between 5 PM and 8 PM (17:00 - 20:00)
+      if (day === 5 && hour >= 17 && hour <= 20) {
+        return 1.5;
+      }
+    }
+    return 1.0;
+  };
+  const surgeMultiplier = calculateSurge();
 
   const getEsgEmissions = () => {
     const distance = parseFloat(formData.totalDistance) || 15;
@@ -739,6 +753,12 @@ const Booking = () => {
                       🌿 {getEsgEmissions()} kg CO₂
                     </span>
                   </div>
+                  {surgeMultiplier > 1.0 && (
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-red-400 flex items-center gap-2 font-bold px-2 py-1 bg-red-500/20 border border-red-500/30 rounded-md">🚀 Surge Active ({surgeMultiplier}x)</span>
+                      <span className="font-bold text-red-400">High Demand</span>
+                    </div>
+                  )}
                   {isPro && (
                     <div className="flex justify-between items-center mb-2 text-yellow-500">
                       <span className="text-yellow-500 flex items-center gap-2 font-bold"><Crown className="w-4 h-4"/> Eminence Pro Discount</span>
