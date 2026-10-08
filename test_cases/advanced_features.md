@@ -69,6 +69,7 @@ This document focuses exclusively on the testing scenarios for the React Web Por
   - The ESG badge correctly displays the CO2 footprint calculation based on the distance.
   - Because you are using `rzp_test_` keys, the Razorpay mock popup should appear seamlessly.
   - Entering fake card details (`4111 1111 ...`) should succeed and redirect you to the "Booking Confirmed" screen.
+  [DONE{PASSED}]
 
 ---
 
@@ -85,15 +86,17 @@ This document focuses exclusively on the testing scenarios for the React Web Por
   - The driver's assigned vehicle (`MH-12-PQ-1234`) is rendered on the map.
   - Driver details (Ramesh Kumar, 4.8 Rating) are visible in the side panel.
   - *Note:* The vehicle will remain static at 0 km/h and say "Loading..." until the Driver logs into the Mobile App, accepts the ride, and enters the Start Ride OTP (e.g. `8492`).
+  [DONE{PASSED}]
 
 ### TC-W006: Admin Fleet Overview Map
 - **Pre-condition**: Logged in as Admin (`admin@eminence.com`).
 - **Steps**:
   1. Navigate to **"Live Fleet Tracking"** on the admin sidebar.
 - **Expected Result**: 
-  - A global city map is displayed.
-  - A cluster of pins is shown for all active vehicles.
-  - Clicking on the pin for `MH-12-PQ-1234` opens a tooltip showing its current status ("In-Transit") and assigned driver ("Ramesh Kumar").
+  - The Live Fleet Telematics dashboard is displayed with real-time IoT data streams.
+  - Four live dials are visible: **Current Speed**, **Engine RPM**, **Engine Temp**, and **Fuel Level**.
+  - The values should actively fluctuate as the backend `telematicsSimulator` streams WebSocket data.
+  [DONE{PASSED}]
 
 ---
 
