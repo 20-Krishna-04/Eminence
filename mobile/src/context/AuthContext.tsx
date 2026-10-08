@@ -14,6 +14,7 @@ export interface User {
   isPhoneVerified?: boolean;
   termsAccepted?: boolean;
   termsVersion?: string;
+  vehicleNo?: string;
 }
 
 interface AuthContextType {
