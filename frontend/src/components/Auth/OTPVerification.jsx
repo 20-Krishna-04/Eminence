@@ -185,7 +185,7 @@ const OTPVerification = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="flex justify-between gap-4">
+          <div className="flex justify-between gap-2 sm:gap-3">
             {otp.map((digit, index) => (
               <input
                 key={index}
@@ -194,7 +194,7 @@ const OTPVerification = () => {
                 inputMode="numeric"
                 pattern="\d*"
                 maxLength={1}
-                className="w-16 h-16 text-center text-2xl font-bold bg-loft-950/80 border border-loft-800/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-copper-500/50 focus:border-copper-500/50 transition-all text-loft-50 shadow-inner"
+                className="w-10 h-12 sm:w-12 sm:h-14 md:w-14 md:h-16 text-center text-xl sm:text-2xl font-bold bg-loft-950/80 border border-loft-800/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-copper-500/50 focus:border-copper-500/50 transition-all text-loft-50 shadow-inner"
                 value={digit}
                 onChange={(e) => handleChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}

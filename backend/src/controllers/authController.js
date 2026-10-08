@@ -19,7 +19,11 @@ const checkAndSetProfileComplete = async (customer) => {
 
 // Generate 6 digit OTP
 const generateOtp = () => {
-  return crypto.randomInt(100000, 1000000).toString();
+  const otp = crypto.randomInt(100000, 1000000).toString();
+  console.log(`\n\n==============================`);
+  console.log(`🚀 TEST OTP GENERATED: ${otp}`);
+  console.log(`==============================\n\n`);
+  return otp;
 };
 
 // Secure JWT Secret Loader
