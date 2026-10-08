@@ -16,12 +16,8 @@ if (!apiKey || apiKey === 'your_api_key_here') {
  */
 const sendSMS = (to, body) => {
   return new Promise((resolve, reject) => {
-    if (!apiKey || apiKey === 'your_api_key_here') {
-      if (process.env.NODE_ENV !== 'development') {
-        console.error('Fast2SMS is not configured. Cannot send SMS in non-development environment.');
-        return resolve(null);
-      }
-
+    if (!apiKey || apiKey === 'your_api_key_here' || apiKey === 'your_fast2sms_api_key_here') {
+      // Always fallback to terminal logging if API key is missing, to save Fast2SMS limit limits
       const maskPhone = (phone) => {
         if (!phone) return phone;
         const str = String(phone);
