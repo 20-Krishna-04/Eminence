@@ -9,12 +9,10 @@ const BusinessDashboard = () => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
-  const { token } = useSelector((state) => state.auth);
+  const { token, user } = useSelector((state) => state.auth);
 
-  const [expenseReports, setExpenseReports] = useState([
-    { id: 'EXP-901', date: '2026-09-25', employee: 'Rahul Verma', amount: '₹1,250', rides: 3, status: 'pending_approval' },
-    { id: 'EXP-882', date: '2026-09-20', employee: 'Sneha Patel', amount: '₹800', rides: 2, status: 'approved' },
-  ]);
+  // Expenses will now be fetched if API supports it, otherwise use empty state
+  const [expenseReports, setExpenseReports] = useState([]);
 
   const handleApproveExpense = (id) => {
     setExpenseReports(expenseReports.map(exp => exp.id === id ? { ...exp, status: 'approved' } : exp));
@@ -131,7 +129,7 @@ const BusinessDashboard = () => {
               Contract Client
             </div>
             <h1 className="text-3xl md:text-4xl font-serif font-bold text-loft-50 mb-2">Business Portal</h1>
-            <p className="text-loft-300">Reliance Smart - Magarpatta Branch</p>
+            <p className="text-loft-300">{user?.companyName || user?.name || 'Business Account'}</p>
           </div>
           <button className="btn-primary py-2.5 px-6">
             <Truck className="w-4 h-4 mr-2" /> Request Extra Vehicle
@@ -158,10 +156,10 @@ const BusinessDashboard = () => {
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Active Contracts', value: '2', icon: FileText, color: 'text-moss-500', bg: 'bg-moss-500/10' },
-            { label: 'Trips this Month', value: '142', icon: Truck, color: 'text-copper-500', bg: 'bg-copper-500/10' },
-            { label: 'Dedicated Drivers', value: '3', icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-            { label: 'Pending Invoice', value: '₹45,200', icon: CreditCard, color: 'text-red-500', bg: 'bg-red-500/10' },
+            { label: 'Active Contracts', value: contracts.filter(c => c.status === 'active').length, icon: FileText, color: 'text-moss-500', bg: 'bg-moss-500/10' },
+            { label: 'Trips this Month', value: '—', icon: Truck, color: 'text-copper-500', bg: 'bg-copper-500/10' },
+            { label: 'Total Contracts', value: contracts.length, icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+            { label: 'Pending Invoices', value: invoices.filter(i => i.status === 'pending').length, icon: CreditCard, color: 'text-red-500', bg: 'bg-red-500/10' },
           ].map((stat, idx) => (
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
@@ -193,18 +191,20 @@ const BusinessDashboard = () => {
                   <h3 className="text-xl font-bold text-loft-50">Active Contracts</h3>
                 </div>
                 
-                {[
-                  { id: 'CTR-8892-A', type: 'Daily Routine (Morning)', vehicle: 'Large Truck (Eicher 14ft)', driver: 'Suresh M.' },
-                  { id: 'CTR-8892-B', type: 'Ad-hoc Warehouse Transfer', vehicle: 'Medium Tempo (Bolero)', driver: 'Amit P.' }
-                ].map((contract, idx) => (
+                {contracts.filter(c => c.status === 'active').length === 0 ? (
+                  <div className="card p-8 text-center border-loft-800">
+                    <FileText className="w-10 h-10 text-loft-600 mx-auto mb-3" />
+                    <p className="text-loft-400 text-sm">No active contracts yet. Request one below!</p>
+                  </div>
+                ) : contracts.filter(c => c.status === 'active').map((contract, idx) => (
                   <div key={idx} className="card p-6 border border-loft-800 flex flex-col md:flex-row justify-between md:items-center gap-4">
                     <div>
                       <div className="flex items-center gap-3 mb-2">
-                        <span className="font-mono text-sm text-copper-400 bg-copper-500/10 px-2 py-0.5 rounded">{contract.id}</span>
-                        <span className="text-xs bg-moss-500/10 text-moss-500 px-2 py-0.5 rounded uppercase font-bold">Active</span>
+                        <span className="font-mono text-sm text-copper-400 bg-copper-500/10 px-2 py-0.5 rounded">{contract.id?.slice(0,8).toUpperCase()}</span>
+                        <span className="text-xs bg-moss-500/10 text-moss-500 px-2 py-0.5 rounded uppercase font-bold">{contract.status}</span>
                       </div>
-                      <h4 className="text-lg font-bold text-loft-50 mb-1">{contract.type}</h4>
-                      <p className="text-loft-400 text-sm">{contract.vehicle} &bull; Driver: {contract.driver}</p>
+                      <h4 className="text-lg font-bold text-loft-50 mb-1">{contract.vehicleType}</h4>
+                      <p className="text-loft-400 text-sm">{contract.vehicleCount} vehicle(s) &bull; {new Date(contract.startDate).toLocaleDateString('en-IN')} - {new Date(contract.endDate).toLocaleDateString('en-IN')}</p>
                     </div>
                     <div>
                       <button className="text-sm font-medium text-copper-500 hover:text-copper-400 border border-copper-500/30 px-4 py-2 rounded-lg transition-colors">

@@ -13,6 +13,8 @@ const DriverDashboard = () => {
   const [isOnline, setIsOnline] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [heatmapData, setHeatmapData] = useState(null);
+  const [driverStats, setDriverStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(false);
   
   // WMS Scanning State
   const [scanResult, setScanResult] = useState(null);
@@ -202,7 +204,21 @@ const DriverDashboard = () => {
       };
       fetchHeatmap();
     }
-  }, [activeTab]);
+    if (activeTab === 'earnings' && user?.id) {
+      const fetchStats = async () => {
+        setStatsLoading(true);
+        try {
+          const res = await api.get(`/api/drivers/${user.id}/payslip`);
+          if (res.data.success) setDriverStats(res.data.payslip);
+        } catch (err) {
+          console.error('Error fetching driver stats:', err);
+        } finally {
+          setStatsLoading(false);
+        }
+      };
+      fetchStats();
+    }
+  }, [activeTab, user?.id]);
 
   return (
     <div className="w-full pt-12 pb-24 relative min-h-[80vh]">
@@ -222,7 +238,7 @@ const DriverDashboard = () => {
               {isOnline ? 'ONLINE - RECEIVING TRIPS' : 'OFFLINE'}
             </button>
             <h1 className="text-3xl md:text-4xl font-serif font-bold text-loft-50 mb-2">Driver Portal</h1>
-            <p className="text-loft-300">Welcome, Ramesh Kumar (MH 12 AB 1234)</p>
+            <p className="text-loft-300">Welcome, <span className="text-copper-400">{user?.name || 'Driver'}</span></p>
           </div>
           <button className="btn-primary py-2.5 px-6 shadow-[0_0_20px_rgba(232,99,49,0.2)] bg-red-600/20 text-red-500 border-red-500/50 hover:bg-red-600/30 hover:border-red-500">
             <AlertTriangle className="w-5 h-5 mr-2" /> SOS / Emergency
@@ -250,10 +266,10 @@ const DriverDashboard = () => {
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Today\'s Earnings', value: '₹1,250', icon: Wallet, color: 'text-copper-500', bg: 'bg-copper-500/10' },
-            { label: 'Completed Trips', value: '4', icon: CheckCircle, color: 'text-moss-500', bg: 'bg-moss-500/10' },
-            { label: 'Online Hours', value: '5.2 hrs', icon: Clock, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-            { label: 'Rating', value: '4.8 ⭐', icon: Navigation, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
+            { label: 'Today\'s Earnings', value: driverStats ? `₹${driverStats.netPayout.toLocaleString('en-IN')}` : '...' , icon: Wallet, color: 'text-copper-500', bg: 'bg-copper-500/10' },
+            { label: 'Completed Trips', value: user?.totalTrips ?? '—', icon: CheckCircle, color: 'text-moss-500', bg: 'bg-moss-500/10' },
+            { label: 'Online Hours', value: '—', icon: Clock, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+            { label: 'Rating', value: user?.rating ? `${user.rating} ⭐` : '—', icon: Navigation, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
           ].map((stat, idx) => (
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
@@ -306,12 +322,12 @@ const DriverDashboard = () => {
                       <div className="relative">
                         <div className="absolute -left-[29px] top-0.5 w-4 h-4 rounded-full bg-moss-500 border-4 border-loft-900"></div>
                         <p className="text-sm font-bold text-loft-200">Pickup (4 mins away)</p>
-                        <p className="text-sm text-loft-400">123 Market Street, Viman Nagar</p>
+                          <p className="text-sm text-loft-400">{activeRide?.pickup || '—'}</p>
                       </div>
                       <div className="relative">
                         <div className="absolute -left-[29px] top-0.5 w-4 h-4 rounded-full bg-copper-500 border-4 border-loft-900"></div>
                         <p className="text-sm font-bold text-loft-200">Drop-off</p>
-                        <p className="text-sm text-loft-400">{activeRide?.dropoff || '456 Industrial Area, Hinjewadi'}</p>
+                          <p className="text-sm text-loft-400">{activeRide?.dropoff || '—'}</p>
                       </div>
                     </div>
 
@@ -361,7 +377,7 @@ const DriverDashboard = () => {
                       <div className="space-y-4">
                         <div>
                           <p className="text-loft-400 text-xs">Customer Name</p>
-                          <p className="font-bold text-loft-50">Rahul Sharma</p>
+                          <p className="font-bold text-loft-50">{activeRide?.customerName || '—'}</p>
                         </div>
                         <div>
                           <p className="text-loft-400 text-xs">Goods</p>

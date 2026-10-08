@@ -19,6 +19,10 @@ const CustomerDashboard = () => {
   const [copySuccess, setCopySuccess] = useState(false);
   const copyTimeoutRef = useRef(null);
 
+  // Live booking state
+  const [bookings, setBookingsData] = useState([]);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
+
   useEffect(() => {
     return () => {
       if (copyTimeoutRef.current) {
@@ -101,9 +105,22 @@ const CustomerDashboard = () => {
     }
   };
 
+  const fetchBookings = async () => {
+    setBookingsLoading(true);
+    try {
+      const res = await api.get('/api/bookings');
+      setBookingsData(res.data.bookings || []);
+    } catch (err) {
+      console.error('Error fetching bookings:', err);
+    } finally {
+      setBookingsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (token) {
       fetchWallet();
+      fetchBookings();
     }
     if (activeTab === 'addresses' && token) {
       fetchAddresses();
@@ -269,12 +286,12 @@ const CustomerDashboard = () => {
           ))}
         </div>
 
-        {/* Statistics Cards */}
+        {/* Statistics Cards — Live from API */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {[
-            { label: 'Total Bookings', value: '12', icon: Package },
-            { label: 'Completed Rides', value: '10', icon: CheckCircle },
-            { label: 'Total Spent', value: '₹4,250', icon: Wallet },
+            { label: 'Total Bookings', value: bookings.length || 0, icon: Package },
+            { label: 'Completed Rides', value: bookings.filter(b => b.status === 'completed').length || 0, icon: CheckCircle },
+            { label: 'Total Spent', value: `₹${bookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + (parseFloat(b.estimatedFare) || 0), 0).toLocaleString('en-IN')}`, icon: Wallet },
           ].map((stat, idx) => (
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
@@ -366,54 +383,59 @@ const CustomerDashboard = () => {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold text-loft-50">Recent Bookings</h3>
-                <button className="text-copper-500 text-sm font-medium hover:text-copper-400">View All</button>
+                <button onClick={fetchBookings} className="text-copper-500 text-sm font-medium hover:text-copper-400 flex items-center gap-1">
+                  <RefreshCw className="w-3 h-3" /> Refresh
+                </button>
               </div>
               <div className="space-y-4">
-                {[
-                  { id: 'BKG-7829', date: 'Aug 21, 2026', vehicle: 'Tata Ace (Chota Hathi)', from: 'Kalyani Nagar', to: 'Viman Nagar', status: 'Completed', amount: '₹450', esgEmissions: '1.44 KG CO2' },
-                  { id: 'BKG-7815', date: 'Aug 18, 2026', vehicle: 'Mahindra Bolero Pickup', from: 'Kothrud', to: 'Deccan Gymkhana', status: 'Completed', amount: '₹600', is3plOutsourced: true, thirdPartyProvider: 'Delhivery Logistics', esgEmissions: '2.50 KG CO2' },
-                  { id: 'BKG-7790', date: 'Aug 12, 2026', vehicle: 'Tata Ace', from: 'Shivaji Nagar', to: 'Baner', status: 'Cancelled', amount: '₹0' }
-                ].map((booking, idx) => (
-                  <div key={idx} className="card p-5 bg-loft-900 flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-l-transparent hover:border-l-copper-500 transition-all">
+                {bookingsLoading ? (
+                  <div className="card p-8 text-center">
+                    <div className="w-8 h-8 border-2 border-copper-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                    <p className="text-loft-400 text-sm">Loading your bookings...</p>
+                  </div>
+                ) : bookings.length === 0 ? (
+                  <div className="card p-12 text-center">
+                    <Package className="w-12 h-12 text-loft-600 mx-auto mb-3" />
+                    <h4 className="text-loft-300 font-semibold mb-1">No bookings yet</h4>
+                    <p className="text-loft-500 text-sm">Your ride history will appear here once you book your first trip.</p>
+                  </div>
+                ) : bookings.map((booking) => {
+                  const statusLabel = booking.status === 'completed' ? 'Completed' : booking.status === 'cancelled' ? 'Cancelled' : booking.status;
+                  const isCompleted = booking.status === 'completed';
+                  const isCancelled = booking.status === 'cancelled';
+                  return (
+                  <div key={booking.id} className="card p-5 bg-loft-900 flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-l-transparent hover:border-l-copper-500 transition-all">
                     <div>
                       <div className="flex items-center gap-3 mb-2">
-                        <span className="font-bold text-loft-50">{booking.id}</span>
+                        <span className="font-bold text-loft-50 font-mono text-sm">{booking.id?.slice(0, 8).toUpperCase()}</span>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                          booking.status === 'Completed' ? 'bg-moss-500/20 text-moss-500' : 'bg-red-500/20 text-red-500'
+                          isCompleted ? 'bg-moss-500/20 text-moss-500' : isCancelled ? 'bg-red-500/20 text-red-500' : 'bg-blue-500/20 text-blue-400'
                         }`}>
-                          {booking.status}
+                          {statusLabel}
                         </span>
-                        <span className="text-loft-400 text-sm">{booking.date}</span>
+                        <span className="text-loft-400 text-sm">{new Date(booking.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-loft-300">
                         <Package className="w-4 h-4 text-loft-500" />
-                        <span>{booking.vehicle}</span>
+                        <span>{booking.vehicle?.type || booking.tempoType || 'Vehicle'}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-loft-300 mt-1">
                         <MapPin className="w-4 h-4 text-copper-500" />
-                        <span>{booking.from} &rarr; {booking.to}</span>
+                        <span>{booking.pickupAddress || 'Pickup'} &rarr; {booking.dropAddress || (booking.drops?.[0]) || 'Drop'}</span>
                       </div>
-                      {(booking.esgEmissions || booking.is3plOutsourced) && (
+                      {booking.esgEmissions && (
                         <div className="flex flex-wrap items-center gap-3 mt-3">
-                          {booking.esgEmissions && (
-                            <span className="flex items-center gap-1.5 text-xs text-moss-400 bg-moss-900/30 px-2 py-1 rounded-md border border-moss-800">
-                              <Leaf className="w-3 h-3" />
-                              {booking.esgEmissions} Saved
-                            </span>
-                          )}
-                          {booking.is3plOutsourced && (
-                            <span className="flex items-center gap-1.5 text-xs text-blue-400 bg-blue-900/30 px-2 py-1 rounded-md border border-blue-800">
-                              <Truck className="w-3 h-3" />
-                              3PL Handled: {booking.thirdPartyProvider}
-                            </span>
-                          )}
+                          <span className="flex items-center gap-1.5 text-xs text-moss-400 bg-moss-900/30 px-2 py-1 rounded-md border border-moss-800">
+                            <Leaf className="w-3 h-3" />
+                            {booking.esgEmissions} KG CO2 Saved
+                          </span>
                         </div>
                       )}
                     </div>
                     <div className="flex items-center justify-between md:flex-col md:items-end gap-2">
-                      <span className="text-xl font-bold text-loft-100">{booking.amount}</span>
+                      <span className="text-xl font-bold text-loft-100">₹{parseFloat(booking.estimatedFare || 0).toLocaleString('en-IN')}</span>
                       <div className="flex items-center gap-2">
-                        {booking.status === 'Completed' && (
+                        {isCompleted && (
                           reviewedBookings[booking.id] ? (
                             <span className="text-xs font-semibold text-moss-400 bg-moss-900/30 px-2 py-1 rounded border border-moss-800">
                               ★ {reviewedBookings[booking.id]}.0 Rated
@@ -439,7 +461,8 @@ const CustomerDashboard = () => {
                       </div>
                     </div>
                   </div>
-                ))}
+                );
+                })}
               </div>
             </motion.div>
           )}
@@ -463,22 +486,21 @@ const CustomerDashboard = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-loft-800">
-                      {[
-                        { id: 'INV-2608-012', date: 'Aug 21, 2026', ref: 'BKG-7829', amount: '₹450' },
-                        { id: 'INV-2608-005', date: 'Aug 18, 2026', ref: 'BKG-7815', amount: '₹600' }
-                      ].map((invoice, idx) => (
+                      {bookings.filter(b => b.status === 'completed').length === 0 ? (
+                        <tr><td colSpan="5" className="px-6 py-8 text-center text-loft-500 text-sm">No invoices yet. Completed bookings will appear here.</td></tr>
+                      ) : bookings.filter(b => b.status === 'completed').map((booking, idx) => (
                         <tr key={idx} className="hover:bg-loft-800/50 transition-colors">
-                          <td className="px-6 py-4 font-medium text-loft-200">{invoice.id}</td>
-                          <td className="px-6 py-4">{invoice.date}</td>
-                          <td className="px-6 py-4">{invoice.ref}</td>
-                          <td className="px-6 py-4 font-bold text-loft-100">{invoice.amount}</td>
+                          <td className="px-6 py-4 font-medium text-loft-200 font-mono text-sm">INV-{booking.id?.slice(0,8).toUpperCase()}</td>
+                          <td className="px-6 py-4">{new Date(booking.updatedAt || booking.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                          <td className="px-6 py-4 font-mono text-sm">{booking.id?.slice(0,8).toUpperCase()}</td>
+                          <td className="px-6 py-4 font-bold text-loft-100">₹{parseFloat(booking.estimatedFare || 0).toLocaleString('en-IN')}</td>
                           <td className="px-6 py-4">
                             <button 
-                              onClick={() => handleDownloadInvoice(invoice.id)}
-                              disabled={downloadingInvoice === invoice.id}
+                              onClick={() => handleDownloadInvoice(booking.id)}
+                              disabled={downloadingInvoice === booking.id}
                               className="text-copper-500 hover:text-copper-400 font-medium text-xs flex items-center gap-1 disabled:opacity-50"
                             >
-                              {downloadingInvoice === invoice.id ? 'Downloading...' : 'Download PDF'}
+                              {downloadingInvoice === booking.id ? 'Downloading...' : 'Download PDF'}
                             </button>
                           </td>
                         </tr>
