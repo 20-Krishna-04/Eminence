@@ -19,7 +19,7 @@ This document focuses exclusively on the testing scenarios for the React Web Por
 - **Expected Result**: 
   - You are redirected to the customer dashboard.
   - The profile page correctly loads the seeded user details: Name is "Demo User", and phone is verified.
-  [DONE]
+  [DONE{PASSED}]
 
 
 ### TC-W002: Admin Login & Secure Dashboard
@@ -33,13 +33,13 @@ This document focuses exclusively on the testing scenarios for the React Web Por
 - **Expected Result**: 
   - Redirected to `/admin/dashboard`.
   - The Admin sidebar is fully loaded, displaying options like "Fleet Telematics", "Driver Verification", and "Asset Health".
-
+[DONE{PASSED}]
 ---
 
 ## 2. The Booking Flow & Smart Pricing
 **Objective**: Validate the core logistics booking engine on the web.
 
-### TC-W003: Standard Vehicle Booking & Surge Calculation
+### TC-W003: Standard Vehicle Booking, Surge Calculation & Payment Flow
 - **Pre-condition**: Logged in as Customer (`1234567890`).
 - **Steps**:
   1. On the customer dashboard, click **"Book a Vehicle"**.
@@ -47,10 +47,17 @@ This document focuses exclusively on the testing scenarios for the React Web Por
   3. **Step 2 (Vehicle & Goods)**: Select "Small Tempo". Enter a mock weight like "250 KG" and select "Furniture".
   4. **Step 3 (Schedule)**: Select an upcoming Friday at 18:00 (6:00 PM).
   5. Click **"Calculate Fare"**.
+  6. **Step 4 (Details & Discounts)**: Enter a valid referral code or "Eminence Pro" code if applicable.
+  7. Provide the Receiver's Contact Number.
+  8. Select "Card" or "Netbanking" as the payment method and click **"Confirm Booking"**.
+  9. Complete the Razorpay test payment flow using the test UPI credentials.
 - **Expected Result**: 
   - The UI accurately calculates the distance.
   - A red surge badge `🚀 Surge Active (1.5x)` appears because Friday 6 PM falls into peak hours.
-  - The final price dynamically reflects (Base Fare * Distance * 1.5).
+  - The referral discount is successfully applied to the total fare.
+  - The final price dynamically reflects (Base Fare * Distance * 1.5) - Discount.
+  - The booking is successfully created, generating a valid Booking ID and receipt.
+  [DONE{PASSED}]
 
 ### TC-W004: Payment Gateway & ESG Emissions UI
 - **Pre-condition**: You are at the final payment step of TC-W003.
@@ -77,6 +84,7 @@ This document focuses exclusively on the testing scenarios for the React Web Por
   - The tracking map loads with Leaflet/Google Maps.
   - The driver's assigned vehicle (`MH-12-PQ-1234`) is rendered on the map.
   - Driver details (Ramesh Kumar, 4.8 Rating) are visible in the side panel.
+  - *Note:* The vehicle will remain static at 0 km/h and say "Loading..." until the Driver logs into the Mobile App, accepts the ride, and enters the Start Ride OTP (e.g. `8492`).
 
 ### TC-W006: Admin Fleet Overview Map
 - **Pre-condition**: Logged in as Admin (`admin@eminence.com`).

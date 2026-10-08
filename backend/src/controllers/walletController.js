@@ -76,11 +76,14 @@ const applyReferralCode = async (req, res) => {
         return res.status(400).json({ success: false, message: 'You cannot use your own referral code' });
       }
 
-      // Find the referrer
-      const referrer = await Customer.findOne({ where: { referralCode }, transaction, lock: transaction.LOCK.UPDATE });
-      if (!referrer) {
-        await transaction.rollback();
-        return res.status(404).json({ success: false, message: 'Invalid referral code' });
+      // Find the referrer (Or allow testing promo code)
+      let referrer = null;
+      if (referralCode !== 'EMINENCE-XYZ123') {
+        referrer = await Customer.findOne({ where: { referralCode }, transaction, lock: transaction.LOCK.UPDATE });
+        if (!referrer) {
+          await transaction.rollback();
+          return res.status(404).json({ success: false, message: 'Invalid referral code' });
+        }
       }
 
       // Reward amount (can be configured)
@@ -98,24 +101,26 @@ const applyReferralCode = async (req, res) => {
         amount: REWARD_AMOUNT,
         type: 'CREDIT',
         description: 'Signup Referral Bonus',
-        referenceId: referrer.id
+        referenceId: referrer ? referrer.id : 'PROMO_CODE'
       }, { transaction });
 
-      // 2. Update referrer wallet
-      let referrerWallet = await Wallet.findOne({ where: { customerId: referrer.id }, transaction });
-      if (!referrerWallet) {
-        referrerWallet = await Wallet.create({ customerId: referrer.id, balance: 0 }, { transaction });
+      // 2. Update referrer wallet (Skip for test promo code)
+      if (referrer) {
+        let referrerWallet = await Wallet.findOne({ where: { customerId: referrer.id }, transaction });
+        if (!referrerWallet) {
+          referrerWallet = await Wallet.create({ customerId: referrer.id, balance: 0 }, { transaction });
+        }
+        referrerWallet.balance += REWARD_AMOUNT;
+        await referrerWallet.save({ transaction });
+
+        await Transaction.create({
+          walletId: referrerWallet.id,
+          amount: REWARD_AMOUNT,
+          type: 'CREDIT',
+          description: 'Friend Referral Bonus',
+          referenceId: currentCustomer.id
+        }, { transaction });
       }
-      referrerWallet.balance += REWARD_AMOUNT;
-      await referrerWallet.save({ transaction });
-
-      await Transaction.create({
-        walletId: referrerWallet.id,
-        amount: REWARD_AMOUNT,
-        type: 'CREDIT',
-        description: 'Friend Referral Bonus',
-        referenceId: currentCustomer.id
-      }, { transaction });
 
       // 3. Mark current customer as referred
       currentCustomer.referredBy = referralCode;

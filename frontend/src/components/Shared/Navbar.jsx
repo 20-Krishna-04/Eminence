@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, Phone, LogOut } from 'lucide-react';
+import { Menu, Phone, LogOut, X } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice';
 import { useState } from 'react';
@@ -11,6 +11,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [ivrCopied, setIvrCopied] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
 
   const handleLanguageChange = (e) => {
@@ -116,12 +117,44 @@ const Navbar = () => {
           </div>
 
           <div className="md:hidden flex items-center gap-4">
-            <button className="p-2 text-loft-300 hover:text-loft-50 focus:outline-none bg-loft-900 rounded-lg">
-              <Menu className="w-6 h-6" />
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 text-loft-300 hover:text-loft-50 focus:outline-none bg-loft-900 rounded-lg transition-colors"
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-loft-950 border-b border-loft-800/60 px-4 py-4 space-y-4">
+          {isAuthenticated ? (
+            <div className="flex flex-col space-y-3">
+              {(user?.role === 'customer' || user?.role === 'business') && (
+                <>
+                  <Link to="/booking" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.bookTempo')}</Link>
+                  <Link to="/tracking" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.trackBooking')}</Link>
+                </>
+              )}
+              <Link to={`/${user?.role || 'customer'}/dashboard`} onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.dashboard')}</Link>
+              <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="text-left text-red-400 hover:text-red-300 font-medium">Sign Out</button>
+            </div>
+          ) : (
+            <div className="flex flex-col space-y-3">
+              <Link to="/services" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.services')}</Link>
+              <Link to="/contracts" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.businessContracts')}</Link>
+              <Link to="/pricing" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.pricing')}</Link>
+              <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.aboutUs')}</Link>
+              <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.contact')}</Link>
+              <div className="h-px bg-loft-800 my-2"></div>
+              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.signIn')}</Link>
+              <Link to="/register" onClick={() => setIsMobileMenuOpen(false)} className="text-copper-500 font-medium">{t('navbar.getStarted')}</Link>
+            </div>
+          )}
+        </div>
+      )}
     </nav>
   );
 };

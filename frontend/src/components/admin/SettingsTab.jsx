@@ -76,7 +76,7 @@ const SettingsTab = () => {
                   </td>
                   <td className="px-6 py-4">{admin.email}</td>
                   <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                    <span className={`inline-block whitespace-nowrap px-3 py-1 rounded-full text-xs font-bold ${
                       admin.role === 'Superadmin' ? 'bg-moss-500/20 text-moss-500 border border-moss-500/30' :
                       admin.role === 'Finance Admin' ? 'bg-blue-500/20 text-blue-500 border border-blue-500/30' :
                       'bg-copper-500/20 text-copper-500 border border-copper-500/30'
