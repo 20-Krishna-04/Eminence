@@ -16,7 +16,7 @@
   3. Enter `1234567890` and click **Sign In**.
   4. Check the backend terminal for the OTP code.
   5. Enter the OTP and click **Verify OTP**.
-- **Expected**: Redirected to `/customer/dashboard`. Name shows "Demo User". [ ]
+- **Expected**: Redirected to `/customer/dashboard`. Name shows "Demo User". [x]
 
 ---
 
@@ -48,7 +48,7 @@
   1. Go to `http://localhost:5173/login`.
   2. Click the **"Driver"** tab.
   3. Enter driver phone and OTP from backend terminal.
-- **Expected**: Redirected to `/driver/dashboard`. Driver Portal header shows correct driver name from DB (not hardcoded). [ ]
+- **Expected**: Redirected to `/driver/dashboard`. Driver Portal header shows correct driver name from DB (not hardcoded). [x]
 
 ---
 
@@ -59,7 +59,7 @@
   1. Go to `http://localhost:5173/admin/login` or click **Admin** tab on the login page.
   2. Enter email and password.
   3. Click **Login as Administrator**.
-- **Expected**: Redirected to `/admin/dashboard`. Sidebar shows all 8 admin options. [ ]
+- **Expected**: Redirected to `/admin/dashboard`. Sidebar shows all 8 admin options. [x]
 
 ---
 
@@ -89,7 +89,7 @@
   - **Total Bookings** shows the real count from `/api/bookings`.
   - **Completed Rides** shows only `completed` status count.
   - **Total Spent** is correctly summed from completed booking fares.
-  - Values are NOT hardcoded (`12`, `10`, `₹4,250`). [ ]
+  - Values are NOT hardcoded (`12`, `10`, `₹4,250`). [x]
 
 ---
 
@@ -99,7 +99,7 @@
 - **Expected**:
   - If you have no bookings, shows empty state: *"No bookings yet"* with an icon.
   - If bookings exist, each card shows real booking ID (first 8 chars), date, pickup → drop, vehicle, status badge, and correct fare.
-  - Booking IDs are NOT `BKG-7829`, `BKG-7815` (those were removed). [ ]
+  - Booking IDs are NOT `BKG-7829`, `BKG-7815` (those were removed). [x]
 
 ---
 
@@ -151,7 +151,7 @@
   1. Click the **"Invoices"** tab.
   2. Find a completed booking in the table.
   3. Click **"Download PDF"**.
-- **Expected**: Invoice data is generated from real completed bookings (not hardcoded INV-2608-012). Download button shows "Downloading..." state. [ ]
+- **Expected**: Invoice data is generated from real completed bookings (not hardcoded INV-2608-012). Download button shows "Downloading..." state. [x]
 
 ---
 
@@ -167,7 +167,7 @@
   5. Click **"Calculate Fare"**.
   6. **Step 4 (Details)**: Enter receiver phone = `9876543210`.
   7. Select **Wallet** payment, click **Confirm Booking**.
-- **Expected**: Booking created. Redirected to tracking page. Booking ID visible in URL. [ ]
+- **Expected**: Booking created. Redirected to tracking page. Booking ID visible in URL. [x]
 
 ---
 
@@ -232,7 +232,7 @@
   1. Look at the status button in the top-left of the Driver Portal.
   2. Click it to toggle from **OFFLINE → ONLINE**.
   3. Click again to go back to **OFFLINE**.
-- **Expected**: Button text changes. API call to `/api/drivers/:id/toggle` is made. Status badge updates. [ ]
+- **Expected**: Button text changes. API call to `/api/drivers/:id/toggle` is made. Status badge updates. [x]
 
 ---
 
@@ -240,7 +240,7 @@
 - **Pre-condition**: Logged in as Driver.
 - **Steps**:
   1. Click the **"Heatmap"** tab.
-- **Expected**: A list of demand hotspot zones is shown (e.g., `Swargate Bus Stand - 1.3x`). Zones fetched from `/api/drivers/heatmap`. [ ]
+- **Expected**: A list of demand hotspot zones is shown (e.g., `Swargate Bus Stand - 1.3x`). Zones fetched from `/api/drivers/heatmap`. [x]
 
 ---
 
@@ -258,7 +258,7 @@
 - **Pre-condition**: Logged in as Driver.
 - **Steps**:
   1. Click the **"Earnings"** tab.
-- **Expected**: Earnings data is fetched from `/api/drivers/:id/payslip`. Shows gross, platform fee, TDS, and net payout. NOT hardcoded `₹1,250`. [ ]
+- **Expected**: Earnings data is fetched from `/api/drivers/:id/payslip`. Shows gross, platform fee, TDS, and net payout. NOT hardcoded `₹1,250`. [x]
 
 ---
 
@@ -322,7 +322,7 @@
 ### TC-W-ADM-01: Admin Overview Stats
 - **Pre-condition**: Logged in as Admin.
 - **Steps**: Click **"Overview"** in the Admin sidebar.
-- **Expected**: Revenue, Drivers, Vehicles, Customers counts fetched live from `/api/admin/stats/overview`. Matches actual database count. [ ]
+- **Expected**: Revenue, Drivers, Vehicles, Customers counts fetched live from `/api/admin/stats/overview`. Matches actual database count. [x]
 
 ---
 
@@ -358,14 +358,14 @@
 ### TC-W-ADM-05: Fleet Telematics — Live IoT Dials
 - **Pre-condition**: Logged in as Admin.
 - **Steps**: Click **"Fleet Telematics"**.
-- **Expected**: Four live animated dials — Speed, RPM, Engine Temp, Fuel Level — fluctuate in real time from the backend `telematicsSimulator`. "LIVE CONNECTION ACTIVE" badge is green and pulsing. [ ]
+- **Expected**: Four live animated dials — Speed, RPM, Engine Temp, Fuel Level — fluctuate in real time from the backend `telematicsSimulator`. "LIVE CONNECTION ACTIVE" badge is green and pulsing. [x]
 
 ---
 
 ### TC-W-ADM-06: Analytics — Revenue Chart
 - **Pre-condition**: Logged in as Admin.
 - **Steps**: Click **"Analytics"** in the sidebar.
-- **Expected**: A 7-day revenue bar chart is rendered with real booking data from `/api/admin/stats/revenue`. Each bar shows earnings per day. [ ]
+- **Expected**: A 7-day revenue bar chart is rendered with real booking data from `/api/admin/stats/revenue`. Each bar shows earnings per day. [x]
 
 ---
 
@@ -386,7 +386,7 @@
   2. Click **"Add Team Member"**.
   3. Enter email, temporary password, and role (Finance Admin / Support Admin).
   4. Click **Save**.
-- **Expected**: New team member appears in the roles table with correct role badge (not distorted). [ ]
+- **Expected**: New team member appears in the roles table with correct role badge (not distorted). [x]
 
 ---
 
@@ -456,45 +456,45 @@
 
 | Test ID | Description | Status |
 |---|---|---|
-| TC-W-AUTH-01 | Customer Phone Login | [ ] |
+| TC-W-AUTH-01 | Customer Phone Login | ✅ |
 | TC-W-AUTH-02 | Customer Google Sign-In | [ ] |
 | TC-W-AUTH-03 | Business Login | [ ] |
-| TC-W-AUTH-04 | Driver Login | [ ] |
-| TC-W-AUTH-05 | Admin Login | [ ] |
+| TC-W-AUTH-04 | Driver Login | ✅ |
+| TC-W-AUTH-05 | Admin Login | ✅ |
 | TC-W-AUTH-06 | Invalid Login Rejection | [ ] |
 | TC-W-AUTH-07 | Logout Flow | [ ] |
-| TC-W-CUST-01 | Dashboard Live Stats | [ ] |
-| TC-W-CUST-02 | Real Bookings Tab | [ ] |
+| TC-W-CUST-01 | Dashboard Live Stats | ✅ |
+| TC-W-CUST-02 | Real Bookings Tab | ✅ |
 | TC-W-CUST-03 | Referral Code Copy | [ ] |
 | TC-W-CUST-04 | Add & Delete Address | [ ] |
 | TC-W-CUST-05 | Update Profile | [ ] |
 | TC-W-CUST-06 | Notifications Tab | [ ] |
-| TC-W-CUST-07 | Invoice PDF Download | [ ] |
-| TC-W-BOOK-01 | Full Booking Flow | [ ] |
+| TC-W-CUST-07 | Invoice PDF Download | ✅ |
+| TC-W-BOOK-01 | Full Booking Flow | ✅ |
 | TC-W-BOOK-02 | Surge Pricing Detection | [ ] |
 | TC-W-BOOK-03 | Promo Code Apply | [ ] |
 | TC-W-BOOK-04 | Multi-Stop Booking | [ ] |
 | TC-W-BOOK-05 | ESG Emissions Badge | [ ] |
 | TC-W-BOOK-06 | Razorpay Wallet Payment | [ ] |
 | TC-W-DRV-01 | Driver Name from DB | [ ] |
-| TC-W-DRV-02 | Duty Toggle | [ ] |
-| TC-W-DRV-03 | Demand Heatmap | [ ] |
+| TC-W-DRV-02 | Duty Toggle | ✅ |
+| TC-W-DRV-03 | Demand Heatmap | ✅ |
 | TC-W-DRV-04 | WMS Scanner | [ ] |
-| TC-W-DRV-05 | Earnings from API | [ ] |
+| TC-W-DRV-05 | Earnings from API | ✅ |
 | TC-W-DRV-06 | Accept Ride via Socket | [ ] |
 | TC-W-BIZ-01 | Business Name from DB | [ ] |
 | TC-W-BIZ-02 | Live Contracts List | [ ] |
 | TC-W-BIZ-03 | Request New Contract | [ ] |
 | TC-W-BIZ-04 | Bulk CSV Upload | [ ] |
 | TC-W-BIZ-05 | Business Invoices | [ ] |
-| TC-W-ADM-01 | Overview Stats | [ ] |
+| TC-W-ADM-01 | Overview Stats | ✅ |
 | TC-W-ADM-02 | Add New Driver | [ ] |
 | TC-W-ADM-03 | Add New Vehicle | [ ] |
 | TC-W-ADM-04 | Manage Customers | [ ] |
-| TC-W-ADM-05 | Fleet Telematics Dials | [ ] |
-| TC-W-ADM-06 | Analytics Revenue Chart | [ ] |
+| TC-W-ADM-05 | Fleet Telematics Dials | ✅ |
+| TC-W-ADM-06 | Analytics Revenue Chart | ✅ |
 | TC-W-ADM-07 | Support Inbox Chat | [ ] |
-| TC-W-ADM-08 | Settings / Team Roles | [ ] |
+| TC-W-ADM-08 | Settings / Team Roles | ✅ |
 | TC-W-ADM-09 | Approve B2B Contract | [ ] |
 | TC-W-ADM-10 | Audit Logs | [ ] |
 | TC-W-EDGE-01 | Route Guard | [ ] |

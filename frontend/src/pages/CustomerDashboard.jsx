@@ -118,18 +118,19 @@ const CustomerDashboard = () => {
   };
 
   useEffect(() => {
-    if (token) {
+    console.log('CustomerDashboard useEffect running. user:', !!user, 'activeTab:', activeTab);
+    if (user) {
       fetchWallet();
       fetchBookings();
     }
-    if (activeTab === 'addresses' && token) {
+    if (activeTab === 'addresses' && user) {
       fetchAddresses();
     }
-    if (activeTab === 'notifications' && token) {
+    if (activeTab === 'notifications' && user) {
       fetchNotifications();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, token]);
+  }, [activeTab, user]);
 
   const fetchAddresses = async () => {
     setAddressState(prev => ({ ...prev, loading: true, error: null }));
@@ -240,11 +241,21 @@ const CustomerDashboard = () => {
   };
 
   const handleDownloadInvoice = (id) => {
+    console.log('Downloading invoice for id:', id);
     setDownloadingInvoice(id);
     setTimeout(() => {
       setDownloadingInvoice(null);
-      alert(`Invoice ${id} downloaded successfully!`);
-    }, 1500);
+      
+      const blob = new Blob(['Invoice Data'], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `INV-${id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 500);
   };
 
   return (
