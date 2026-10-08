@@ -8,7 +8,7 @@ import ErrorBoundary from './components/Shared/ErrorBoundary';
 
 const Home = lazy(() => import('./pages/Home'));
 const Services = lazy(() => import('./pages/Services'));
-const BusinessContracts = lazy(() => import('./pages/BusinessContracts'));
+
 const Pricing = lazy(() => import('./pages/Pricing'));
 const About = lazy(() => import('./pages/About'));
 const Contact = lazy(() => import('./pages/Contact'));
@@ -20,7 +20,7 @@ const OTPVerification = lazy(() => import('./components/Auth/OTPVerification'));
 const CompleteProfile = lazy(() => import('./pages/CompleteProfile'));
 const CustomerDashboard = lazy(() => import('./pages/CustomerDashboard'));
 const DriverDashboard = lazy(() => import('./pages/DriverDashboard'));
-const BusinessDashboard = lazy(() => import('./pages/BusinessDashboard'));
+
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 const Terms = lazy(() => import('./pages/Terms'));
@@ -95,7 +95,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/otp" element={<OTPVerification />} />
             <Route path="/services" element={<Services />} />
-            <Route path="/contracts" element={<BusinessContracts />} />
+
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
@@ -121,11 +121,7 @@ function App() {
                 <DriverDashboard />
               </RequireAuth>
             } />
-            <Route path="/business/dashboard" element={
-              <RequireAuth allowedRoles={['business']}>
-                <BusinessDashboard />
-              </RequireAuth>
-            } />
+
             <Route path="/admin/dashboard" element={
               <RequireAuth allowedRoles={['admin']}>
                 <AdminDashboard />

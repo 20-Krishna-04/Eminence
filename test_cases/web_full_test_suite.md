@@ -272,50 +272,6 @@
 
 ---
 
-## 🏢 Section 5: Business (B2B) Dashboard
-
-### TC-W-BIZ-01: Business Welcome — No Hardcoded Company Name
-- **Pre-condition**: Logged in as Business user.
-- **Steps**: Open `/business/dashboard`.
-- **Expected**: Header shows `user?.companyName || user?.name`. NOT "Reliance Smart - Magarpatta Branch". [ ]
-
----
-
-### TC-W-BIZ-02: Active Contracts — Live from API
-- **Pre-condition**: Business account logged in.
-- **Steps**: Click **"Contracts"** tab.
-- **Expected**: Contracts fetched from `/api/b2b/contracts`. If none, empty state shows "No active contracts yet." NOT "CTR-8892-A". [ ]
-
----
-
-### TC-W-BIZ-03: Request a New Contract
-- **Pre-condition**: Logged in as Business.
-- **Steps**:
-  1. Click the **"Contracts"** tab.
-  2. Click **"Request Contract"**.
-  3. Fill: Vehicle Type = `Medium Tempo`, Count = `2`, Start Date = next Monday, End Date = 3 months later.
-  4. Click **Submit**.
-- **Expected**: Contract appears in the list with status `pending`. Admin can approve it from the Admin panel. [ ]
-
----
-
-### TC-W-BIZ-04: Bulk CSV Upload (Batch Bookings)
-- **Pre-condition**: Logged in as Business.
-- **Steps**:
-  1. Click the **"bulk-load"** tab.
-  2. Download the CSV template.
-  3. Fill in 3 rows of booking data.
-  4. Upload the file.
-- **Expected**: Success state appears: "Batch Bookings Scheduled!". [ ]
-
----
-
-### TC-W-BIZ-05: Business Invoices Tab
-- **Pre-condition**: Logged in as Business with at least one invoice.
-- **Steps**: Click the **"Invoices"** tab.
-- **Expected**: Invoices fetched from `/api/b2b/invoices`. Shows invoice amount, date, status. Empty state if none. [ ]
-
----
 
 ## ⚙️ Section 6: Admin Panel
 
@@ -390,15 +346,6 @@
 
 ---
 
-### TC-W-ADM-09: Contracts — Approve a B2B Request
-- **Pre-condition**: A Business user has submitted a contract request (TC-W-BIZ-03).
-- **Steps**:
-  1. Logged in as Admin, click **"Contracts"**.
-  2. Find the `pending` contract.
-  3. Click **"Approve"**.
-- **Expected**: Contract status changes to `active`. The Business user's dashboard now shows it under Active Contracts. [ ]
-
----
 
 ### TC-W-ADM-10: Audit Logs Tab
 - **Pre-condition**: Logged in as Super Admin.
@@ -458,7 +405,6 @@
 |---|---|---|
 | TC-W-AUTH-01 | Customer Phone Login | ✅ |
 | TC-W-AUTH-02 | Customer Google Sign-In | [ ] |
-| TC-W-AUTH-03 | Business Login | [ ] |
 | TC-W-AUTH-04 | Driver Login | ✅ |
 | TC-W-AUTH-05 | Admin Login | ✅ |
 | TC-W-AUTH-06 | Invalid Login Rejection | [ ] |
@@ -482,11 +428,7 @@
 | TC-W-DRV-04 | WMS Scanner | [ ] |
 | TC-W-DRV-05 | Earnings from API | ✅ |
 | TC-W-DRV-06 | Accept Ride via Socket | [ ] |
-| TC-W-BIZ-01 | Business Name from DB | [ ] |
-| TC-W-BIZ-02 | Live Contracts List | [ ] |
-| TC-W-BIZ-03 | Request New Contract | [ ] |
-| TC-W-BIZ-04 | Bulk CSV Upload | [ ] |
-| TC-W-BIZ-05 | Business Invoices | [ ] |
+
 | TC-W-ADM-01 | Overview Stats | ✅ |
 | TC-W-ADM-02 | Add New Driver | [ ] |
 | TC-W-ADM-03 | Add New Vehicle | [ ] |
@@ -495,7 +437,7 @@
 | TC-W-ADM-06 | Analytics Revenue Chart | ✅ |
 | TC-W-ADM-07 | Support Inbox Chat | [ ] |
 | TC-W-ADM-08 | Settings / Team Roles | ✅ |
-| TC-W-ADM-09 | Approve B2B Contract | [ ] |
+
 | TC-W-ADM-10 | Audit Logs | [ ] |
 | TC-W-EDGE-01 | Route Guard | [ ] |
 | TC-W-EDGE-02 | Role Separation | [ ] |

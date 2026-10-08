@@ -157,7 +157,7 @@ const Login = () => {
 
         {/* Role Selection Tabs */}
         <div className="flex bg-loft-950/50 p-1 rounded-xl mb-8 overflow-x-auto">
-          {['customer', 'business', 'driver', 'admin'].map((role) => (
+          {['customer', 'driver', 'admin'].map((role) => (
             <button
               key={role}
               onClick={() => { setActiveTab(role); setError(''); setFieldErrors({ email: '', password: '' }); }}
