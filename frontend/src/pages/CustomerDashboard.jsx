@@ -498,43 +498,70 @@ const CustomerDashboard = () => {
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold text-loft-50">Your Addresses</h3>
                 <button 
-                  onClick={() => setIsAddAddressOpen(true)}
+                  onClick={() => {
+                    setAddressFormError('');
+                    setIsAddAddressOpen(true);
+                  }}
                   className="btn-secondary py-2 px-4 text-sm"
                 >
                   <Plus className="w-4 h-4 mr-2" /> Add Address
                 </button>
               </div>
+
+              {addressState.loading && (
+                <div className="flex justify-center items-center py-12 text-loft-400">
+                  <RefreshCw className="w-5 h-5 animate-spin mr-2 text-copper-500" />
+                  <span>Loading addresses...</span>
+                </div>
+              )}
+
+              {addressState.error && !addressState.loading && (
+                <div className="p-4 mb-6 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                    <span>{addressState.error}</span>
+                  </div>
+                  <button 
+                    onClick={fetchAddresses}
+                    className="btn-secondary py-1 px-3 text-xs flex items-center gap-1 hover:bg-red-500/20"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" /> Retry
+                  </button>
+                </div>
+              )}
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {addresses.length === 0 ? (
-                  <p className="text-loft-400">No saved addresses yet.</p>
-                ) : (
-                  addresses.map((address) => (
-                    <div key={address.id} className="card p-6 border-l-4 border-l-copper-500">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h4 className="font-bold text-loft-50 mb-1">{address.label}</h4>
-                          <p className="text-loft-300 text-sm leading-relaxed">
-                            {address.street}<br/>
-                            {address.city}, {address.postalCode}
-                          </p>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                          <div className="p-2 bg-loft-800 rounded-lg text-copper-500">
-                            <MapPin className="w-5 h-5" />
+              {!addressState.loading && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {addressState.data.length === 0 ? (
+                    <p className="text-loft-400">No saved addresses yet.</p>
+                  ) : (
+                    addressState.data.map((address) => (
+                      <div key={address.id} className="card p-6 border-l-4 border-l-copper-500">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h4 className="font-bold text-loft-50 mb-1">{address.label}</h4>
+                            <p className="text-loft-300 text-sm leading-relaxed">
+                              {address.street}<br/>
+                              {address.city}, {address.postalCode}
+                            </p>
                           </div>
-                          <button 
-                            onClick={() => handleDeleteAddress(address.id)}
-                            className="p-1.5 text-xs text-red-500 hover:bg-red-500/10 rounded transition-colors text-center"
-                          >
-                            Delete
-                          </button>
+                          <div className="flex flex-col gap-2">
+                            <div className="p-2 bg-loft-800 rounded-lg text-copper-500">
+                              <MapPin className="w-5 h-5" />
+                            </div>
+                            <button 
+                              onClick={() => handleDeleteAddress(address.id)}
+                              className="p-1.5 text-xs text-red-500 hover:bg-red-500/10 rounded transition-colors text-center"
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))
-                )}
-              </div>
+                    ))
+                  )}
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -779,6 +806,13 @@ const CustomerDashboard = () => {
             >
               <h3 className="text-xl font-bold text-loft-50 mb-6">Add New Address</h3>
               
+              {addressFormError && (
+                <div className="p-3 mb-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <span>{addressFormError}</span>
+                </div>
+              )}
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-loft-200 mb-1">Label (e.g. Home, Office)</label>
@@ -802,17 +836,28 @@ const CustomerDashboard = () => {
               
               <div className="flex gap-4 mt-8">
                 <button 
-                  onClick={() => setIsAddAddressOpen(false)}
+                  onClick={() => {
+                    setIsAddAddressOpen(false);
+                    setAddressFormError('');
+                  }}
                   className="btn-secondary w-full"
+                  disabled={isSavingAddress}
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={handleSaveAddress}
-                  className="btn-primary w-full"
-                  disabled={!newAddress.label || !newAddress.street}
+                  className="btn-primary w-full flex items-center justify-center gap-2"
+                  disabled={isSavingAddress || !newAddress.label || !newAddress.street}
                 >
-                  Save Address
+                  {isSavingAddress ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    'Save Address'
+                  )}
                 </button>
               </div>
             </motion.div>

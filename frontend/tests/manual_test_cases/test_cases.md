@@ -15,7 +15,7 @@
 | **Precondition** | App is running, no user is logged in |
 | **Steps** | 1. Go to `http://localhost:5173` → Click "Sign In" / "Get Started" <br> 2. Enter phone number `1234567890` <br> 3. Click "Send OTP" <br> 4. Enter any 6-digit OTP (simulation accepts any) <br> 5. Click "Verify" |
 | **Expected Result** | ✅ Redirected to Customer Dashboard. User name "Demo User" visible. |
-| **Status** | `[ ] Pass` `[ ] Fail` |
+| **Status** | `[✅] Pass` `[ ] Fail` |
 
 ### TC-002 — Admin Login
 | Field | Details |
@@ -23,21 +23,21 @@
 | **Precondition** | App is running |
 | **Steps** | 1. Navigate to `/admin/login` <br> 2. Enter email: `admin@eminence.com` <br> 3. Enter password: `adminpassword123` <br> 4. Click "Login" |
 | **Expected Result** | ✅ Redirected to Admin Dashboard. Overview stats visible. |
-| **Status** | `[ ] Pass` `[ ] Fail` |
+| **Status** | `[✅] Pass` `[ ] Fail` |
 
 ### TC-003 — Invalid Admin Login
 | Field | Details |
 |-------|---------|
 | **Steps** | 1. Go to Admin login <br> 2. Enter wrong password `wrongpassword` <br> 3. Click "Login" |
 | **Expected Result** | ✅ Error message shown. No redirect. |
-| **Status** | `[ ] Pass` `[ ] Fail` |
+| **Status** | `[✅] Pass` `[ ] Fail` |
 
 ### TC-004 — Route Guard (Unauthorized Access)
 | Field | Details |
 |-------|---------|
 | **Steps** | 1. While logged out, navigate directly to `/dashboard` or `/admin` |
 | **Expected Result** | ✅ Redirected to login page. Access denied. |
-| **Status** | `[ ] Pass` `[ ] Fail` |
+| **Status** | `[✅] Pass` `[ ] Fail` |
 
 ---
 
@@ -49,7 +49,7 @@
 | **Precondition** | Logged in as Demo Customer |
 | **Steps** | 1. Log in with phone `1234567890` <br> 2. Navigate to Dashboard |
 | **Expected Result** | ✅ Booking history visible with 2 seeded rides (Swargate→Hinjewadi, Pune Station→Kothrud). |
-| **Status** | `[ ] Pass` `[ ] Fail` |
+| **Status** | `[✅] Pass` `[ ] Fail` |
 
 ### TC-011 — Create a Standard Booking
 | Field | Details |
@@ -57,14 +57,14 @@
 | **Precondition** | Logged in as customer |
 | **Steps** | 1. Click "Book a Tempo" <br> 2. Fill in: Pickup: `Koregaon Park, Pune`, Drop: `Viman Nagar, Pune` <br> 3. Select tempo type: `Small` <br> 4. Enter weight: `150` kg, Goods: `Electronics` <br> 5. Pick today's date and a time <br> 6. Click "Confirm Booking" |
 | **Expected Result** | ✅ Booking created. Confirmation message shown. Appears in ride history. |
-| **Status** | `[ ] Pass` `[ ] Fail` |
+| **Status** | `[✅] Pass` `[ ] Fail` |
 
 ### TC-012 — Booking with Multi-Stop Addresses
 | Field | Details |
 |-------|---------|
 | **Steps** | 1. Create a booking <br> 2. Add 2 additional stop addresses <br> 3. Confirm |
 | **Expected Result** | ✅ Booking saved with multiple drop addresses. |
-| **Status** | `[ ] Pass` `[ ] Fail` |
+| **Status** | `[✅] Pass` `[ ] Fail` |
 
 ### TC-013 — ESG Emissions Badge in Ride History
 | Field | Details |
@@ -72,14 +72,14 @@
 | **Precondition** | TC-011 completed |
 | **Steps** | 1. Go to Customer Dashboard → Ride History <br> 2. Find the newly created booking |
 | **Expected Result** | ✅ Green 🌿 ESG badge visible showing estimated CO2 kg saved. |
-| **Status** | `[ ] Pass` `[ ] Fail` |
+| **Status** | `[✅] Pass` `[ ] Fail` |
 
 ### TC-014 — Save Address to Address Book
 | Field | Details |
 |-------|---------|
 | **Steps** | 1. Go to Customer Dashboard → "Address Book" tab <br> 2. Click "Add Address" <br> 3. Fill in Label: `Home`, Street: `123 MG Road`, City: `Pune`, Postal: `411001` <br> 4. Save |
 | **Expected Result** | ✅ New address appears in the address book list. |
-| **Status** | `[ ] Pass` `[ ] Fail` |
+| **Status** | `[✅] Pass` `[ ] Fail` |
 
 ### TC-015 — Wallet Balance View
 | Field | Details |
