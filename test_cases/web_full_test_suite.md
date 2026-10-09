@@ -121,7 +121,7 @@
   4. Click **Save**.
   5. Verify the address appears in the list.
   6. Click **Delete** on the new address.
-- **Expected**: Address saves and appears live. Deletion removes it from the list immediately. [ ]
+- **Expected**: Address saves and appears live. Deletion removes it from the list immediately. [x]
 
 ---
 
