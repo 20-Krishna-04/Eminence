@@ -19,11 +19,11 @@ export default function BookScreen() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [pickup, setPickup] = useState('Koregaon Park, Pune');
-  const [drops, setDrops] = useState<string[]>(['Viman Nagar, Pune']);
+  const [pickup, setPickup] = useState('');
+  const [drops, setDrops] = useState<string[]>(['']);
   const [tempoType, setTempoType] = useState<'small' | 'medium' | 'large'>('small');
-  const [weight, setWeight] = useState('150');
-  const [goodsType, setGoodsType] = useState('Electronics');
+  const [weight, setWeight] = useState('');
+  const [goodsType, setGoodsType] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState('14:00');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'online'>('online');

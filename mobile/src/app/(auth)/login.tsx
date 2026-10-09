@@ -11,24 +11,60 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
 import { useAuth } from '../../context/AuthContext';
 import TermsModal from '../../components/TermsModal';
+
+WebBrowser.maybeCompleteAuthSession();
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { sendOtp, verifyOtp } = useAuth();
+  const { sendOtp, verifyOtp, adminLogin, googleLogin } = useAuth();
 
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
-  const [role, setRole] = useState<'customer' | 'driver'>('customer');
+  const [role, setRole] = useState<'customer' | 'driver' | 'admin'>('customer');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(true);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID || 'dummy-ios',
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID || 'dummy-android',
+    webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID || 'dummy-web',
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      if (authentication?.idToken) {
+        handleGoogleSuccess(authentication.idToken);
+      }
+    } else if (response?.type === 'error') {
+      setErrorMessage('Google Sign-In failed or was cancelled.');
+    }
+  }, [response]);
+
+  const handleGoogleSuccess = async (idToken: string) => {
+    setLoading(true);
+    setErrorMessage('');
+    const res = await googleLogin(idToken);
+    setLoading(false);
+    if (res.success) {
+      if (res.user?.role === 'driver') router.replace('/(driver)/dashboard');
+      else router.replace('/(customer)/dashboard');
+    } else {
+      setErrorMessage(res.message || 'Google login failed');
+    }
+  };
 
   useEffect(() => {
     const checkEnrolledUser = async () => {
@@ -167,6 +203,32 @@ export default function LoginScreen() {
     }
   };
 
+  const handleAdminLogin = async () => {
+    if (!email || !password) {
+      setErrorMessage('Please enter both email and password');
+      return;
+    }
+    setLoading(true);
+    setErrorMessage('');
+
+    const res = await adminLogin(email.trim(), password);
+    setLoading(false);
+
+    if (res.success) {
+      router.replace('/(admin)/dashboard');
+    } else {
+      setErrorMessage(res.message || 'Invalid credentials');
+    }
+  };
+
+  const handleGoogleSignIn = () => {
+    if (!request) {
+      setErrorMessage('Google Sign-In configuration is loading, please try again in a moment.');
+      return;
+    }
+    promptAsync();
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -193,12 +255,12 @@ export default function LoginScreen() {
               : `Enter the OTP sent to +91 ${phone}`}
           </Text>
 
-          {/* Role selector (Customer vs Driver) */}
+          {/* Role selector (Customer vs Driver vs Admin) */}
           {step === 'phone' && (
             <View style={styles.roleSelector}>
               <TouchableOpacity
                 style={[styles.roleBtn, role === 'customer' && styles.roleBtnActive]}
-                onPress={() => setRole('customer')}
+                onPress={() => { setRole('customer'); setErrorMessage(''); }}
               >
                 <Text
                   style={[styles.roleBtnText, role === 'customer' && styles.roleBtnTextActive]}
@@ -208,12 +270,22 @@ export default function LoginScreen() {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.roleBtn, role === 'driver' && styles.roleBtnActive]}
-                onPress={() => setRole('driver')}
+                onPress={() => { setRole('driver'); setErrorMessage(''); }}
               >
                 <Text
                   style={[styles.roleBtnText, role === 'driver' && styles.roleBtnTextActive]}
                 >
                   Driver
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.roleBtn, role === 'admin' && styles.roleBtnActive, { backgroundColor: role === 'admin' ? '#6366f1' : 'transparent' }]}
+                onPress={() => { setRole('admin'); setErrorMessage(''); }}
+              >
+                <Text
+                  style={[styles.roleBtnText, role === 'admin' && styles.roleBtnTextActive]}
+                >
+                  Admin
                 </Text>
               </TouchableOpacity>
             </View>
@@ -230,11 +302,61 @@ export default function LoginScreen() {
             <View style={styles.successBox}>
               <Text style={styles.successText}>{successMessage}</Text>
             </View>
-          ) : null}
-
-          {/* Input Fields */}
-          {step === 'phone' ? (
+          ) : null}          {/* Input Fields */}
+          {role === 'admin' ? (
             <View style={styles.inputGroup}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Admin Email Address</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="admin@eminence.com"
+                  placeholderTextColor="#a2b2c7"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Password</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••••••"
+                  placeholderTextColor="#a2b2c7"
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
+                />
+              </View>
+              <TouchableOpacity
+                style={[styles.primaryBtn, { backgroundColor: '#6366f1' }]}
+                onPress={handleAdminLogin}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.primaryBtnText}>Secure Admin Login</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          ) : step === 'phone' ? (
+            <View style={styles.inputGroup}>
+              <TouchableOpacity
+                style={[styles.primaryBtn, { backgroundColor: '#ffffff', marginBottom: 20, borderWidth: 1, borderColor: '#d1d5db', flexDirection: 'row', alignItems: 'center' }]}
+                onPress={handleGoogleSignIn}
+                disabled={loading}
+              >
+                <Text style={{ fontSize: 20, marginRight: 10 }}>G</Text>
+                <Text style={[styles.primaryBtnText, { color: '#374151' }]}>Continue with Google</Text>
+              </TouchableOpacity>
+
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                <View style={{ flex: 1, height: 1, backgroundColor: '#2f3a4e' }} />
+                <Text style={{ color: '#a2b2c7', paddingHorizontal: 10, fontSize: 12 }}>OR CONTINUE WITH PHONE</Text>
+                <View style={{ flex: 1, height: 1, backgroundColor: '#2f3a4e' }} />
+              </View>
+
               <Text style={styles.label}>Mobile Phone Number</Text>
               <View style={styles.phoneInputRow}>
                 <View style={styles.countryCode}>
@@ -250,14 +372,6 @@ export default function LoginScreen() {
                   onChangeText={setPhone}
                 />
               </View>
-
-              {/* Demo Quick Fill */}
-              <TouchableOpacity
-                style={styles.demoFillBtn}
-                onPress={fillDemoCustomer}
-              >
-                <Text style={styles.demoFillText}>✨ Use Demo Customer (1234567890)</Text>
-              </TouchableOpacity>
 
               {/* Terms Agreement */}
               <View style={styles.termsRow}>
@@ -315,12 +429,7 @@ export default function LoginScreen() {
                 onChangeText={setOtp}
               />
 
-              <TouchableOpacity
-                style={styles.demoFillBtn}
-                onPress={fillDemoOtp}
-              >
-                <Text style={styles.demoFillText}>✨ Use Demo OTP (123456)</Text>
-              </TouchableOpacity>
+
 
               <TouchableOpacity
                 style={styles.primaryBtn}
@@ -347,19 +456,7 @@ export default function LoginScreen() {
             </View>
           )}
 
-          {/* Admin Login Link */}
-          <View style={styles.adminDivider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>OR</Text>
-            <View style={styles.dividerLine} />
-          </View>
 
-          <TouchableOpacity
-            style={styles.adminLinkBtn}
-            onPress={() => router.push('/(auth)/admin-login')}
-          >
-            <Text style={styles.adminLinkText}>🔐 Admin / Enterprise Login</Text>
-          </TouchableOpacity>
 
           <TermsModal
             visible={showTermsModal}
@@ -517,6 +614,16 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     color: '#f4f6f8',
     fontSize: 16,
+  },
+  input: {
+    backgroundColor: '#0f141f',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#2f3a4e',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    color: '#f4f6f8',
+    fontSize: 15,
   },
   otpInput: {
     backgroundColor: '#0f141f',

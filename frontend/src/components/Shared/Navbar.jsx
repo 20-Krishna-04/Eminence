@@ -41,7 +41,7 @@ const Navbar = () => {
             <div className="hidden md:flex items-center gap-5 lg:gap-6">
               {isAuthenticated ? (
                 <>
-                  {(user?.role === 'customer' || user?.role === 'business') && (
+                  {(user?.role === 'customer') && (
                     <>
                       <Link to="/booking" className="text-loft-300 hover:text-loft-50 font-medium transition-colors whitespace-nowrap">{t('navbar.bookTempo')}</Link>
                       <Link to="/tracking" className="text-loft-300 hover:text-loft-50 font-medium transition-colors whitespace-nowrap">{t('navbar.trackBooking')}</Link>
@@ -51,7 +51,7 @@ const Navbar = () => {
               ) : (
                 <>
                   <Link to="/services" className="text-loft-300 hover:text-loft-50 font-medium transition-colors whitespace-nowrap">{t('navbar.services')}</Link>
-                  <Link to="/contracts" className="text-loft-300 hover:text-loft-50 font-medium transition-colors hidden lg:block whitespace-nowrap">{t('navbar.businessContracts')}</Link>
+
                   <Link to="/pricing" className="text-loft-300 hover:text-loft-50 font-medium transition-colors hidden lg:block whitespace-nowrap">{t('navbar.pricing')}</Link>
                   <Link to="/about" className="text-loft-300 hover:text-loft-50 font-medium transition-colors hidden xl:block whitespace-nowrap">{t('navbar.aboutUs')}</Link>
                   <Link to="/contact" className="text-loft-300 hover:text-loft-50 font-medium transition-colors hidden xl:block whitespace-nowrap">{t('navbar.contact')}</Link>
@@ -132,7 +132,7 @@ const Navbar = () => {
         <div className="md:hidden bg-loft-950 border-b border-loft-800/60 px-4 py-4 space-y-4">
           {isAuthenticated ? (
             <div className="flex flex-col space-y-3">
-              {(user?.role === 'customer' || user?.role === 'business') && (
+              {(user?.role === 'customer') && (
                 <>
                   <Link to="/booking" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.bookTempo')}</Link>
                   <Link to="/tracking" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.trackBooking')}</Link>
@@ -144,7 +144,7 @@ const Navbar = () => {
           ) : (
             <div className="flex flex-col space-y-3">
               <Link to="/services" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.services')}</Link>
-              <Link to="/contracts" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.businessContracts')}</Link>
+
               <Link to="/pricing" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.pricing')}</Link>
               <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.aboutUs')}</Link>
               <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="text-loft-300 hover:text-loft-50 font-medium">{t('navbar.contact')}</Link>

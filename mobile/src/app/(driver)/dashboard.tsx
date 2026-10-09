@@ -28,15 +28,7 @@ export default function DriverDashboard() {
   const [loading, setLoading] = useState(false);
 
   // Incoming Trip State (TC-021)
-  const [incomingTrip, setIncomingTrip] = useState<any>({
-    bookingId: 'BKG-9921-DEMO',
-    pickupAddress: 'Koregaon Park North Main Rd, Pune',
-    dropAddress: 'Viman Nagar IT Hub, Pune',
-    fare: 520,
-    tempoType: 'Small (Tata Ace)',
-    goodsType: 'Retail Cargo / Electronics',
-    weight: '180 kg',
-  });
+  const [incomingTrip, setIncomingTrip] = useState<any>(null);
 
   // Active Trip Progression (TC-022)
   const [activeTrip, setActiveTrip] = useState<any>(null);
@@ -52,10 +44,10 @@ export default function DriverDashboard() {
   const [cameraRef, setCameraRef] = useState<any>(null);
   // Driver Payslip / Earnings (TC-024)
   const [payslip, setPayslip] = useState<any>({
-    grossEarnings: 1850,
-    platformFee: 277.5,
-    tdsTax: 18.5,
-    netPayout: 1554,
+    grossEarnings: 0,
+    platformFee: 0,
+    tdsTax: 0,
+    netPayout: 0,
   });
 
   // TC-KRI-003: Device Wake Lock Management
@@ -290,8 +282,8 @@ export default function DriverDashboard() {
       <View style={styles.header}>
         <View>
           <Text style={styles.pilotBadge}>DRIVER PARTNER</Text>
-          <Text style={styles.userName}>{user?.name || 'Ramesh Patil'}</Text>
-          <Text style={styles.userPhone}>MH 12 QZ 4412 • Tata Ace</Text>
+          <Text style={styles.userName}>{user?.name}</Text>
+          <Text style={styles.userPhone}>{user?.vehicleNo || 'Vehicle Info Not Available'}</Text>
         </View>
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Text style={styles.logoutBtnText}>Logout</Text>
@@ -506,23 +498,23 @@ export default function DriverDashboard() {
         <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Weekly Payout & Payslip</Text>
         <View style={styles.earningsCard}>
           <Text style={styles.earningsTitle}>Weekly Gross Earnings</Text>
-          <Text style={styles.earningsAmount}>₹{payslip?.grossEarnings ?? 1850}.00</Text>
+          <Text style={styles.earningsAmount}>₹{payslip?.grossEarnings ?? 0}.00</Text>
 
           <View style={styles.breakdownRow}>
             <Text style={styles.breakdownLabel}>Platform Fee (15%)</Text>
-            <Text style={styles.breakdownVal}>-₹{payslip?.platformFee ?? 277.5}</Text>
+            <Text style={styles.breakdownVal}>-₹{payslip?.platformFee ?? 0}</Text>
           </View>
 
           <View style={styles.breakdownRow}>
             <Text style={styles.breakdownLabel}>TDS Tax Deduction (1%)</Text>
-            <Text style={styles.breakdownVal}>-₹{payslip?.tdsTax ?? 18.5}</Text>
+            <Text style={styles.breakdownVal}>-₹{payslip?.tdsTax ?? 0}</Text>
           </View>
 
           <View style={styles.divider} />
 
           <View style={styles.netRow}>
             <Text style={styles.netLabel}>Estimated Net Payout</Text>
-            <Text style={styles.netAmount}>₹{payslip?.netPayout ?? 1554}.00</Text>
+            <Text style={styles.netAmount}>₹{payslip?.netPayout ?? 0}.00</Text>
           </View>
 
           <TouchableOpacity
