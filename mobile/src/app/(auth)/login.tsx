@@ -11,14 +11,18 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
 import { useAuth } from '../../context/AuthContext';
 import TermsModal from '../../components/TermsModal';
+
+WebBrowser.maybeCompleteAuthSession();
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { sendOtp, verifyOtp, adminLogin } = useAuth();
+  const { sendOtp, verifyOtp, adminLogin, googleLogin } = useAuth();
 
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
@@ -31,6 +35,36 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID || 'dummy-ios',
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID || 'dummy-android',
+    webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID || 'dummy-web',
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      if (authentication?.idToken) {
+        handleGoogleSuccess(authentication.idToken);
+      }
+    } else if (response?.type === 'error') {
+      setErrorMessage('Google Sign-In failed or was cancelled.');
+    }
+  }, [response]);
+
+  const handleGoogleSuccess = async (idToken: string) => {
+    setLoading(true);
+    setErrorMessage('');
+    const res = await googleLogin(idToken);
+    setLoading(false);
+    if (res.success) {
+      if (res.user?.role === 'driver') router.replace('/(driver)/dashboard');
+      else router.replace('/(customer)/dashboard');
+    } else {
+      setErrorMessage(res.message || 'Google login failed');
+    }
+  };
 
   useEffect(() => {
     const checkEnrolledUser = async () => {
@@ -188,7 +222,11 @@ export default function LoginScreen() {
   };
 
   const handleGoogleSignIn = () => {
-    setErrorMessage('Google Sign-In is pending Firebase configuration for native apps.');
+    if (!request) {
+      setErrorMessage('Google Sign-In configuration is loading, please try again in a moment.');
+      return;
+    }
+    promptAsync();
   };
 
   return (

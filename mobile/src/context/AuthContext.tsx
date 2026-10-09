@@ -25,6 +25,7 @@ interface AuthContextType {
   verifyOtp: (phone: string, code: string, role?: string, acceptedTerms?: boolean) => Promise<{ success: boolean; user?: User; message?: string }>;
   acceptTerms: (version?: string) => Promise<{ success: boolean; message?: string }>;
   adminLogin: (email: string, password: string) => Promise<{ success: boolean; user?: User; message?: string }>;
+  googleLogin: (idToken: string) => Promise<{ success: boolean; user?: User; message?: string }>;
   logout: () => Promise<void>;
 }
 
@@ -182,6 +183,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const googleLogin = async (idToken: string) => {
+    try {
+      const res = await api.post('/api/auth/google-login', { idToken });
+      if (res.data.success && res.data.token) {
+        await saveAuthSession(res.data.token, res.data.user);
+        return { success: true, user: res.data.user };
+      }
+      return { success: false, message: res.data.message || 'Google login failed' };
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || 'Google login error';
+      return { success: false, message: msg };
+    }
+  };
+
   const logout = async () => {
     setUser(null);
     setToken(null);
@@ -208,6 +223,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         verifyOtp,
         acceptTerms,
         adminLogin,
+        googleLogin,
         logout,
       }}
     >
