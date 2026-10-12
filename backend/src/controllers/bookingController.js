@@ -348,11 +348,16 @@ const aiVoiceBooking = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Authentication required: customerId must be provided' });
     }
 
-    const Groq = require('groq-sdk');
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    
+    let extractedData = null;
     const today = new Date().toISOString().split('T')[0];
-    const prompt = `You are a logistics booking assistant. Extract the booking details from this user request: "${transcript}".
+
+    if (process.env.GROQ_API_KEY) {
+      try {
+        const Groq = require('groq-sdk');
+        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+        const groqModel = process.env.GROQ_MODEL || 'openai/gpt-oss-20b';
+        
+        const prompt = `You are a logistics booking assistant. Extract the booking details from this user request: "${transcript}".
 Return exactly a raw JSON object (and nothing else) with these keys: 
 - pickupAddress (string)
 - dropAddress (string)
@@ -363,19 +368,79 @@ Return exactly a raw JSON object (and nothing else) with these keys:
 - weight (number, default to 100 if unknown)
 `;
 
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [{ role: 'user', content: prompt }],
-      model: 'llama3-8b-8192',
-      temperature: 0,
-      response_format: { type: 'json_object' }
-    });
+        const chatCompletion = await groq.chat.completions.create({
+          messages: [{ role: 'user', content: prompt }],
+          model: groqModel,
+          temperature: 0,
+          response_format: { type: 'json_object' }
+        });
 
-    let extractedData;
-    try {
-      extractedData = JSON.parse(chatCompletion.choices[0].message.content);
-    } catch (err) {
-      console.error('JSON Parse Error:', err);
-      return res.status(500).json({ success: false, message: 'Failed to parse AI response' });
+        extractedData = JSON.parse(chatCompletion.choices[0].message.content);
+      } catch (groqErr) {
+        console.warn('Groq AI extraction failed, using resilient NLP fallback:', groqErr.message);
+      }
+    }
+
+    if (!extractedData) {
+      // Resilient rule-based NLP extraction fallback
+      const lower = transcript.toLowerCase();
+      let tempoType = 'small';
+      if (lower.includes('large')) tempoType = 'large';
+      else if (lower.includes('medium')) tempoType = 'medium';
+
+      let pickup = 'Unknown Pickup';
+      let drop = 'Unknown Drop';
+      const match = transcript.match(/(?:from|for)\s+(.+?)\s+to\s+(.+)/i);
+      if (match) {
+        pickup = match[1].trim();
+        drop = match[2].replace(/\s+(tomorrow|today|morning|evening|night|now|afternoon|\d{1,2}:\d{2}.*)/i, '').trim() || match[2].trim();
+      }
+
+      let date = today;
+      if (lower.includes('tomorrow')) {
+        const d = new Date();
+        d.setDate(d.getDate() + 1);
+        date = d.toISOString().split('T')[0];
+      }
+
+      let time = '10:00:00';
+      const timeMatch = transcript.match(/(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)/i);
+      if (timeMatch) {
+        let hours = parseInt(timeMatch[1], 10);
+        const minutes = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
+        const isPm = timeMatch[3].toLowerCase().startsWith('p');
+        if (isPm && hours < 12) hours += 12;
+        if (!isPm && hours === 12) hours = 0;
+        time = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+      }
+
+      extractedData = {
+        pickupAddress: pickup,
+        dropAddress: drop,
+        tempoType,
+        date,
+        time,
+        goodsType: 'General Cargo',
+        weight: 100
+      };
+    }
+
+    // Normalize date format (YYYY-MM-DD)
+    if (!extractedData.date || !/^\d{4}-\d{2}-\d{2}$/.test(extractedData.date)) {
+      if (String(extractedData.date).toLowerCase().includes('tomorrow')) {
+        const d = new Date();
+        d.setDate(d.getDate() + 1);
+        extractedData.date = d.toISOString().split('T')[0];
+      } else {
+        extractedData.date = today;
+      }
+    }
+
+    // Normalize time format (HH:mm:ss)
+    if (!extractedData.time || !/^\d{2}:\d{2}(:\d{2})?$/.test(extractedData.time)) {
+      extractedData.time = '10:00:00';
+    } else if (extractedData.time.split(':').length === 2) {
+      extractedData.time = `${extractedData.time}:00`;
     }
 
     const tempoType = extractedData.tempoType || 'small';
