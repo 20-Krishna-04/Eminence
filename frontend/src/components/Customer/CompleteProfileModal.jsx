@@ -32,7 +32,21 @@ const CompleteProfileModal = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const [isClosed, setIsClosed] = useState(false);
+  const dismissKey = user?.id ? `profile_modal_dismissed_${user.id}` : 'profile_modal_dismissed';
+  const [isClosed, setIsClosed] = useState(() => {
+    try {
+      return sessionStorage.getItem(dismissKey) === 'true';
+    } catch (_e) {
+      return false;
+    }
+  });
+
+  const handleDismiss = () => {
+    setIsClosed(true);
+    try {
+      sessionStorage.setItem(dismissKey, 'true');
+    } catch (_e) {}
+  };
   const [otpCooldown, setOtpCooldown] = useState(0);
   const [detectingLocation, setDetectingLocation] = useState(false);
 
@@ -204,7 +218,7 @@ const CompleteProfileModal = () => {
           className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col relative"
         >
           <button 
-            onClick={() => setIsClosed(true)}
+            onClick={handleDismiss}
             className="absolute top-4 right-4 z-10 p-2 text-white/70 hover:text-white bg-black/20 hover:bg-black/40 rounded-full transition-colors"
           >
             <X className="w-5 h-5" />

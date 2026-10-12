@@ -248,20 +248,20 @@ const syncDatabase = async () => {
         });
         console.log('Seeded default bookings for demo user');
       }
+    }
 
-      // Seed default admin in development / test if no admin exists
-      if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test' || process.env.DEMO_SEED === 'true') {
-        const adminCount = await Admin.count();
-        if (adminCount === 0) {
-          const bcrypt = require('bcrypt');
-          const hashedPassword = await bcrypt.hash('adminpassword123', 10);
-          await Admin.create({
-            name: 'System Admin',
-            email: 'admin@eminence.com',
-            password: hashedPassword
-          });
-          console.log('Seeded default admin: admin@eminence.com');
-        }
+    // Ensure default admin exists in development / test environments
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test' || !process.env.NODE_ENV) {
+      const adminCount = await Admin.count();
+      if (adminCount === 0) {
+        const bcrypt = require('bcrypt');
+        const hashedPassword = await bcrypt.hash('adminpassword123', 10);
+        await Admin.create({
+          name: 'System Admin',
+          email: 'admin@eminence.com',
+          password: hashedPassword
+        });
+        console.log('Seeded default admin: admin@eminence.com');
       }
     }
   } catch (error) {
