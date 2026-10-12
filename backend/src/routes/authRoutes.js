@@ -13,6 +13,8 @@ router.post('/register', authLimiter, authController.register);
 router.post('/register-password', authLimiter, authController.register);
 router.post('/login', authLimiter, authController.login);
 router.post('/login-password', authLimiter, authController.login);
+router.post('/forgot-password', otpLimiter, authController.forgotPassword);
+router.post('/reset-password', authLimiter, authController.resetPassword);
 
 // Protected Routes
 router.post('/accept-terms', authLimiter, authMiddleware, authController.acceptTerms);

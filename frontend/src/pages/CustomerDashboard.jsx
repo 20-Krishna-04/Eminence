@@ -45,7 +45,7 @@ const CustomerDashboard = () => {
   });
   const [addressFormError, setAddressFormError] = useState('');
   const [isSavingAddress, setIsSavingAddress] = useState(false);
-  const [newAddress, setNewAddress] = useState({ label: '', street: '', city: '', postalCode: '' });
+  const [newAddress, setNewAddress] = useState({ label: '', street: '', city: 'Pune', postalCode: '411001' });
 
   // Wallet State with explicit request tracking
   const [walletState, setWalletState] = useState({
@@ -185,9 +185,9 @@ const CustomerDashboard = () => {
     setIsSavingAddress(true);
     try {
       const res = await api.post('/api/address', newAddress);
-      setAddressState(prev => ({ ...prev, data: [...prev.data, res.data] }));
+      setAddressState(prev => ({ ...prev, data: [...(prev.data || []), res.data] }));
       setIsAddAddressOpen(false);
-      setNewAddress({ label: '', street: '', city: '', postalCode: '' });
+      setNewAddress({ label: '', street: '', city: 'Pune', postalCode: '411001' });
     } catch (error) {
       console.error('Error saving address:', error);
       setAddressFormError(error.response?.data?.message || 'Failed to save address.');
@@ -956,14 +956,21 @@ const CustomerDashboard = () => {
             >
               <h3 className="text-xl font-bold text-loft-50 mb-6">Add New Address</h3>
               
+              {addressFormError && (
+                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-sm flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <span>{addressFormError}</span>
+                </div>
+              )}
+
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-loft-200 mb-1">Label (e.g. Home, Office)</label>
+                  <label className="block text-sm font-medium text-loft-200 mb-1">Label (e.g. Home, Office, Warehouse)</label>
                   <input type="text" className="input-field" placeholder="Enter label" value={newAddress.label} onChange={(e) => setNewAddress({...newAddress, label: e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-loft-200 mb-1">Street Address</label>
-                  <textarea className="input-field resize-none h-24" placeholder="Enter full address" value={newAddress.street} onChange={(e) => setNewAddress({...newAddress, street: e.target.value})}></textarea>
+                  <textarea className="input-field resize-none h-24" placeholder="Enter full address (at least 5 characters)" value={newAddress.street} onChange={(e) => setNewAddress({...newAddress, street: e.target.value})}></textarea>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -979,7 +986,7 @@ const CustomerDashboard = () => {
               
               <div className="flex gap-4 mt-8">
                 <button 
-                  onClick={() => setIsAddAddressOpen(false)}
+                  onClick={() => { setIsAddAddressOpen(false); setAddressFormError(''); }}
                   className="btn-secondary w-full"
                 >
                   Cancel
@@ -987,9 +994,9 @@ const CustomerDashboard = () => {
                 <button 
                   onClick={handleSaveAddress}
                   className="btn-primary w-full"
-                  disabled={!newAddress.label || !newAddress.street}
+                  disabled={isSavingAddress || !newAddress.label || !newAddress.street}
                 >
-                  Save Address
+                  {isSavingAddress ? 'Saving...' : 'Save Address'}
                 </button>
               </div>
             </motion.div>

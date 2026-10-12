@@ -190,6 +190,12 @@ const updateProfile = async (req, res) => {
       customer.isProfileComplete = false;
     }
 
+    // Set account password if provided (e.g. Google user completing profile)
+    if (req.body.password && req.body.password.trim().length >= 6) {
+      const salt = await bcryptjs.genSalt(10);
+      customer.password = await bcryptjs.hash(req.body.password.trim(), salt);
+    }
+
     await customer.save();
     customer = await checkAndSetProfileComplete(customer);
 
@@ -997,6 +1003,141 @@ const changePassword = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  try {
+    const { identifier, method = 'email', role = 'customer' } = req.body; // method: 'email' or 'phone'
+
+    if (!identifier) {
+      return res.status(400).json({ success: false, message: 'Email or phone number is required' });
+    }
+
+    let user;
+    if (role === 'driver') {
+      user = await Driver.findOne({
+        where: method === 'phone' ? { phone: identifier } : { email: identifier }
+      });
+    } else {
+      user = await Customer.findOne({
+        where: method === 'phone' ? { phone: identifier } : { email: identifier }
+      });
+    }
+
+    if (!user) {
+      // Security: return success message without leaking account existence
+      return res.status(200).json({
+        success: true,
+        message: `If an account exists with that ${method}, a verification OTP has been sent.`
+      });
+    }
+
+    const code = generateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60000);
+    const otpHash = crypto.createHash('sha256').update(code).digest('hex');
+
+    await Otp.destroy({ where: { customerId: user.id, type: method } });
+    await Otp.create({
+      customerId: user.id,
+      type: method,
+      code: otpHash,
+      expiresAt,
+      attempts: 0,
+      lockoutUntil: null
+    });
+
+    if (method === 'email') {
+      await sendEmail(
+        user.email,
+        'Eminence Password Reset OTP',
+        `Your password reset code is ${code}. Valid for 10 minutes.`,
+        `<p>Your Eminence password reset code is: <b>${code}</b></p><p>Valid for 10 minutes.</p>`
+      );
+    } else {
+      await smsService.sendSMS(user.phone, `Your Eminence password reset OTP is ${code}. Valid for 10 minutes.`);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `OTP sent successfully to your ${method}.`,
+      type: method
+    });
+  } catch (error) {
+    console.error('Forgot Password Error:', error);
+    return res.status(500).json({ success: false, message: 'Server error requesting password reset' });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { identifier, method = 'email', code, newPassword, role = 'customer' } = req.body;
+
+    if (!identifier || !code || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Identifier, verification code, and new password are required'
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long'
+      });
+    }
+
+    let user;
+    if (role === 'driver') {
+      user = await Driver.findOne({
+        where: method === 'phone' ? { phone: identifier } : { email: identifier }
+      });
+    } else {
+      user = await Customer.findOne({
+        where: method === 'phone' ? { phone: identifier } : { email: identifier }
+      });
+    }
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Account not found' });
+    }
+
+    // Verify OTP
+    const otpHash = crypto.createHash('sha256').update(code.trim()).digest('hex');
+    const otpRecord = await Otp.findOne({
+      where: { customerId: user.id, type: method },
+      order: [['createdAt', 'DESC']]
+    });
+
+    if (!otpRecord) {
+      return res.status(400).json({ success: false, message: 'No active OTP found. Please request a new code.' });
+    }
+
+    if (new Date() > new Date(otpRecord.expiresAt)) {
+      await otpRecord.destroy();
+      return res.status(400).json({ success: false, message: 'OTP has expired. Please request a new one.' });
+    }
+
+    if (otpRecord.code !== otpHash) {
+      otpRecord.attempts = (otpRecord.attempts || 0) + 1;
+      await otpRecord.save();
+      return res.status(400).json({ success: false, message: 'Invalid OTP code' });
+    }
+
+    // Hash and update password
+    const salt = await bcryptjs.genSalt(10);
+    user.password = await bcryptjs.hash(newPassword, salt);
+    await user.save();
+
+    await otpRecord.destroy();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password has been reset successfully. You can now login with your new password.'
+    });
+  } catch (error) {
+    console.error('Reset Password Error:', error);
+    return res.status(500).json({ success: false, message: 'Server error resetting password' });
+  }
+};
+
 module.exports = {
   googleLogin,
   updateProfile,
@@ -1007,6 +1148,8 @@ module.exports = {
   register,
   login,
   changePassword,
+  forgotPassword,
+  resetPassword,
   getTerms,
   acceptTerms,
   exportUserData,
