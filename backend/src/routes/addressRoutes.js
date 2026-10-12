@@ -21,16 +21,25 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { label, street, city, postalCode } = req.body;
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'Unauthorized: User not found in session' });
+    }
     const address = await Address.create({
       customerId: req.user.id,
-      label,
+      label: label || 'Home',
       street,
       city,
       postalCode
     });
     res.status(201).json(address);
   } catch (error) {
-    res.status(500).json({ message: 'Server error creating address', error: error.message });
+    console.error('Failed to create address:', error);
+    res.status(500).json({ 
+      message: error.name === 'SequelizeForeignKeyConstraintError' || (error.message && error.message.includes('FOREIGN KEY'))
+        ? 'Addresses can only be saved for customer accounts. Please log in as a customer.' 
+        : (error.message || 'Server error creating address'), 
+      error: error.message 
+    });
   }
 });
 
