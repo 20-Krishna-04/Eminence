@@ -551,10 +551,10 @@ const CustomerDashboard = () => {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {addresses.length === 0 ? (
+                {(!addressState?.data || addressState.data.length === 0) ? (
                   <p className="text-loft-400">No saved addresses yet.</p>
                 ) : (
-                  addresses.map((address) => (
+                  addressState.data.map((address) => (
                     <div key={address.id} className="card p-6 border-l-4 border-l-copper-500">
                       <div className="flex items-start justify-between">
                         <div>
@@ -594,7 +594,7 @@ const CustomerDashboard = () => {
                   <h3 className="text-lg font-bold text-loft-300 mb-2">Available Balance</h3>
                   <div className="flex items-end gap-2 mb-6">
                     <span className="text-4xl font-bold text-copper-400">
-                      ₹{walletData?.wallet?.balance?.toFixed(2) || '0.00'}
+                      ₹{typeof walletData?.wallet?.balance === 'number' ? walletData.wallet.balance.toFixed(2) : (walletData?.balance ?? '0.00')}
                     </span>
                   </div>
                   <button className="btn-primary py-2 px-6 w-full md:w-auto text-sm">
