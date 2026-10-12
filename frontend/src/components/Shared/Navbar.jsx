@@ -26,9 +26,9 @@ const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 bg-loft-950/80 backdrop-blur-md border-b border-loft-800/60 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20 items-center relative">
-          {/* Left: Logo */}
-          <div className="flex items-center">
+        <div className="flex justify-between h-20 items-center">
+          {/* Left: Logo and Nav Links grouped together */}
+          <div className="flex items-center gap-6 lg:gap-8">
             <Link to="/" className="flex items-center gap-2 group">
               <div className="bg-loft-950 p-1 rounded-lg border border-copper-500/30 group-hover:border-copper-500/60 transition-colors flex items-center justify-center overflow-hidden">
                 <img src="/logo.jpg" alt="Eminence Logo" className="w-8 h-8 object-contain rounded-md" />
@@ -37,27 +37,26 @@ const Navbar = () => {
                 EMIN<span className="text-copper-500">ENCE</span>
               </span>
             </Link>
-          </div>
 
-          {/* Center: Nav Links centered on the page */}
-          <div className="hidden md:flex items-center justify-center gap-8 lg:gap-10 absolute left-1/2 -translate-x-1/2">
-            {isAuthenticated ? (
-              <>
-                {(user?.role === 'customer') && (
-                  <>
-                    <Link to="/booking" className="text-loft-300 hover:text-copper-400 font-medium text-base transition-colors whitespace-nowrap">{t('navbar.bookTempo')}</Link>
-                    <Link to="/tracking" className="text-loft-300 hover:text-copper-400 font-medium text-base transition-colors whitespace-nowrap">{t('navbar.trackBooking')}</Link>
-                  </>
-                )}
-              </>
-            ) : (
-              <>
-                <Link to="/services" className="text-loft-300 hover:text-copper-400 font-medium text-base transition-colors whitespace-nowrap">{t('navbar.services')}</Link>
-                <Link to="/pricing" className="text-loft-300 hover:text-copper-400 font-medium text-base transition-colors whitespace-nowrap">{t('navbar.pricing')}</Link>
-                <Link to="/about" className="text-loft-300 hover:text-copper-400 font-medium text-base transition-colors hidden lg:block whitespace-nowrap">{t('navbar.aboutUs')}</Link>
-                <Link to="/contact" className="text-loft-300 hover:text-copper-400 font-medium text-base transition-colors hidden xl:block whitespace-nowrap">{t('navbar.contact')}</Link>
-              </>
-            )}
+            <div className="hidden md:flex items-center gap-5 lg:gap-6">
+              {isAuthenticated ? (
+                <>
+                  {(user?.role === 'customer') && (
+                    <>
+                      <Link to="/booking" className="text-loft-300 hover:text-loft-50 font-medium transition-colors whitespace-nowrap">{t('navbar.bookTempo')}</Link>
+                      <Link to="/tracking" className="text-loft-300 hover:text-loft-50 font-medium transition-colors whitespace-nowrap">{t('navbar.trackBooking')}</Link>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Link to="/services" className="text-loft-300 hover:text-loft-50 font-medium transition-colors whitespace-nowrap">{t('navbar.services')}</Link>
+                  <Link to="/pricing" className="text-loft-300 hover:text-loft-50 font-medium transition-colors hidden lg:block whitespace-nowrap">{t('navbar.pricing')}</Link>
+                  <Link to="/about" className="text-loft-300 hover:text-loft-50 font-medium transition-colors hidden xl:block whitespace-nowrap">{t('navbar.aboutUs')}</Link>
+                  <Link to="/contact" className="text-loft-300 hover:text-loft-50 font-medium transition-colors hidden xl:block whitespace-nowrap">{t('navbar.contact')}</Link>
+                </>
+              )}
+            </div>
           </div>
           
           {/* Right: Actions */}

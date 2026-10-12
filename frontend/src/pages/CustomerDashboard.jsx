@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { 
   Package, CheckCircle, Wallet, MapPin, Plus, Gift, Copy, 
   Crown, Target, Star, Leaf, Truck, Bell, Check, AlertCircle, RefreshCw, Lock, Eye, EyeOff 
@@ -341,14 +342,49 @@ const CustomerDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Header */}
-        <div className="mb-10 flex justify-between items-center">
+        {/* Header with prominent Book Tempo and Track Booking focus cards */}
+        <div className="mb-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div>
             <h1 className="text-3xl md:text-4xl font-serif font-bold text-loft-50 mb-2 flex items-center gap-3">
               Dashboard
               {isPro && <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 uppercase tracking-widest"><Crown className="w-3 h-3"/> Pro</span>}
             </h1>
             <p className="text-loft-300">Welcome back, <span className="text-copper-400 font-medium">{user?.name || 'User'}</span>!</p>
+          </div>
+
+          {/* Prominent Focal Actions: Book Tempo & Track Booking */}
+          <div className="grid grid-cols-2 gap-4 w-full lg:w-auto">
+            <Link 
+              to="/booking"
+              className="group relative flex items-center justify-between gap-4 px-6 py-4 rounded-2xl bg-gradient-to-br from-copper-500/20 via-loft-900 to-loft-900 border border-copper-500/40 hover:border-copper-500 hover:shadow-lg hover:shadow-copper-500/10 transition-all cursor-pointer"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-xl bg-copper-500/20 border border-copper-500/30 flex items-center justify-center text-copper-400 group-hover:bg-copper-500 group-hover:text-loft-950 transition-all">
+                  <Truck className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-loft-50 group-hover:text-copper-300 transition-colors">Book Tempo</h3>
+                  <p className="text-xs text-loft-400">Instant intracity dispatch</p>
+                </div>
+              </div>
+              <span className="text-copper-400 group-hover:translate-x-1 transition-transform text-lg font-bold">→</span>
+            </Link>
+
+            <Link 
+              to="/tracking"
+              className="group relative flex items-center justify-between gap-4 px-6 py-4 rounded-2xl bg-gradient-to-br from-moss-500/20 via-loft-900 to-loft-900 border border-moss-500/40 hover:border-moss-500 hover:shadow-lg hover:shadow-moss-500/10 transition-all cursor-pointer"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-xl bg-moss-500/20 border border-moss-500/30 flex items-center justify-center text-moss-400 group-hover:bg-moss-500 group-hover:text-loft-950 transition-all">
+                  <MapPin className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-loft-50 group-hover:text-moss-300 transition-colors">Track Booking</h3>
+                  <p className="text-xs text-loft-400">Live GPS telematics</p>
+                </div>
+              </div>
+              <span className="text-moss-400 group-hover:translate-x-1 transition-transform text-lg font-bold">→</span>
+            </Link>
           </div>
         </div>
         
