@@ -2,7 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Search, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const AutocompleteLocationInput = ({ value, onChange, placeholder, required = false, iconColor = "text-moss-500" }) => {
+const AutocompleteLocationInput = ({ 
+  value, 
+  onChange, 
+  onSelectDetails,
+  placeholder, 
+  required = false, 
+  iconColor = "text-moss-500",
+  cityLimit = null // e.g. "pune"
+}) => {
   const [query, setQuery] = useState(value || '');
   const [suggestions, setSuggestions] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -38,7 +46,18 @@ const AutocompleteLocationInput = ({ value, onChange, placeholder, required = fa
 
       setLoading(true);
       try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=5`, {
+        // Build query string with city restriction if configured
+        let searchParam = query;
+        let viewboxParam = '';
+        if (cityLimit && cityLimit.toLowerCase() === 'pune') {
+          if (!query.toLowerCase().includes('pune')) {
+            searchParam = `${query}, Pune`;
+          }
+          // Pune bounding box: min_lon,max_lat,max_lon,min_lat (73.7,18.65,74.05,18.4)
+          viewboxParam = '&viewbox=73.70,18.65,74.05,18.40&bounded=1';
+        }
+
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(searchParam)}&countrycodes=in&limit=5${viewboxParam}`, {
           headers: {
             'Accept-Language': 'en'
           }
@@ -65,6 +84,9 @@ const AutocompleteLocationInput = ({ value, onChange, placeholder, required = fa
     setSuggestions([]);
     setIsOpen(false);
     onChange(location.display_name); // Call parent onChange with the full address
+    if (onSelectDetails) {
+      onSelectDetails(location);
+    }
   };
 
   const handleInputChange = (e) => {

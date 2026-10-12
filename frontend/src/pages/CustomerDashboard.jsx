@@ -9,6 +9,7 @@ import api from '../services/api';
 import { updateProfileSuccess } from '../redux/slices/authSlice';
 import ReviewModal from '../components/Customer/ReviewModal';
 import { addressSchema, profileSchema } from '../utils/formSchemas';
+import AutocompleteLocationInput from '../components/Customer/Booking/AutocompleteLocationInput';
 
 const CustomerDashboard = () => {
   const { user, token } = useSelector((state) => state.auth);
@@ -1001,12 +1002,28 @@ const CustomerDashboard = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-loft-200 mb-1">Street Address</label>
-                  <textarea className="input-field resize-none h-24" placeholder="Enter full address (at least 5 characters)" value={newAddress.street} onChange={(e) => setNewAddress({...newAddress, street: e.target.value})}></textarea>
+                  <AutocompleteLocationInput 
+                    value={newAddress.street}
+                    onChange={(val) => setNewAddress(prev => ({ ...prev, street: val }))}
+                    onSelectDetails={(loc) => {
+                      const addr = loc.address || {};
+                      const detectedPostal = addr.postcode ? addr.postcode.replace(/\D/g, '').slice(0, 6) : '';
+                      setNewAddress(prev => ({
+                        ...prev,
+                        city: 'Pune',
+                        postalCode: detectedPostal && detectedPostal.length === 6 ? detectedPostal : (prev.postalCode || '411001')
+                      }));
+                    }}
+                    placeholder="Search area, landmark or street in Pune"
+                    cityLimit="pune"
+                    iconColor="text-copper-500"
+                  />
+                  <p className="text-[11px] text-loft-400 mt-1">Suggestions restricted to Pune &amp; PCMC metropolitan areas</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-loft-200 mb-1">City</label>
-                    <input type="text" className="input-field" placeholder="Pune" value={newAddress.city} onChange={(e) => setNewAddress({...newAddress, city: e.target.value})} />
+                    <input type="text" className="input-field bg-loft-900/60 cursor-not-allowed" readOnly placeholder="Pune" value={newAddress.city} />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-loft-200 mb-1">Postal Code</label>
