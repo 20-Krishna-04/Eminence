@@ -256,9 +256,10 @@ const Booking = () => {
   const handleApplyPromo = async () => {
     if (!promoCode) return;
     try {
-      await api.post('/api/wallet/referral', { referralCode: promoCode });
-      setDiscount(100); // 100 Rs discount applied immediately for UI purposes
-      setPromoMessage({ type: 'success', text: 'Referral applied! ₹100 discount added.' });
+      const res = await api.post('/api/wallet/referral', { referralCode: promoCode });
+      const amount = res.data?.discount || 100;
+      setDiscount(amount);
+      setPromoMessage({ type: 'success', text: res.data?.message || `Promo code applied! ₹${amount} discount added.` });
     } catch (error) {
       setPromoMessage({ type: 'error', text: error.response?.data?.message || 'Invalid code' });
     }

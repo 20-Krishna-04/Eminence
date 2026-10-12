@@ -15,6 +15,8 @@ import ContractsTab from '../components/admin/ContractsTab';
 import AnalyticsTab from '../components/admin/AnalyticsTab';
 import ChatInbox from '../components/admin/ChatInbox';
 import SettingsTab from '../components/admin/SettingsTab';
+import PromoCodesTab from '../components/admin/PromoCodesTab';
+import { Tag } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -40,6 +42,7 @@ const AdminDashboard = () => {
                 { id: 'drivers', label: 'Manage Drivers', icon: ShieldAlert },
                 { id: 'vehicles', label: 'Manage Vehicles', icon: Truck },
                 { id: 'contracts', label: 'Contracts', icon: FileText },
+                { id: 'promocodes', label: 'Promo Codes', icon: Tag },
                 { id: 'analytics', label: 'Analytics', icon: BarChart3 },
                 { id: 'chat', label: 'Support Inbox', icon: MessageSquare },
                 { id: 'settings', label: 'Settings', icon: Settings },
@@ -69,6 +72,7 @@ const AdminDashboard = () => {
           {activeTab === 'drivers' && <DriversTab />}
           {activeTab === 'vehicles' && <VehiclesTab />}
           {activeTab === 'contracts' && <ContractsTab />}
+          {activeTab === 'promocodes' && <PromoCodesTab />}
           {activeTab === 'analytics' && <AnalyticsTab />}
           {activeTab === 'chat' && <ChatInbox activeTab={activeTab} token={token} />}
           {activeTab === 'settings' && <SettingsTab />}

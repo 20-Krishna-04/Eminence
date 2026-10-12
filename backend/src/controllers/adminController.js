@@ -1,4 +1,4 @@
-const { Driver, Customer, Vehicle, Booking, AuditLog, PlatformConfig, B2BContract, sequelize } = require('../models');
+const { Driver, Customer, Vehicle, Booking, AuditLog, PlatformConfig, B2BContract, PromoCode, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const cache = require('../services/cacheService');
 const startTime = Date.now();
@@ -724,6 +724,92 @@ const getPeakHoursAnalytics = async (req, res) => {
   }
 };
 
+// --- PROMO CODE / REFERRAL CRUD ---
+const getPromoCodes = async (req, res) => {
+  try {
+    const promoCodes = await PromoCode.findAll({
+      order: [['createdAt', 'DESC']]
+    });
+    res.status(200).json({ success: true, promoCodes });
+  } catch (error) {
+    console.error('Error fetching promo codes:', error);
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
+  }
+};
+
+const createPromoCode = async (req, res) => {
+  try {
+    const { code, description, discountType, discountValue, maxDiscount, minOrderValue, maxUses, expiresAt, isActive } = req.body;
+    if (!code || !expiresAt) {
+      return res.status(400).json({ success: false, message: 'Code and expiration date are required' });
+    }
+
+    const existing = await PromoCode.findOne({ where: { code: code.trim().toUpperCase() } });
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'Promo code already exists' });
+    }
+
+    const promoCode = await PromoCode.create({
+      code: code.trim().toUpperCase(),
+      description,
+      discountType: discountType || 'FLAT',
+      discountValue: discountValue || 100,
+      maxDiscount: maxDiscount || null,
+      minOrderValue: minOrderValue || 0,
+      maxUses: maxUses || null,
+      expiresAt: new Date(expiresAt),
+      isActive: isActive !== undefined ? Boolean(isActive) : true
+    });
+
+    res.status(201).json({ success: true, promoCode });
+  } catch (error) {
+    console.error('Error creating promo code:', error);
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
+  }
+};
+
+const updatePromoCode = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { description, discountType, discountValue, maxDiscount, minOrderValue, maxUses, expiresAt, isActive } = req.body;
+
+    const promoCode = await PromoCode.findByPk(id);
+    if (!promoCode) {
+      return res.status(404).json({ success: false, message: 'Promo code not found' });
+    }
+
+    if (description !== undefined) promoCode.description = description;
+    if (discountType !== undefined) promoCode.discountType = discountType;
+    if (discountValue !== undefined) promoCode.discountValue = discountValue;
+    if (maxDiscount !== undefined) promoCode.maxDiscount = maxDiscount;
+    if (minOrderValue !== undefined) promoCode.minOrderValue = minOrderValue;
+    if (maxUses !== undefined) promoCode.maxUses = maxUses;
+    if (expiresAt !== undefined) promoCode.expiresAt = new Date(expiresAt);
+    if (isActive !== undefined) promoCode.isActive = Boolean(isActive);
+
+    await promoCode.save();
+    res.status(200).json({ success: true, promoCode });
+  } catch (error) {
+    console.error('Error updating promo code:', error);
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
+  }
+};
+
+const deletePromoCode = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const promoCode = await PromoCode.findByPk(id);
+    if (!promoCode) {
+      return res.status(404).json({ success: false, message: 'Promo code not found' });
+    }
+    await promoCode.destroy();
+    res.status(200).json({ success: true, message: 'Promo code deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting promo code:', error);
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
+  }
+};
+
 module.exports = {
   getDrivers,
   createDriver,
@@ -749,5 +835,9 @@ module.exports = {
   exportBookings,
   getSurgePricing,
   getContracts,
-  updateContractStatus
+  updateContractStatus,
+  getPromoCodes,
+  createPromoCode,
+  updatePromoCode,
+  deletePromoCode
 };

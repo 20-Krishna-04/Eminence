@@ -43,4 +43,10 @@ router.get('/stats/routes', adminController.getRouteAnalytics);
 router.get('/contracts', adminController.getContracts);
 router.put('/contracts/:id', adminController.updateContractStatus);
 
+// Promo Code / Referral CRUD routes
+router.get('/promocodes', adminController.getPromoCodes);
+router.post('/promocodes', adminController.createPromoCode);
+router.put('/promocodes/:id', adminController.updatePromoCode);
+router.delete('/promocodes/:id', adminController.deletePromoCode);
+
 module.exports = router;
