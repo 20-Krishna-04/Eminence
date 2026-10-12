@@ -1,10 +1,33 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Phone, MessageSquare, Clock, MapPin, Search, CheckCircle2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import AuthModal from '../components/Auth/AuthModal';
 
 const Home = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const handleBookNowClick = (e) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+    } else {
+      navigate('/booking');
+    }
+  };
+
   return (
     <div className="w-full">
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => navigate('/booking')}
+        message="Please sign in to your Eminence account first to create and confirm your booking."
+      />
+
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-24 pb-32">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[radial-gradient(ellipse_at_center,rgba(232,99,49,0.15),transparent_70%)] pointer-events-none"></div>
@@ -37,9 +60,12 @@ const Home = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Link to="/booking" className="w-full sm:w-auto btn-primary text-lg px-10 py-4 shadow-[0_0_30px_rgba(232,99,49,0.2)]">
+              <button 
+                onClick={handleBookNowClick}
+                className="w-full sm:w-auto btn-primary text-lg px-10 py-4 shadow-[0_0_30px_rgba(232,99,49,0.2)] flex items-center justify-center cursor-pointer"
+              >
                 Book Now <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+              </button>
               <Link to="/contracts" className="w-full sm:w-auto flex items-center justify-center gap-2 px-10 py-4 bg-moss-500/10 border border-moss-500/20 rounded-xl text-moss-300 font-medium hover:bg-moss-500/20 transition-colors">
                 <Phone className="w-5 h-5" /> Call Now
               </Link>

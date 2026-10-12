@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import api from '../services/api';
 import AutocompleteLocationInput from '../components/Customer/Booking/AutocompleteLocationInput';
 import { bookingLocationsSchema, bookingDetailsSchema } from '../utils/formSchemas';
+import AuthModal from '../components/Auth/AuthModal';
 
 const Booking = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const Booking = () => {
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [promoMessage, setPromoMessage] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   
 
   // Gamification States
@@ -308,6 +310,7 @@ const Booking = () => {
     e.preventDefault();
     if (!user) {
       setError('You must be logged in to create a booking. Please sign in first.');
+      setShowAuthModal(true);
       return;
     }
     setIsSubmitting(true);
@@ -427,6 +430,16 @@ const Booking = () => {
             </div>
           ))}
         </div>
+
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => {
+            setError('');
+            setShowAuthModal(false);
+          }}
+          message="Please log in to your account to confirm and process this booking."
+        />
 
         <motion.div className="card p-8 md:p-10">
           {error && (
