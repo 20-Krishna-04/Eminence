@@ -1,9 +1,32 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Truck, Phone, Mail, MapPin, ArrowRight } from 'lucide-react';
+import AuthModal from '../Auth/AuthModal';
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const handleBookNowClick = (e) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+    } else {
+      navigate('/booking');
+    }
+  };
+
   return (
     <footer className="bg-loft-950 border-t border-loft-900 pt-16 pb-8 relative overflow-hidden">
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => navigate('/booking')}
+        message="Please sign in to your Eminence account first to create and confirm your booking."
+      />
+
       {/* Decorative gradient */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-copper-500/50 to-transparent"></div>
       
@@ -21,9 +44,12 @@ const Footer = () => {
             </p>
           </div>
           <div className="relative z-10 flex-shrink-0 flex gap-4 w-full md:w-auto">
-            <Link to="/booking" className="btn-primary py-4 px-8 w-full md:w-auto">
+            <button 
+              onClick={handleBookNowClick} 
+              className="btn-primary py-4 px-8 w-full md:w-auto flex items-center justify-center cursor-pointer"
+            >
               Book Now <ArrowRight className="w-5 h-5 ml-2" />
-            </Link>
+            </button>
           </div>
         </div>
 
