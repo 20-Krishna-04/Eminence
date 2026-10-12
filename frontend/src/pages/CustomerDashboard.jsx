@@ -68,6 +68,18 @@ const CustomerDashboard = () => {
     state: user?.state || '',
   });
 
+  useEffect(() => {
+    if (user) {
+      setProfileForm({
+        name: user?.name || '',
+        email: user?.email || '',
+        phone: user?.phone || '',
+        city: user?.city || '',
+        state: user?.state || '',
+      });
+    }
+  }, [user]);
+
   // Trip History State
   const [selectedTrip, setSelectedTrip] = useState(null);
 
@@ -693,6 +705,18 @@ const CustomerDashboard = () => {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className="card p-6 md:p-8 bg-loft-900 border-loft-800">
                 <h3 className="text-2xl font-bold text-loft-50 mb-6 border-b border-loft-800 pb-4">Profile Settings</h3>
+                {profileState.error && (
+                  <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-sm flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                    <span>{profileState.error}</span>
+                  </div>
+                )}
+                {profileState.success && (
+                  <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-lg text-sm flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                    <span>Profile updated successfully!</span>
+                  </div>
+                )}
                 <form onSubmit={handleProfileUpdate} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -706,20 +730,38 @@ const CustomerDashboard = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-loft-300 mb-2">Phone Number</label>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-sm font-medium text-loft-300">Phone Number</label>
+                        {user?.isPhoneVerified && (
+                          <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-medium border border-emerald-500/30">
+                            Verified
+                          </span>
+                        )}
+                      </div>
                       <input 
                         type="tel" 
                         required
-                        className="input-field" 
+                        readOnly={Boolean(user?.isPhoneVerified)}
+                        disabled={Boolean(user?.isPhoneVerified)}
+                        className={`input-field ${user?.isPhoneVerified ? 'opacity-60 cursor-not-allowed bg-loft-800/50' : ''}`}
                         value={profileForm.phone} 
                         onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})} 
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-loft-300 mb-2">Email Address</label>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-sm font-medium text-loft-300">Email Address</label>
+                        {(user?.googleId || user?.isEmailVerified) && (
+                          <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-medium border border-emerald-500/30">
+                            Verified
+                          </span>
+                        )}
+                      </div>
                       <input 
                         type="email" 
-                        className="input-field" 
+                        readOnly={Boolean(user?.googleId || user?.isEmailVerified)}
+                        disabled={Boolean(user?.googleId || user?.isEmailVerified)}
+                        className={`input-field ${(user?.googleId || user?.isEmailVerified) ? 'opacity-60 cursor-not-allowed bg-loft-800/50' : ''}`} 
                         value={profileForm.email} 
                         onChange={(e) => setProfileForm({...profileForm, email: e.target.value})} 
                       />
@@ -735,8 +777,8 @@ const CustomerDashboard = () => {
                     </div>
                   </div>
                   <div className="flex justify-end pt-4">
-                    <button type="submit" className="btn-primary py-3 px-8 text-sm">
-                      Save Changes
+                    <button type="submit" disabled={profileState.loading} className="btn-primary py-3 px-8 text-sm disabled:opacity-50">
+                      {profileState.loading ? 'Saving...' : 'Save Changes'}
                     </button>
                   </div>
                 </form>

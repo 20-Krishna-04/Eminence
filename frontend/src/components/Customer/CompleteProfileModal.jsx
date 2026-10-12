@@ -43,6 +43,24 @@ const CompleteProfileModal = () => {
     }
   }, [otpCooldown]);
 
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+        phone: user.phone || prev.phone,
+        address: user.address || prev.address,
+        city: user.city || prev.city,
+        state: user.state || prev.state,
+        governmentId: user.governmentId || prev.governmentId
+      }));
+      if (user.termsAccepted) {
+        setTermsAccepted(true);
+      }
+    }
+  }, [user]);
+
   // If user is not logged in or already complete, or modal is dismissed, don't render
   if (!user || user.isProfileComplete || isClosed) return null;
 

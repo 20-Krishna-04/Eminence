@@ -15,7 +15,7 @@ const apiLimiter = rateLimit({
 // Stricter limiter for auth / sensitive routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 30, // Limit each IP to 30 requests per windowMs
+  max: process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development' ? 200 : 30, // Relaxed in test/dev for automated test runners
   standardHeaders: true,
   legacyHeaders: false,
   message: {

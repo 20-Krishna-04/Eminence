@@ -248,8 +248,8 @@ const syncDatabase = async () => {
         console.log('Seeded default bookings for demo user');
       }
 
-      // Seed default admin in development
-      if (process.env.NODE_ENV === 'development' && process.env.DEMO_SEED === 'true') {
+      // Seed default admin in development / test if no admin exists
+      if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test' || process.env.DEMO_SEED === 'true') {
         const adminCount = await Admin.count();
         if (adminCount === 0) {
           const bcrypt = require('bcrypt');
