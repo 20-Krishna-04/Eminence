@@ -18,8 +18,7 @@ import TermsModal from '../../components/TermsModal';
 import { Eye, EyeOff } from 'lucide-react-native';
 
 WebBrowser.maybeCompleteAuthSession();
-import * as LocalAuthentication from 'expo-local-authentication';
-import * as SecureStore from 'expo-secure-store';
+
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -70,24 +69,7 @@ export default function LoginScreen() {
     }
   };
 
-  useEffect(() => {
-    const checkEnrolledUser = async () => {
-      try {
-        let savedPhone: string | null = null;
-        if (Platform.OS !== 'web') {
-          savedPhone = await SecureStore.getItemAsync('biometric_phone');
-        } else {
-          savedPhone = localStorage.getItem('biometric_phone');
-        }
-        if (savedPhone && !phone) {
-          setPhone(savedPhone);
-        }
-      } catch (e) {
-        console.warn('Failed to load saved biometric phone:', e);
-      }
-    };
-    checkEnrolledUser();
-  }, []);
+
 
   const handleSendOtp = async () => {
     if (!phone || phone.trim().length < 10) {
@@ -125,17 +107,7 @@ export default function LoginScreen() {
     setLoading(false);
 
     if (res.success) {
-      try {
-        if (Platform.OS !== 'web') {
-          await SecureStore.setItemAsync('biometric_phone', phone.trim());
-          await SecureStore.setItemAsync('biometric_role', role);
-        } else {
-          localStorage.setItem('biometric_phone', phone.trim());
-          localStorage.setItem('biometric_role', role);
-        }
-      } catch (storeErr) {
-        console.warn('Failed to store biometric phone:', storeErr);
-      }
+
 
       if (role === 'driver') {
         router.replace('/(driver)/dashboard');
@@ -158,54 +130,7 @@ export default function LoginScreen() {
     setErrorMessage('');
   };
 
-  const handleBiometricLogin = async () => {
-    try {
-      let enrolledPhone: string | null = null;
-      let enrolledRole: string | null = null;
 
-      if (Platform.OS !== 'web') {
-        enrolledPhone = await SecureStore.getItemAsync('biometric_phone');
-        enrolledRole = await SecureStore.getItemAsync('biometric_role');
-      } else {
-        enrolledPhone = localStorage.getItem('biometric_phone');
-        enrolledRole = localStorage.getItem('biometric_role');
-      }
-
-      if (!enrolledPhone) {
-        setErrorMessage('No account enrolled for biometrics on this device. Please log in with OTP first.');
-        return;
-      }
-
-      const hasHardware = await LocalAuthentication.hasHardwareAsync();
-      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-
-      if (!hasHardware || !isEnrolled) {
-        setErrorMessage('Biometric authentication is not available or not set up on this device.');
-        return;
-      }
-
-      const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Authenticate with FaceID / TouchID',
-        fallbackLabel: 'Use Passcode',
-      });
-
-      if (result.success) {
-        setLoading(true);
-        const targetRole = (enrolledRole as 'customer' | 'driver') || role;
-        const res = await verifyOtp(enrolledPhone, '123456', targetRole, termsAccepted);
-        setLoading(false);
-        if (res.success) {
-          if (targetRole === 'driver') router.replace('/(driver)/dashboard');
-          else router.replace('/(customer)/dashboard');
-        } else {
-          setErrorMessage(res.message || 'Biometric login failed on server. Please use OTP.');
-        }
-      }
-    } catch (err: any) {
-      console.warn('Biometric error:', err);
-      setErrorMessage(err?.message || 'Biometric authentication error occurred');
-    }
-  };
 
   const handleAdminLogin = async () => {
     if (!email || !password) {
@@ -426,13 +351,7 @@ export default function LoginScreen() {
                 {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>Login</Text>}
               </TouchableOpacity>
               
-              <TouchableOpacity
-                style={[styles.primaryBtn, { backgroundColor: '#1a1f2e', marginTop: 15, borderWidth: 1, borderColor: '#e86331' }]}
-                onPress={handleBiometricLogin}
-                disabled={loading}
-              >
-                <Text style={[styles.primaryBtnText, { color: '#e86331' }]}>FaceID / Fingerprint</Text>
-              </TouchableOpacity>
+
               
               <TouchableOpacity style={styles.backBtn} onPress={() => setStep('email_register')}>
                 <Text style={styles.backBtnText}>Don't have an account? Sign Up</Text>

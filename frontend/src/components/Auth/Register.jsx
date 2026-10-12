@@ -39,7 +39,7 @@ const Register = () => {
     
     setIsLoading(true);
     try {
-      const response = await api.post('/api/auth/register-password', { 
+      const response = await api.post('/api/auth/register', { 
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
