@@ -910,13 +910,26 @@ const login = async (req, res) => {
       });
     }
 
-    if (!user || !user.password) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials or account uses OTP login' });
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'No account found with this email or phone number.' });
+    }
+
+    if (!user.password) {
+      if (user.googleId) {
+        return res.status(401).json({ 
+          success: false, 
+          message: 'This account was created with Google. Please click "Continue with Google" or set a password in your profile.' 
+        });
+      }
+      return res.status(401).json({ 
+        success: false, 
+        message: 'This account uses OTP/Phone login. Please sign in via Phone OTP or set a password.' 
+      });
     }
 
     const isMatch = await bcryptjs.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return res.status(401).json({ success: false, message: 'Incorrect password. Please try again.' });
     }
 
     const token = jwt.sign(
