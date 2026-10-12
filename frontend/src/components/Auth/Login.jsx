@@ -363,15 +363,7 @@ const Login = () => {
                   )}
                 </button>
 
-                <div className="text-center pt-1">
-                  <button
-                    type="button"
-                    onClick={() => { setEmail('admin@eminence.com'); setPassword('adminpassword123'); }}
-                    className="text-xs text-moss-400 hover:text-moss-300 underline underline-offset-4"
-                  >
-                    Fill demo admin credentials
-                  </button>
-                </div>
+
               </form>
             </motion.div>
           ) : (

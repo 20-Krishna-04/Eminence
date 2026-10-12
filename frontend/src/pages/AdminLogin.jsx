@@ -140,18 +140,7 @@ const AdminLogin = () => {
             )}
           </button>
 
-          <div className="text-center pt-2">
-            <button
-              type="button"
-              onClick={() => {
-                setEmail('admin@eminence.com');
-                setPassword('adminpassword123');
-              }}
-              className="text-xs text-moss-400 hover:text-moss-300 underline"
-            >
-              Fill Demo Admin Credentials (admin@eminence.com)
-            </button>
-          </div>
+
         </form>
       </motion.div>
     </div>
