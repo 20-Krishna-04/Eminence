@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { Home, Store, Factory, Clock, CheckCircle2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 const Services = () => {
   const serviceCategories = [
@@ -74,11 +73,7 @@ const Services = () => {
           ))}
         </div>
 
-        <div className="text-center">
-          <Link to="/booking" className="btn-primary inline-flex px-10 py-4">
-            Book a Tempo Now
-          </Link>
-        </div>
+
       </div>
     </div>
   );
