@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
   Package, CheckCircle, Wallet, MapPin, Plus, Gift, Copy, 
-  Crown, Target, Star, Leaf, Truck, Bell, Check, AlertCircle, RefreshCw, Lock 
+  Crown, Target, Star, Leaf, Truck, Bell, Check, AlertCircle, RefreshCw, Lock, Eye, EyeOff 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
@@ -81,6 +81,9 @@ const CustomerDashboard = () => {
     newPassword: '',
     confirmPassword: ''
   });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -896,35 +899,65 @@ const CustomerDashboard = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-loft-300 mb-2">Current Password</label>
-                        <input 
-                          type="password" 
-                          placeholder="Current password (if set)"
-                          className="input-field" 
-                          value={passwordForm.currentPassword} 
-                          onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})} 
-                        />
+                        <div className="relative">
+                          <input 
+                            type={showCurrentPassword ? "text" : "password"} 
+                            placeholder="Current password (if set)"
+                            className="input-field pr-10" 
+                            value={passwordForm.currentPassword} 
+                            onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})} 
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-loft-400 hover:text-loft-200 transition-colors focus:outline-none"
+                            aria-label={showCurrentPassword ? "Hide current password" : "Show current password"}
+                          >
+                            {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-loft-300 mb-2">New Password</label>
-                        <input 
-                          type="password" 
-                          required
-                          placeholder="At least 6 characters"
-                          className="input-field" 
-                          value={passwordForm.newPassword} 
-                          onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})} 
-                        />
+                        <div className="relative">
+                          <input 
+                            type={showNewPassword ? "text" : "password"} 
+                            required
+                            placeholder="At least 6 characters"
+                            className="input-field pr-10" 
+                            value={passwordForm.newPassword} 
+                            onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})} 
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-loft-400 hover:text-loft-200 transition-colors focus:outline-none"
+                            aria-label={showNewPassword ? "Hide new password" : "Show new password"}
+                          >
+                            {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-loft-300 mb-2">Confirm New Password</label>
-                        <input 
-                          type="password" 
-                          required
-                          placeholder="Repeat new password"
-                          className="input-field" 
-                          value={passwordForm.confirmPassword} 
-                          onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})} 
-                        />
+                        <div className="relative">
+                          <input 
+                            type={showConfirmPassword ? "text" : "password"} 
+                            required
+                            placeholder="Repeat new password"
+                            className="input-field pr-10" 
+                            value={passwordForm.confirmPassword} 
+                            onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})} 
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-loft-400 hover:text-loft-200 transition-colors focus:outline-none"
+                            aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                          >
+                            {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
                       </div>
                     </div>
                     <div className="flex justify-end pt-2">
