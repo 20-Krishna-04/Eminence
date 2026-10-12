@@ -382,18 +382,64 @@ Return exactly a raw JSON object (and nothing else) with these keys:
     }
 
     if (!extractedData) {
-      // Resilient rule-based NLP extraction fallback
-      const lower = transcript.toLowerCase();
+      // Deterministic, ReDoS-safe linear NLP extraction fallback (CWE-1333 safe)
+      const cleaned = typeof transcript === 'string' ? transcript.slice(0, 500).trim() : '';
+      const lower = cleaned.toLowerCase();
+
       let tempoType = 'small';
       if (lower.includes('large')) tempoType = 'large';
       else if (lower.includes('medium')) tempoType = 'medium';
 
       let pickup = 'Unknown Pickup';
       let drop = 'Unknown Drop';
-      const match = transcript.match(/(?:from|for)\s+(.+?)\s+to\s+(.+)/i);
-      if (match) {
-        pickup = match[1].trim();
-        drop = match[2].replace(/\s+(tomorrow|today|morning|evening|night|now|afternoon|\d{1,2}:\d{2}.*)/i, '').trim() || match[2].trim();
+
+      let startIdx = -1;
+      const markers = [' from ', ' for '];
+      for (const marker of markers) {
+        const idx = lower.indexOf(marker);
+        if (idx !== -1 && (startIdx === -1 || idx < startIdx)) {
+          startIdx = idx + marker.length;
+        }
+      }
+
+      if (startIdx === -1) {
+        if (lower.startsWith('from ')) {
+          startIdx = 5;
+        } else if (lower.startsWith('for ')) {
+          startIdx = 4;
+        }
+      }
+
+      if (startIdx !== -1) {
+        const toIdx = lower.indexOf(' to ', startIdx);
+        if (toIdx !== -1) {
+          const parsedPickup = cleaned.slice(startIdx, toIdx).trim();
+          let parsedDrop = cleaned.slice(toIdx + 4).trim();
+
+          // Stop at punctuation if present
+          for (let i = 0; i < parsedDrop.length; i++) {
+            if (parsedDrop[i] === ',' || parsedDrop[i] === '.' || parsedDrop[i] === '\n') {
+              parsedDrop = parsedDrop.slice(0, i).trim();
+              break;
+            }
+          }
+
+          // Strip trailing time keywords
+          const timeKeywords = ['tomorrow', 'today', 'morning', 'evening', 'night', 'now', 'afternoon'];
+          const dropWords = parsedDrop.split(/\s+/);
+          while (dropWords.length > 0) {
+            const lastWord = dropWords[dropWords.length - 1].toLowerCase().replace(/[^a-z]/g, '');
+            if (timeKeywords.includes(lastWord)) {
+              dropWords.pop();
+            } else {
+              break;
+            }
+          }
+          parsedDrop = dropWords.join(' ').trim();
+
+          if (parsedPickup) pickup = parsedPickup;
+          if (parsedDrop) drop = parsedDrop;
+        }
       }
 
       let date = today;
@@ -403,15 +449,33 @@ Return exactly a raw JSON object (and nothing else) with these keys:
         date = d.toISOString().split('T')[0];
       }
 
+      // Linear, ReDoS-safe time parsing
       let time = '10:00:00';
-      const timeMatch = transcript.match(/(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)/i);
-      if (timeMatch) {
-        let hours = parseInt(timeMatch[1], 10);
-        const minutes = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
-        const isPm = timeMatch[3].toLowerCase().startsWith('p');
-        if (isPm && hours < 12) hours += 12;
-        if (!isPm && hours === 12) hours = 0;
-        time = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+      const words = lower.split(/\s+/);
+      for (let i = 0; i < words.length; i++) {
+        const w = words[i].replace(/[.,]/g, '');
+        const isAm = w.endsWith('am') || (i + 1 < words.length && (words[i + 1] === 'am' || words[i + 1] === 'a.m.'));
+        const isPm = w.endsWith('pm') || (i + 1 < words.length && (words[i + 1] === 'pm' || words[i + 1] === 'p.m.'));
+        const numPart = w.replace(/(am|pm|a\.m\.|p\.m\.)$/, '');
+        if (numPart.includes(':')) {
+          const parts = numPart.split(':');
+          let h = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10);
+          if (!isNaN(h) && h >= 0 && h <= 23 && !isNaN(m) && m >= 0 && m <= 59) {
+            if (isPm && h < 12) h += 12;
+            if (isAm && h === 12) h = 0;
+            time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
+            break;
+          }
+        } else {
+          let h = parseInt(numPart, 10);
+          if (!isNaN(h) && h >= 1 && h <= 12 && (isAm || isPm)) {
+            if (isPm && h < 12) h += 12;
+            if (isAm && h === 12) h = 0;
+            time = `${String(h).padStart(2, '0')}:00:00`;
+            break;
+          }
+        }
       }
 
       extractedData = {
@@ -425,22 +489,40 @@ Return exactly a raw JSON object (and nothing else) with these keys:
       };
     }
 
-    // Normalize date format (YYYY-MM-DD)
-    if (!extractedData.date || !/^\d{4}-\d{2}-\d{2}$/.test(extractedData.date)) {
-      if (String(extractedData.date).toLowerCase().includes('tomorrow')) {
-        const d = new Date();
-        d.setDate(d.getDate() + 1);
-        extractedData.date = d.toISOString().split('T')[0];
+    // Safe normalization of date format without ReDoS regex
+    if (typeof extractedData.date === 'string' && extractedData.date.length === 10) {
+      const parts = extractedData.date.split('-');
+      if (parts.length === 3 && parts[0].length === 4 && parts[1].length === 2 && parts[2].length === 2 &&
+          !isNaN(Number(parts[0])) && !isNaN(Number(parts[1])) && !isNaN(Number(parts[2]))) {
+        // Date is in valid YYYY-MM-DD
       } else {
         extractedData.date = today;
       }
+    } else if (typeof extractedData.date === 'string' && extractedData.date.toLowerCase().includes('tomorrow')) {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      extractedData.date = d.toISOString().split('T')[0];
+    } else {
+      extractedData.date = today;
     }
 
-    // Normalize time format (HH:mm:ss)
-    if (!extractedData.time || !/^\d{2}:\d{2}(:\d{2})?$/.test(extractedData.time)) {
+    // Safe normalization of time format without ReDoS regex
+    if (typeof extractedData.time === 'string') {
+      const parts = extractedData.time.split(':');
+      if (parts.length >= 2) {
+        const h = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+        const s = parts[2] ? parseInt(parts[2], 10) : 0;
+        if (!isNaN(h) && h >= 0 && h <= 23 && !isNaN(m) && m >= 0 && m <= 59 && !isNaN(s) && s >= 0 && s <= 59) {
+          extractedData.time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        } else {
+          extractedData.time = '10:00:00';
+        }
+      } else {
+        extractedData.time = '10:00:00';
+      }
+    } else {
       extractedData.time = '10:00:00';
-    } else if (extractedData.time.split(':').length === 2) {
-      extractedData.time = `${extractedData.time}:00`;
     }
 
     const tempoType = extractedData.tempoType || 'small';
