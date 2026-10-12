@@ -164,7 +164,7 @@ const syncDatabase = async () => {
 
     // Seed default/demo user on startup
     const seedPhone = process.env.SEED_PHONE || '1234567890';
-    const seedName = process.env.SEED_NAME || 'Demo User';
+    const seedName = process.env.SEED_NAME || 'Customer';
 
     if (seedPhone) {
       const [user, created] = await Customer.findOrCreate({

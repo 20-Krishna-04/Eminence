@@ -222,7 +222,7 @@ export default function CustomerDashboard() {
       <View style={styles.header}>
         <View>
           <Text style={styles.welcomeLabel}>CUSTOMER ACCOUNT</Text>
-          <Text style={styles.userName}>{user?.name || 'Demo User'}</Text>
+          <Text style={styles.userName}>{user?.name || 'User'}</Text>
           <Text style={styles.userPhone}>+91 {user?.phone || '1234567890'}</Text>
         </View>
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>

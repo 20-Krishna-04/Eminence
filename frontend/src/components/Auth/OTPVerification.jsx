@@ -54,7 +54,7 @@ const OTPVerification = () => {
             dispatch(loginSuccess({
               id: data.user.id,
               phone: data.user.phone,
-              name: data.user.name || 'Demo User',
+              name: data.user.name || 'User',
               role: userRole,
               token: data.token,
               isProfileComplete: data.user.isProfileComplete,
