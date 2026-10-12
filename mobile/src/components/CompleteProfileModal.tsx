@@ -16,8 +16,7 @@ export default function CompleteProfileModal() {
     phone: user?.phone || '',
     address: '',
     city: '',
-    state: '',
-    governmentId: ''
+    state: ''
   });
 
   if (!user || user.isProfileComplete || isClosed) return null;
@@ -54,7 +53,7 @@ export default function CompleteProfileModal() {
   };
 
   const handleSubmit = async () => {
-    if (!formData.name || !formData.email || !formData.phone || !formData.address || !formData.city || !formData.state || !formData.governmentId) {
+    if (!formData.name || !formData.email || !formData.phone || !formData.address || !formData.city || !formData.state) {
       Alert.alert('Incomplete', 'Please fill all the fields.');
       return;
     }
@@ -126,15 +125,6 @@ export default function CompleteProfileModal() {
               onChangeText={(text) => setFormData(prev => ({ ...prev, phone: text }))}
               placeholder="+91 1234567890"
               keyboardType="phone-pad"
-              placeholderTextColor="#748bac"
-            />
-
-            <Text style={styles.label}>Government ID (Aadhar/SSN)</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.governmentId}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, governmentId: text }))}
-              placeholder="Enter ID Number"
               placeholderTextColor="#748bac"
             />
 

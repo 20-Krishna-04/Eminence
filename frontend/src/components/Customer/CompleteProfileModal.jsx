@@ -19,8 +19,7 @@ const CompleteProfileModal = () => {
     password: '',
     address: user?.address || '',
     city: user?.city || '',
-    state: user?.state || '',
-    governmentId: user?.governmentId || ''
+    state: user?.state || ''
   });
 
   const isEmailLocked = Boolean(user?.googleId || user?.isEmailVerified || (user?.email && user.email.includes('@gmail.com')));
@@ -68,8 +67,7 @@ const CompleteProfileModal = () => {
         phone: user.phone || prev.phone,
         address: user.address || prev.address,
         city: user.city || prev.city,
-        state: user.state || prev.state,
-        governmentId: user.governmentId || prev.governmentId
+        state: user.state || prev.state
       }));
       if (user.termsAccepted) {
         setTermsAccepted(true);
@@ -318,56 +316,39 @@ const CompleteProfileModal = () => {
                     />
                   </div>
 
-                  {/* Government ID */}
+                  {/* Account Password Field */}
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-primary" />
-                      Government ID (e.g. Aadhar/SSN)
+                    <label className="text-sm font-semibold text-gray-700 flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <Lock className="w-4 h-4 text-primary" />
+                        Account Password
+                      </span>
+                      <span className="text-xs text-gray-500 font-normal">
+                        Direct login password
+                      </span>
                     </label>
-                    <input
-                      type="text"
-                      name="governmentId"
-                      required
-                      value={formData.governmentId}
-                      onChange={handleChange}
-                      placeholder="Enter ID Number"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Account Password Field */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700 flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Lock className="w-4 h-4 text-primary" />
-                      Account Password
-                    </span>
-                    <span className="text-xs text-gray-500 font-normal">
-                      Set a password for direct login
-                    </span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      placeholder="Create a password (min 6 chars)"
-                      className="w-full px-4 py-3 pr-11 rounded-xl border border-gray-200 text-gray-900 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none p-1"
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-5 h-5" />
-                      ) : (
-                        <Eye className="w-5 h-5" />
-                      )}
-                    </button>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder="Create a password (min 6 chars)"
+                        className="w-full px-4 py-3 pr-11 rounded-xl border border-gray-200 text-gray-900 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none p-1"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="w-5 h-5" />
+                        ) : (
+                          <Eye className="w-5 h-5" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
 

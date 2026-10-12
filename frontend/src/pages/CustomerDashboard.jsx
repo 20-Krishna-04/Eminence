@@ -67,7 +67,6 @@ const CustomerDashboard = () => {
     city: user?.city || '',
     state: user?.state || '',
     address: user?.address || '',
-    governmentId: user?.governmentId || '',
   });
 
   // Password Change State
@@ -94,7 +93,6 @@ const CustomerDashboard = () => {
         city: user?.city || '',
         state: user?.state || '',
         address: user?.address || '',
-        governmentId: user?.governmentId || '',
       });
     }
   }, [user]);

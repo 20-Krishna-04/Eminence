@@ -43,6 +43,5 @@ export const profileSchema = z.object({
   email: z.string().trim().email('Invalid email address').optional().or(z.literal('')),
   city: z.string().trim().optional().or(z.literal('')),
   state: z.string().trim().optional().or(z.literal('')),
-  address: z.string().trim().optional().or(z.literal('')),
-  governmentId: z.string().trim().optional().or(z.literal(''))
+  address: z.string().trim().optional().or(z.literal(''))
 });
