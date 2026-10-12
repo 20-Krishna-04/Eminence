@@ -46,6 +46,41 @@ export default function CustomerDashboard() {
   const [addressPostal, setAddressPostal] = useState('411001');
   const [addressSubmitting, setAddressSubmitting] = useState(false);
   const [addressMessage, setAddressMessage] = useState('');
+  const [addressSuggestions, setAddressSuggestions] = useState<any[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+
+  // Address search query effect restricted to Pune
+  useEffect(() => {
+    if (!addressStreet || addressStreet.length < 3) {
+      setAddressSuggestions([]);
+      return;
+    }
+
+    if (addressSuggestions.some(s => s.display_name === addressStreet)) {
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setLoadingSuggestions(true);
+      try {
+        let q = addressStreet;
+        if (!q.toLowerCase().includes('pune')) {
+          q = `${q}, Pune`;
+        }
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(q)}&countrycodes=in&limit=4&viewbox=73.70,18.65,74.05,18.40&bounded=1`, {
+          headers: { 'Accept-Language': 'en' }
+        });
+        const data = await res.json();
+        setAddressSuggestions(data || []);
+      } catch (err) {
+        console.log('Address suggestion fetch error:', err);
+      } finally {
+        setLoadingSuggestions(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [addressStreet]);
 
   // Referral Copy State
   const [copySuccess, setCopySuccess] = useState(false);
@@ -480,22 +515,52 @@ export default function CustomerDashboard() {
               placeholderTextColor="#748bac"
             />
 
-            <Text style={styles.inputLabel}>Street Address</Text>
+            <Text style={styles.inputLabel}>Street Address (Pune &amp; PCMC)</Text>
             <TextInput
               style={styles.modalInput}
               value={addressStreet}
               onChangeText={setAddressStreet}
-              placeholder="e.g. 123 MG Road, Camp"
+              placeholder="e.g. 123 MG Road, Camp / FC Road"
               placeholderTextColor="#748bac"
             />
+            {loadingSuggestions && (
+              <ActivityIndicator size="small" color="#e86331" style={{ alignSelf: 'flex-start', marginVertical: 4 }} />
+            )}
+            {addressSuggestions.length > 0 && (
+              <View style={{ backgroundColor: '#111827', borderRadius: 8, padding: 4, marginBottom: 8, borderWidth: 1, borderColor: '#374151' }}>
+                {addressSuggestions.map((s, idx) => (
+                  <TouchableOpacity
+                    key={idx}
+                    onPress={() => {
+                      setAddressStreet(s.display_name);
+                      setAddressSuggestions([]);
+                      const addr = s.address || {};
+                      if (addr.postcode) {
+                        const cleanPin = addr.postcode.replace(/\D/g, '').slice(0, 6);
+                        if (cleanPin.length === 6) setAddressPostal(cleanPin);
+                      }
+                      setAddressCity('Pune');
+                    }}
+                    style={{ paddingVertical: 8, paddingHorizontal: 10, borderBottomWidth: idx === addressSuggestions.length - 1 ? 0 : 1, borderBottomColor: '#1f2937' }}
+                  >
+                    <Text style={{ color: '#f3f4f6', fontSize: 13, fontWeight: '500' }} numberOfLines={1}>
+                      {s.display_name.split(',')[0]}
+                    </Text>
+                    <Text style={{ color: '#9ca3af', fontSize: 11 }} numberOfLines={1}>
+                      {s.display_name.split(',').slice(1).join(',')}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
 
             <View style={styles.modalRow}>
               <View style={{ flex: 1, marginRight: 8 }}>
                 <Text style={styles.inputLabel}>City</Text>
                 <TextInput
-                  style={styles.modalInput}
-                  value={addressCity}
-                  onChangeText={setAddressCity}
+                  style={[styles.modalInput, { backgroundColor: '#111827', color: '#9ca3af' }]}
+                  value="Pune"
+                  editable={false}
                   placeholder="Pune"
                   placeholderTextColor="#748bac"
                 />
