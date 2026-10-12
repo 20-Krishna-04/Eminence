@@ -57,7 +57,9 @@ const OTPVerification = () => {
               name: data.user.name || 'Demo User',
               role: userRole,
               token: data.token,
-              isProfileComplete: data.user.isProfileComplete
+              isProfileComplete: data.user.isProfileComplete,
+              isPhoneVerified: data.user.isPhoneVerified,
+              isEmailVerified: data.user.isEmailVerified
             }));
             navigate(`/${userRole}/dashboard`);
           }
@@ -141,7 +143,9 @@ const OTPVerification = () => {
           name: displayName,
           role: data.user.role || 'customer',
           token: data.token,
-          isProfileComplete: profileCompleteVal
+          isProfileComplete: profileCompleteVal,
+          isPhoneVerified: data.user.isPhoneVerified ?? true,
+          isEmailVerified: data.user.isEmailVerified
         }));
         
         const userRole = data.user.role || 'customer';

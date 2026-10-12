@@ -91,20 +91,38 @@ export default function CompleteProfileModal() {
               placeholderTextColor="#748bac"
             />
 
-            <Text style={styles.label}>Email Address</Text>
+            <View style={styles.labelRow}>
+              <Text style={styles.label}>Email Address</Text>
+              {(user?.isEmailVerified) && (
+                <Text style={styles.lockedBadge}>Verified (Locked)</Text>
+              )}
+            </View>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                (user?.isEmailVerified) && styles.inputDisabled
+              ]}
               value={formData.email}
+              editable={!user?.isEmailVerified}
               onChangeText={(text) => setFormData(prev => ({ ...prev, email: text }))}
               placeholder="john@example.com"
               keyboardType="email-address"
               placeholderTextColor="#748bac"
             />
 
-            <Text style={styles.label}>Phone Number</Text>
+            <View style={styles.labelRow}>
+              <Text style={styles.label}>Phone Number</Text>
+              {user?.isPhoneVerified && (
+                <Text style={styles.lockedBadge}>Verified (Locked)</Text>
+              )}
+            </View>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                user?.isPhoneVerified && styles.inputDisabled
+              ]}
               value={formData.phone}
+              editable={!user?.isPhoneVerified}
               onChangeText={(text) => setFormData(prev => ({ ...prev, phone: text }))}
               placeholder="+91 1234567890"
               keyboardType="phone-pad"
@@ -230,6 +248,31 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     color: '#f4f6f8',
     padding: 12,
+  },
+  inputDisabled: {
+    backgroundColor: '#161d2b',
+    borderColor: '#232b3c',
+    color: '#748bac',
+    opacity: 0.8,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+    marginTop: 14,
+  },
+  lockedBadge: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#10b981',
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.25)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    textTransform: 'uppercase',
   },
   row: {
     flexDirection: 'row',

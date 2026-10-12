@@ -135,6 +135,7 @@ const googleLogin = async (req, res) => {
         isEmailVerified: customer.isEmailVerified,
         isPhoneVerified: customer.isPhoneVerified,
         isProfileComplete: customer.isProfileComplete,
+        googleId: customer.googleId,
         role: 'customer'
       }
     });
@@ -157,19 +158,35 @@ const updateProfile = async (req, res) => {
     }
 
     if (name) customer.name = name;
+    
+    // Disallow changing Google authenticated email or already verified email
     if (email && email !== customer.email) {
+      if (customer.googleId || customer.isEmailVerified) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email address is linked to your verified authentication provider and cannot be changed.'
+        });
+      }
       customer.email = email;
       customer.isEmailVerified = false;
       customer.isProfileComplete = false;
     }
+    
     if (city) customer.city = city;
     if (state) customer.state = state;
     if (address) customer.address = address;
     if (governmentId) customer.governmentId = governmentId;
     
+    // Disallow changing verified phone number (e.g. if signed up via phone OTP)
     if (phone && phone !== customer.phone) {
+      if (customer.isPhoneVerified) {
+        return res.status(400).json({
+          success: false,
+          message: 'Phone number is verified and cannot be changed.'
+        });
+      }
       customer.phone = phone;
-      customer.isPhoneVerified = false; // Reset verification if phone changes
+      customer.isPhoneVerified = false;
       customer.isProfileComplete = false;
     }
 

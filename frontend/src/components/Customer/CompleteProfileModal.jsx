@@ -22,6 +22,9 @@ const CompleteProfileModal = () => {
     governmentId: user?.governmentId || ''
   });
 
+  const isEmailLocked = Boolean(user?.googleId || user?.isEmailVerified || (user?.email && user.email.includes('@gmail.com')));
+  const isPhoneLocked = Boolean(user?.isPhoneVerified);
+
   const [termsAccepted, setTermsAccepted] = useState(Boolean(user?.termsAccepted));
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [otpType, setOtpType] = useState(null); // 'phone'
@@ -221,9 +224,16 @@ const CompleteProfileModal = () => {
 
                   {/* Email */}
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-primary" />
-                      Email Address
+                    <label className="text-sm font-semibold text-gray-700 flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-primary" />
+                        Email Address
+                      </span>
+                      {isEmailLocked && (
+                        <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200">
+                          Verified (Locked)
+                        </span>
+                      )}
                     </label>
                     <input
                       type="email"
@@ -231,8 +241,14 @@ const CompleteProfileModal = () => {
                       required
                       value={formData.email}
                       onChange={handleChange}
+                      readOnly={isEmailLocked}
+                      disabled={isEmailLocked}
                       placeholder="john@example.com"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                      className={`w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 transition-all outline-none ${
+                        isEmailLocked 
+                          ? 'bg-gray-100/90 text-gray-500 cursor-not-allowed border-gray-300 select-none' 
+                          : 'bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary'
+                      }`}
                     />
                   </div>
                 </div>
@@ -240,9 +256,16 @@ const CompleteProfileModal = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Phone */}
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-primary" />
-                      Phone Number
+                    <label className="text-sm font-semibold text-gray-700 flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <Phone className="w-4 h-4 text-primary" />
+                        Phone Number
+                      </span>
+                      {isPhoneLocked && (
+                        <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200">
+                          Verified (Locked)
+                        </span>
+                      )}
                     </label>
                     <input
                       type="tel"
@@ -250,8 +273,14 @@ const CompleteProfileModal = () => {
                       required
                       value={formData.phone}
                       onChange={handleChange}
+                      readOnly={isPhoneLocked}
+                      disabled={isPhoneLocked}
                       placeholder="e.g. +1234567890"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                      className={`w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 transition-all outline-none ${
+                        isPhoneLocked 
+                          ? 'bg-gray-100/90 text-gray-500 cursor-not-allowed border-gray-300 select-none' 
+                          : 'bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary'
+                      }`}
                     />
                   </div>
 

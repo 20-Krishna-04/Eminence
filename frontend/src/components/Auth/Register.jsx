@@ -82,7 +82,10 @@ const Register = () => {
           name: data.user.name,
           role: data.user.role || activeTab,
           token: data.token,
-          isProfileComplete: data.user.isProfileComplete
+          isProfileComplete: data.user.isProfileComplete,
+          isEmailVerified: data.user.isEmailVerified,
+          isPhoneVerified: data.user.isPhoneVerified,
+          googleId: data.user.googleId
         }));
 
         if (!data.user.isProfileComplete) {
