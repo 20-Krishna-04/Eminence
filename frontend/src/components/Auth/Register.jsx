@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Phone, User } from 'lucide-react';
+import { ArrowRight, Phone, User, Eye, EyeOff } from 'lucide-react';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../../config/firebase';
 import { useDispatch } from 'react-redux';
@@ -20,6 +20,7 @@ const GoogleIcon = () => (
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', phone: '', email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -216,13 +217,20 @@ const Register = () => {
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
-                className="input-field pl-4"
+                className="input-field pl-4 pr-12"
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-loft-400 hover:text-loft-200 focus:outline-none"
+              >
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
             </div>
           </div>
 
