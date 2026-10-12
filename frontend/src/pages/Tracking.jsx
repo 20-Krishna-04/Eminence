@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Phone, MessageSquare, ShieldCheck, Check, Copy } from 'lucide-react';
+import { Phone, MessageSquare, ShieldCheck, Check, Copy, Truck, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import TrackingMap from '../components/Tracking/TrackingMap';
 import ReviewModal from '../components/Customer/ReviewModal';
@@ -30,12 +30,53 @@ const Tracking = () => {
   });
   const fallbackPodHash = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 
+  const [effectiveBookingId, setEffectiveBookingId] = useState(bookingId || null);
+  const [hasNoActiveBooking, setHasNoActiveBooking] = useState(false);
+
   useEffect(() => {
     let isMounted = true;
-    const loadBooking = async () => {
+
+    const resolveAndLoadBooking = async () => {
       try {
         setLoading(true);
-        const response = await api.get(`/api/bookings/${bookingId}`);
+        setError(null);
+
+        let targetId = bookingId;
+
+        // If no bookingId provided in URL, look up the user's active bookings
+        if (!targetId) {
+          try {
+            const bookingsRes = await api.get('/api/bookings');
+            const userBookings = bookingsRes.data?.bookings || bookingsRes.data || [];
+            // Find most recent active booking (pending, driver_assigned, arrived, in_transit)
+            const activeBooking = userBookings.find(b => 
+              ['pending', 'driver_assigned', 'arrived', 'in_transit'].includes(b.status)
+            );
+
+            if (activeBooking) {
+              targetId = activeBooking.id;
+              if (isMounted) setEffectiveBookingId(targetId);
+            } else {
+              // No active bookings found for this customer
+              if (isMounted) {
+                setHasNoActiveBooking(true);
+                setLoading(false);
+              }
+              return;
+            }
+          } catch (listErr) {
+            console.error('Error fetching customer bookings for tracking:', listErr);
+            if (isMounted) {
+              setHasNoActiveBooking(true);
+              setLoading(false);
+            }
+            return;
+          }
+        } else {
+          if (isMounted) setEffectiveBookingId(targetId);
+        }
+
+        const response = await api.get(`/api/bookings/${targetId}`);
         const data = response.data?.booking || response.data;
         if (isMounted && data) {
           setBooking(data);
@@ -61,9 +102,7 @@ const Tracking = () => {
       }
     };
 
-    if (bookingId) {
-      loadBooking();
-    }
+    resolveAndLoadBooking();
 
     const token = user?.token || getToken();
     const rawSocketUrl = import.meta.env.VITE_API_URL || api.defaults.baseURL || 'http://localhost:3000';
@@ -77,16 +116,22 @@ const Tracking = () => {
       auth: { token }
     });
 
-    socket.emit('join_booking', { bookingId });
-    socket.emit('join_trip', bookingId);
+    const activeId = bookingId || effectiveBookingId;
+    if (activeId) {
+      socket.emit('join_booking', { bookingId: activeId });
+      socket.emit('join_trip', activeId);
+    }
 
     // Socket reconnection strategy handlers
     socket.on('connect', () => {
       if (isMounted) {
         setIsReconnecting(false);
-        socket.emit('join_booking', { bookingId });
-        socket.emit('join_trip', bookingId);
-        loadBooking();
+        const currId = bookingId || effectiveBookingId;
+        if (currId) {
+          socket.emit('join_booking', { bookingId: currId });
+          socket.emit('join_trip', currId);
+          resolveAndLoadBooking();
+        }
       }
     });
 
@@ -103,7 +148,8 @@ const Tracking = () => {
     });
 
     socket.on('booking_status_updated', ({ bookingId: id, status: newStatus }) => {
-      if (id === bookingId && isMounted) {
+      const currId = bookingId || effectiveBookingId;
+      if (id === currId && isMounted) {
         setStatus(newStatus);
         setBooking(prev => prev ? { ...prev, status: newStatus } : prev);
         if (newStatus === 'completed') {
@@ -193,13 +239,49 @@ const Tracking = () => {
     }
   };
 
+  if (hasNoActiveBooking) {
+    return (
+      <div className="w-full min-h-[80vh] flex items-center justify-center py-16 px-4 sm:px-6 lg:px-8 relative">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,99,49,0.06),transparent_60%)] pointer-events-none"></div>
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="max-w-md w-full card p-8 text-center relative z-10 border border-loft-800"
+        >
+          <div className="w-16 h-16 rounded-2xl bg-copper-500/10 border border-copper-500/20 flex items-center justify-center mx-auto mb-6 text-copper-400">
+            <Truck className="w-8 h-8" />
+          </div>
+          <h2 className="text-2xl font-serif font-bold text-loft-50 mb-2">No Active Bookings</h2>
+          <p className="text-loft-300 text-sm mb-8 leading-relaxed">
+            You don't have any ongoing tempo bookings right now. Book a tempo to see live telematics and GPS tracking.
+          </p>
+          <div className="flex flex-col gap-3">
+            <Link 
+              to="/booking" 
+              className="btn-primary py-3 px-6 flex items-center justify-center gap-2 text-sm shadow-lg shadow-copper-500/10"
+            >
+              Book a Tempo Now <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link 
+              to="/customer/dashboard" 
+              className="btn-secondary py-3 px-6 text-sm"
+            >
+              Go to Dashboard
+            </Link>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full relative min-h-screen bg-loft-950 flex flex-col md:flex-row">
       
       {/* Map Area (Leaflet) */}
       <div className="flex-1 relative bg-loft-900 border-r border-loft-800 hidden md:block z-0">
         <TrackingMap 
-          bookingId={bookingId} 
+          bookingId={effectiveBookingId || bookingId} 
           initialLat={PUNE_POSITION[0]} 
           initialLng={PUNE_POSITION[1]} 
           isReconnecting={isReconnecting}
@@ -215,7 +297,7 @@ const Tracking = () => {
             &larr; Back to Dashboard
           </Link>
           <h1 className="text-3xl font-serif font-bold text-loft-50 mt-4 mb-1">Track Ride</h1>
-          <p className="text-loft-400 text-sm">Booking ID: <span className="text-loft-200 font-mono">{bookingId || 'BKG-XXXX-XX'}</span></p>
+          <p className="text-loft-400 text-sm">Booking ID: <span className="text-loft-200 font-mono">{effectiveBookingId || bookingId || 'BKG-XXXX-XX'}</span></p>
         </div>
 
         {error && (
