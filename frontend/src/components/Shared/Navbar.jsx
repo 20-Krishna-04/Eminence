@@ -26,10 +26,10 @@ const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 bg-loft-950/80 backdrop-blur-md border-b border-loft-800/60 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20 items-center">
-          {/* Left: Logo and Nav Links grouped together */}
-          <div className="flex items-center gap-6 lg:gap-8">
-            <Link to="/" className="flex items-center gap-2 group">
+        <div className="flex justify-between h-20 items-center gap-4">
+          {/* Left: Logo and Nav Links */}
+          <div className="flex items-center gap-6 lg:gap-8 min-w-0">
+            <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
               <div className="bg-loft-950 p-1 rounded-lg border border-copper-500/30 group-hover:border-copper-500/60 transition-colors flex items-center justify-center overflow-hidden">
                 <img src="/logo.jpg" alt="Eminence Logo" className="w-8 h-8 object-contain rounded-md" />
               </div>
@@ -38,7 +38,7 @@ const Navbar = () => {
               </span>
             </Link>
 
-            <div className="hidden md:flex items-center gap-5 lg:gap-6">
+            <div className="hidden lg:flex items-center gap-6">
               {isAuthenticated ? (
                 <>
                   {(user?.role === 'customer') && (
@@ -51,19 +51,19 @@ const Navbar = () => {
               ) : (
                 <>
                   <Link to="/services" className="text-loft-300 hover:text-loft-50 font-medium transition-colors whitespace-nowrap">{t('navbar.services')}</Link>
-                  <Link to="/pricing" className="text-loft-300 hover:text-loft-50 font-medium transition-colors hidden lg:block whitespace-nowrap">{t('navbar.pricing')}</Link>
-                  <Link to="/about" className="text-loft-300 hover:text-loft-50 font-medium transition-colors hidden xl:block whitespace-nowrap">{t('navbar.aboutUs')}</Link>
-                  <Link to="/contact" className="text-loft-300 hover:text-loft-50 font-medium transition-colors hidden xl:block whitespace-nowrap">{t('navbar.contact')}</Link>
+                  <Link to="/pricing" className="text-loft-300 hover:text-loft-50 font-medium transition-colors whitespace-nowrap">{t('navbar.pricing')}</Link>
+                  <Link to="/about" className="text-loft-300 hover:text-loft-50 font-medium transition-colors whitespace-nowrap">{t('navbar.aboutUs')}</Link>
+                  <Link to="/contact" className="text-loft-300 hover:text-loft-50 font-medium transition-colors whitespace-nowrap">{t('navbar.contact')}</Link>
                 </>
               )}
             </div>
           </div>
           
           {/* Right: Actions */}
-          <div className="hidden md:flex items-center space-x-4 lg:space-x-6">
+          <div className="hidden md:flex items-center gap-3 lg:gap-5 flex-shrink-0">
             
             <select 
-              className="bg-loft-900 border border-loft-700 text-loft-300 text-sm rounded-lg focus:ring-copper-500 focus:border-copper-500 block p-1.5 cursor-pointer outline-none hover:bg-loft-800 transition-colors"
+              className="bg-loft-900 border border-loft-700 text-loft-300 text-sm rounded-lg focus:ring-copper-500 focus:border-copper-500 block px-2.5 py-1.5 cursor-pointer outline-none hover:bg-loft-800 transition-colors flex-shrink-0"
               value={i18n.language}
               onChange={handleLanguageChange}
             >
