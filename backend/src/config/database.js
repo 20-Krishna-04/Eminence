@@ -58,10 +58,12 @@ if (!useSqlite && dbUrl) {
 
   sequelize = new Sequelize(sanitizedUrl, sequelizeOptions);
 } else if (['development', 'test'].includes(process.env.NODE_ENV) || !process.env.NODE_ENV) {
-  // Local development fallback to SQLite
+  // Use separate SQLite file for test environment so tests never wipe active development data
+  const isTest = process.env.NODE_ENV === 'test';
+  const sqliteFile = isTest ? '../../eminence.test.sqlite' : '../../eminence.sqlite';
   sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: path.resolve(__dirname, '../../eminence.sqlite'),
+    storage: path.resolve(__dirname, sqliteFile),
     logging: false,
   });
 } else {
