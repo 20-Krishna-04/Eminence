@@ -41,5 +41,8 @@ export const profileSchema = z.object({
   name: z.string().trim().min(2, 'Name must be at least 2 characters'),
   phone: z.string().trim().regex(/^[6-9]\d{9}$/, 'Must be a valid 10-digit mobile number'),
   email: z.string().trim().email('Invalid email address').optional().or(z.literal('')),
-  city: z.string().trim().optional().or(z.literal(''))
+  city: z.string().trim().optional().or(z.literal('')),
+  state: z.string().trim().optional().or(z.literal('')),
+  address: z.string().trim().optional().or(z.literal('')),
+  governmentId: z.string().trim().optional().or(z.literal(''))
 });

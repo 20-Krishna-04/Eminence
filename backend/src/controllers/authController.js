@@ -940,6 +940,63 @@ const login = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user?.id;
+    const userRole = req.user?.role || 'customer';
+
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password must be at least 6 characters long'
+      });
+    }
+
+    let user;
+    if (userRole === 'driver') {
+      user = await Driver.findByPk(userId);
+    } else {
+      user = await Customer.findByPk(userId);
+    }
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // If user already had a password, verify currentPassword
+    if (user.password) {
+      if (!currentPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'Current password is required to change password'
+        });
+      }
+
+      const isMatch = await bcryptjs.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({
+          success: false,
+          message: 'Incorrect current password'
+        });
+      }
+    }
+
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(newPassword, salt);
+    user.password = hashedPassword;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: user.password ? 'Password updated successfully' : 'Password created successfully'
+    });
+  } catch (error) {
+    console.error('Change Password Error:', error);
+    return res.status(500).json({ success: false, message: 'Server error changing password' });
+  }
+};
+
 module.exports = {
   googleLogin,
   updateProfile,
@@ -949,6 +1006,7 @@ module.exports = {
   phoneVerify,
   register,
   login,
+  changePassword,
   getTerms,
   acceptTerms,
   exportUserData,

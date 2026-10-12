@@ -17,6 +17,7 @@ router.post('/login-password', authLimiter, authController.login);
 // Protected Routes
 router.post('/accept-terms', authLimiter, authMiddleware, authController.acceptTerms);
 router.post('/complete-profile', authLimiter, authMiddleware, authController.updateProfile);
+router.post('/change-password', authLimiter, authMiddleware, authController.changePassword);
 router.post('/send-otp', otpLimiter, authMiddleware, authController.sendOtp);
 router.post('/verify-otp', authLimiter, authMiddleware, authController.verifyOtp);
 

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
   Package, CheckCircle, Wallet, MapPin, Plus, Gift, Copy, 
-  Crown, Target, Star, Leaf, Truck, Bell, Check, AlertCircle, RefreshCw 
+  Crown, Target, Star, Leaf, Truck, Bell, Check, AlertCircle, RefreshCw, Lock 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
@@ -66,6 +66,20 @@ const CustomerDashboard = () => {
     phone: user?.phone || '',
     city: user?.city || '',
     state: user?.state || '',
+    address: user?.address || '',
+    governmentId: user?.governmentId || '',
+  });
+
+  // Password Change State
+  const [passwordState, setPasswordState] = useState({
+    loading: false,
+    error: null,
+    success: null
+  });
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   });
 
   useEffect(() => {
@@ -76,6 +90,8 @@ const CustomerDashboard = () => {
         phone: user?.phone || '',
         city: user?.city || '',
         state: user?.state || '',
+        address: user?.address || '',
+        governmentId: user?.governmentId || '',
       });
     }
   }, [user]);
@@ -212,6 +228,53 @@ const CustomerDashboard = () => {
         loading: false, 
         error: error.response?.data?.message || 'Error updating profile', 
         success: false 
+      });
+    }
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setPasswordState({ loading: true, error: null, success: null });
+
+    if (passwordForm.newPassword.length < 6) {
+      setPasswordState({
+        loading: false,
+        error: 'New password must be at least 6 characters long',
+        success: null
+      });
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordState({
+        loading: false,
+        error: 'New passwords do not match',
+        success: null
+      });
+      return;
+    }
+
+    try {
+      const res = await api.post('/api/auth/change-password', {
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword
+      });
+      setPasswordState({
+        loading: false,
+        error: null,
+        success: res.data?.message || 'Password changed successfully!'
+      });
+      setPasswordForm({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+    } catch (error) {
+      console.error('Error changing password:', error);
+      setPasswordState({
+        loading: false,
+        error: error.response?.data?.message || 'Failed to change password. Please check your current password.',
+        success: null
       });
     }
   };
@@ -770,9 +833,30 @@ const CustomerDashboard = () => {
                       <label className="block text-sm font-medium text-loft-300 mb-2">City</label>
                       <input 
                         type="text" 
+                        placeholder="e.g. Pune"
                         className="input-field" 
                         value={profileForm.city} 
                         onChange={(e) => setProfileForm({...profileForm, city: e.target.value})} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-loft-300 mb-2">State</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. Maharashtra"
+                        className="input-field" 
+                        value={profileForm.state} 
+                        onChange={(e) => setProfileForm({...profileForm, state: e.target.value})} 
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-loft-300 mb-2">Full Address</label>
+                      <textarea 
+                        rows="3"
+                        placeholder="Enter complete street address, flat/building, area, pincode"
+                        className="input-field resize-none" 
+                        value={profileForm.address} 
+                        onChange={(e) => setProfileForm({...profileForm, address: e.target.value})} 
                       />
                     </div>
                   </div>
@@ -782,6 +866,78 @@ const CustomerDashboard = () => {
                     </button>
                   </div>
                 </form>
+
+                {/* Change Password Card */}
+                <div className="mt-12 pt-8 border-t border-loft-800">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 bg-copper-500/10 rounded-lg text-copper-400">
+                      <Lock className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-bold text-loft-50">Change Password</h4>
+                      <p className="text-xs text-loft-400">Update your account login password or set a new one</p>
+                    </div>
+                  </div>
+
+                  {passwordState.error && (
+                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-sm flex items-center gap-2">
+                      <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                      <span>{passwordState.error}</span>
+                    </div>
+                  )}
+                  {passwordState.success && (
+                    <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-lg text-sm flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                      <span>{passwordState.success}</span>
+                    </div>
+                  )}
+
+                  <form onSubmit={handlePasswordChange} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-loft-300 mb-2">Current Password</label>
+                        <input 
+                          type="password" 
+                          placeholder="Current password (if set)"
+                          className="input-field" 
+                          value={passwordForm.currentPassword} 
+                          onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})} 
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-loft-300 mb-2">New Password</label>
+                        <input 
+                          type="password" 
+                          required
+                          placeholder="At least 6 characters"
+                          className="input-field" 
+                          value={passwordForm.newPassword} 
+                          onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})} 
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-loft-300 mb-2">Confirm New Password</label>
+                        <input 
+                          type="password" 
+                          required
+                          placeholder="Repeat new password"
+                          className="input-field" 
+                          value={passwordForm.confirmPassword} 
+                          onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})} 
+                        />
+                      </div>
+                    </div>
+                    <div className="flex justify-end pt-2">
+                      <button 
+                        type="submit" 
+                        disabled={passwordState.loading || !passwordForm.newPassword} 
+                        className="btn-secondary py-3 px-8 text-sm disabled:opacity-50 hover:border-copper-500/60"
+                      >
+                        {passwordState.loading ? 'Updating...' : 'Update Password'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </motion.div>
           )}
