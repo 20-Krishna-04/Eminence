@@ -4,9 +4,9 @@ const dotenv = require('dotenv');
 const path = require('path');
 
 const initialNodeEnv = process.env.NODE_ENV;
-// Load environment variables (.env.local first, overriding any parent process variables)
-dotenv.config({ path: path.resolve(__dirname, '../../.env.local'), override: true });
-dotenv.config({ path: path.resolve(__dirname, '../../.env'), override: true });
+// Load local environment files without overriding explicit process variables.
+dotenv.config({ path: path.resolve(__dirname, '../../.env.local') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 if (initialNodeEnv === 'test') {
   process.env.NODE_ENV = 'test';
 }

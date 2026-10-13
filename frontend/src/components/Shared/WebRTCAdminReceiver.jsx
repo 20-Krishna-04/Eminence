@@ -3,7 +3,6 @@ import Peer from 'peerjs';
 import { PhoneIncoming, PhoneOff, PhoneCall, Mic, MicOff } from 'lucide-react';
 
 const WebRTCAdminReceiver = () => {
-  const [peer, setPeer] = useState(null);
   const [incomingCall, setIncomingCall] = useState(null);
   const [activeCall, setActiveCall] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -31,8 +30,6 @@ const WebRTCAdminReceiver = () => {
     newPeer.on('error', (err) => {
       console.error('Peer error:', err);
     });
-
-    setPeer(newPeer);
 
     return () => {
       endCall();

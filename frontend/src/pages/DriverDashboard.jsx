@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Navigation, Wallet, AlertTriangle, CheckCircle, Clock, MapPin, Fuel, TrendingUp, Map } from 'lucide-react';
+import { Navigation, Wallet, AlertTriangle, CheckCircle, Clock, MapPin, TrendingUp, Map } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useSelector } from 'react-redux';
 import api from '../services/api';
@@ -8,13 +8,13 @@ import { io } from 'socket.io-client';
 
 
 const DriverDashboard = () => {
-  const { user, token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const [activeTab, setActiveTab] = useState('today');
   const [isOnline, setIsOnline] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [heatmapData, setHeatmapData] = useState(null);
   const [driverStats, setDriverStats] = useState(null);
-  const [statsLoading, setStatsLoading] = useState(false);
+  const [_statsLoading, setStatsLoading] = useState(false);
   
   // WMS Scanning State
   const [scanResult, setScanResult] = useState(null);
@@ -122,7 +122,7 @@ const DriverDashboard = () => {
   const toggleAvailability = async () => {
     setIsLoading(true);
     try {
-      const res = await api.put(`/api/drivers/${user?.id}/toggle-availability`);
+      const res = await api.patch(`/api/drivers/${user?.id}/toggle`);
       setIsOnline(res.data.status === 'active');
     } catch (err) {
       console.error('Toggle availability error:', err);
@@ -137,8 +137,8 @@ const DriverDashboard = () => {
     setIsLoading(true);
 
     try {
-      const response = await api.put(`/api/bookings/${activeRide.bookingId}/status`, 
-        { status: 'driver_assigned' }
+      const response = await api.put(`/api/bookings/${activeRide.bookingId}/status`,
+        { status: 'arrived', driverId: user?.id }
       );
 
       if (!response.data?.success) {

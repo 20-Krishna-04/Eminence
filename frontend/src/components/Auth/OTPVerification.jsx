@@ -10,8 +10,6 @@ import api from '../../services/api';
 const OTPVerification = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
-  const [otpValue, setOtpValue] = useState('');
-  const [error, setError] = useState('');
   const inputRefs = useRef([]);
   
   const getCsrfToken = () => {

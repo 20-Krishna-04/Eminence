@@ -178,7 +178,7 @@ async function main() {
       console.log(`${colors.cyan}[INFO] Spawning backend instance on port 3000 for Mobile QA tests...${colors.reset}`);
       backendProc = spawn('node', ['src/server.js'], {
         cwd: BACKEND_DIR,
-        env: { ...process.env, PORT: '3000', DEMO_SEED: 'true', NODE_ENV: 'development' },
+        env: { ...process.env, PORT: '3000', DEMO_SEED: 'true', NODE_ENV: 'development', USE_SQLITE: 'true' },
         stdio: 'inherit'
       });
       await waitForServer('http://localhost:3000/api/health', 90000);

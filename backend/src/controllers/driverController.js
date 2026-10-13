@@ -29,6 +29,9 @@ const createDriver = async (req, res) => {
 const toggleAvailability = async (req, res) => {
   try {
     const { id } = req.params;
+    if (req.user?.role === 'driver' && String(req.user.id) !== String(id)) {
+      return res.status(403).json({ success: false, message: 'Drivers can only change their own availability' });
+    }
     const driver = await Driver.findByPk(id);
     
     if (!driver) {

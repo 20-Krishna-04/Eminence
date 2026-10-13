@@ -13,7 +13,7 @@ import { addressSchema, profileSchema } from '../utils/formSchemas';
 import AutocompleteLocationInput from '../components/Customer/Booking/AutocompleteLocationInput';
 
 const CustomerDashboard = () => {
-  const { user, token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState('history');
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
@@ -50,7 +50,7 @@ const CustomerDashboard = () => {
   const [newAddress, setNewAddress] = useState({ label: '', street: '', city: 'Pune', postalCode: '411001' });
 
   // Wallet State with explicit request tracking
-  const [walletState, setWalletState] = useState({
+  const [_walletState, setWalletState] = useState({
     loading: false,
     error: null,
     data: null

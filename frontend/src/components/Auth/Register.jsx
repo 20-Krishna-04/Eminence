@@ -24,7 +24,7 @@ const Register = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('customer');
+  const [activeTab] = useState('customer');
   const navigate = useNavigate();
 
   const dispatch = useDispatch();

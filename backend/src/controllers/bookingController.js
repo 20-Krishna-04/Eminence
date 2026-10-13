@@ -281,6 +281,13 @@ const updateBookingStatus = async (req, res) => {
 
     if (driverId) {
       if (isAdmin) {
+        const driver = await Driver.findByPk(driverId);
+        if (!driver) {
+          return res.status(404).json({ success: false, message: 'Driver not found' });
+        }
+        if (driver.status === 'on_trip') {
+          return res.status(409).json({ success: false, message: 'Driver is already on a trip' });
+        }
         booking.driverId = driverId;
       } else if (userRole === 'driver' && driverId === userId) {
         booking.driverId = userId;

@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import api from '../../services/api';
 import { updateProfileSuccess } from '../../redux/slices/authSlice';
-import { MapPin, Phone, Building2, Map, FileText, CheckCircle2, User, Mail, LocateFixed, Loader2, Lock, Eye, EyeOff } from 'lucide-react';
+import { MapPin, Phone, Building2, Map, CheckCircle2, User, Mail, LocateFixed, Loader2, Lock, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TermsModal from '../Common/TermsModal';
 

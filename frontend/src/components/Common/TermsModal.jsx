@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShieldCheck, FileText, CheckCircle, ExternalLink, ScrollText, CheckCircle2, AlertTriangle, Scale, Clock, Shield } from 'lucide-react';
+import { X, ShieldCheck, FileText, CheckCircle, ExternalLink } from 'lucide-react';
 import api from '../../services/api';
 import { Link } from 'react-router-dom';
 

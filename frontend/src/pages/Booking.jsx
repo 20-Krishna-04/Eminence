@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  MapPin, Calendar, Clock, Box, ShieldCheck, Tag, Shield, Crown, 
+  Calendar, Clock, Box, ShieldCheck, Tag, Shield, Crown,
   Mic, MicOff, Sparkles, X, Leaf
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

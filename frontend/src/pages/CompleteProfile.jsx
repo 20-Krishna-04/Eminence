@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { updateProfileSuccess } from '../redux/slices/authSlice';
 import MapPicker from '../components/MapPicker';
@@ -72,7 +71,7 @@ const CompleteProfile = () => {
 
       setScanResult(response.data);
       setMessage('Document successfully verified via API.');
-    } catch (error) {
+    } catch {
       setError('Document verification failed.');
     } finally {
       setIsScanning(false);

@@ -1,5 +1,4 @@
 import api from './api';
-import axios from 'axios';
 
 export const adminApi = {
   getOverviewStats: () => api.get('/api/admin/stats/overview'),
