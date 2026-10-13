@@ -1,5 +1,5 @@
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const { Admin } = require('../models');
 
 // Secure JWT Secret Loader
