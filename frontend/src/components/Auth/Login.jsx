@@ -129,12 +129,8 @@ const Login = () => {
       setIsLoading(false);
       if (data.success) {
         dispatch(loginSuccess({
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.name,
-          role: data.user.role,
-          token: data.token,
-          isProfileComplete: data.user.isProfileComplete
+          ...data.user,
+          token: data.token
         }));
         if (!data.user.isProfileComplete) {
           navigate('/complete-profile');
@@ -168,10 +164,7 @@ const Login = () => {
       setIsLoading(false);
       if (data.success) {
         dispatch(loginSuccess({
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.name,
-          role: data.user.role,
+          ...data.user,
           token: data.token,
           isProfileComplete: true
         }));
@@ -203,15 +196,8 @@ const Login = () => {
       setIsLoading(false);
       if (data.success) {
         dispatch(loginSuccess({
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.name,
-          role: data.user.role,
-          token: data.token,
-          isProfileComplete: data.user.isProfileComplete,
-          isEmailVerified: data.user.isEmailVerified,
-          isPhoneVerified: data.user.isPhoneVerified,
-          googleId: data.user.googleId
+          ...data.user,
+          token: data.token
         }));
         if (!data.user.isProfileComplete) {
           navigate('/complete-profile');

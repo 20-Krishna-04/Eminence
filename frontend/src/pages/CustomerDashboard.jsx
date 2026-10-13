@@ -86,6 +86,25 @@ const CustomerDashboard = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const fetchProfile = async () => {
+    try {
+      const res = await api.get('/api/auth/profile');
+      if (res.data?.success && res.data?.user) {
+        dispatch(updateProfileSuccess(res.data.user));
+        setProfileForm({
+          name: res.data.user.name || '',
+          email: res.data.user.email || '',
+          phone: res.data.user.phone || '',
+          city: res.data.user.city || '',
+          state: res.data.user.state || '',
+          address: res.data.user.address || '',
+        });
+      }
+    } catch (err) {
+      console.warn('Silent profile fetch warning:', err.message);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       setProfileForm({
@@ -96,8 +115,9 @@ const CustomerDashboard = () => {
         state: user?.state || '',
         address: user?.address || '',
       });
+      fetchProfile();
     }
-  }, [user]);
+  }, [user?.id]);
 
   // Trip History State
   const [selectedTrip, setSelectedTrip] = useState(null);

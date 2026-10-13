@@ -224,6 +224,36 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const getProfile = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const userRole = req.user?.role || 'customer';
+
+    let user;
+    if (userRole === 'driver') {
+      user = await Driver.findByPk(userId);
+    } else {
+      user = await Customer.findByPk(userId);
+    }
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const safeUser = user.toJSON ? user.toJSON() : { ...user };
+    delete safeUser.password;
+    safeUser.role = userRole;
+    if (safeUser.governmentId) {
+      safeUser.governmentId = maskGovernmentId(safeUser.governmentId);
+    }
+
+    return res.status(200).json({ success: true, user: safeUser });
+  } catch (error) {
+    console.error('Get Profile Error:', error);
+    return res.status(500).json({ success: false, message: 'Server error fetching profile' });
+  }
+};
+
 const sendOtp = async (req, res) => {
   try {
     const { type } = req.body; // 'email' or 'phone'
@@ -1180,6 +1210,7 @@ const resetPassword = async (req, res) => {
 
 module.exports = {
   googleLogin,
+  getProfile,
   updateProfile,
   sendOtp,
   verifyOtp,

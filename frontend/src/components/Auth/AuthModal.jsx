@@ -43,13 +43,8 @@ const AuthModal = ({ isOpen, onClose, onSuccess, initialMode = 'login', message 
       setIsLoading(false);
       if (data.success) {
         dispatch(loginSuccess({
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.name,
-          phone: data.user.phone,
-          role: data.user.role,
-          token: data.token,
-          isProfileComplete: data.user.isProfileComplete
+          ...data.user,
+          token: data.token
         }));
         if (onSuccess) onSuccess(data.user);
         onClose();
@@ -81,13 +76,8 @@ const AuthModal = ({ isOpen, onClose, onSuccess, initialMode = 'login', message 
         const data = loginRes.data;
         if (data.success) {
           dispatch(loginSuccess({
-            id: data.user.id,
-            email: data.user.email,
-            name: data.user.name,
-            phone: data.user.phone,
-            role: data.user.role,
-            token: data.token,
-            isProfileComplete: data.user.isProfileComplete
+            ...data.user,
+            token: data.token
           }));
           if (onSuccess) onSuccess(data.user);
           onClose();
@@ -113,16 +103,8 @@ const AuthModal = ({ isOpen, onClose, onSuccess, initialMode = 'login', message 
       setIsLoading(false);
       if (data.success) {
         dispatch(loginSuccess({
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.name,
-          phone: data.user.phone,
-          role: data.user.role,
-          token: data.token,
-          isProfileComplete: data.user.isProfileComplete,
-          isEmailVerified: data.user.isEmailVerified,
-          isPhoneVerified: data.user.isPhoneVerified,
-          googleId: data.user.googleId
+          ...data.user,
+          token: data.token
         }));
         if (onSuccess) onSuccess(data.user);
         onClose();

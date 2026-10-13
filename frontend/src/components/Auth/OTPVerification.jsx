@@ -52,14 +52,9 @@ const OTPVerification = () => {
           if (data.success) {
             const userRole = data.user.role || 'customer';
             dispatch(loginSuccess({
-              id: data.user.id,
-              phone: data.user.phone,
-              name: data.user.name || 'User',
+              ...data.user,
               role: userRole,
-              token: data.token,
-              isProfileComplete: data.user.isProfileComplete,
-              isPhoneVerified: data.user.isPhoneVerified,
-              isEmailVerified: data.user.isEmailVerified
+              token: data.token
             }));
             navigate(`/${userRole}/dashboard`);
           }
@@ -138,14 +133,12 @@ const OTPVerification = () => {
         }
 
         dispatch(loginSuccess({
-          id: data.user.id,
-          phone: data.user.phone,
-          name: displayName,
+          ...data.user,
+          name: displayName || data.user.name,
           role: data.user.role || 'customer',
           token: data.token,
-          isProfileComplete: profileCompleteVal,
-          isPhoneVerified: data.user.isPhoneVerified ?? true,
-          isEmailVerified: data.user.isEmailVerified
+          isProfileComplete: profileCompleteVal ?? data.user.isProfileComplete,
+          isPhoneVerified: data.user.isPhoneVerified ?? true
         }));
         
         const userRole = data.user.role || 'customer';
