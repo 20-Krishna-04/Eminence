@@ -85,6 +85,7 @@ const bootstrapDatabase = async () => {
 
       await sequelize.query(`
         ALTER TABLE "Customers" 
+          ADD COLUMN IF NOT EXISTS "password" VARCHAR(255),
           ADD COLUMN IF NOT EXISTS "isPro" BOOLEAN DEFAULT false,
           ADD COLUMN IF NOT EXISTS "totalTrips" INTEGER DEFAULT 0,
           ADD COLUMN IF NOT EXISTS "isBusiness" BOOLEAN DEFAULT false,
@@ -118,6 +119,8 @@ const bootstrapDatabase = async () => {
 
       await sequelize.query(`
         ALTER TABLE "Drivers"
+          ADD COLUMN IF NOT EXISTS "password" VARCHAR(255),
+          ADD COLUMN IF NOT EXISTS "email" VARCHAR(255),
           ADD COLUMN IF NOT EXISTS "isAvailable" BOOLEAN DEFAULT true,
           ADD COLUMN IF NOT EXISTS "termsAccepted" BOOLEAN DEFAULT false,
           ADD COLUMN IF NOT EXISTS "termsAcceptedAt" TIMESTAMP WITH TIME ZONE,

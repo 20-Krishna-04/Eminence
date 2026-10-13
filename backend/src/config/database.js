@@ -45,6 +45,19 @@ if (!useSqlite && dbUrl) {
     }
   };
 
+  // If connecting to Neon or remote Postgres, use @neondatabase/serverless with WebSockets
+  // to avoid ISP / firewall ECONNRESET issues on raw TCP port 5432.
+  if (sanitizedUrl.includes('neon.tech')) {
+    try {
+      const ws = require('ws');
+      const neon = require('@neondatabase/serverless');
+      neon.neonConfig.webSocketConstructor = ws;
+      sequelizeOptions.dialectModule = neon;
+    } catch (e) {
+      console.warn('Note: @neondatabase/serverless not available, falling back to standard pg:', e.message);
+    }
+  }
+
   // Enable SSL for remote databases (like NeonDB)
   if (!isLocalhost) {
     sequelizeOptions.dialectOptions = {
