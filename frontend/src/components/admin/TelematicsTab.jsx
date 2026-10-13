@@ -3,18 +3,22 @@ import { ShieldAlert } from 'lucide-react';
 import { useTelematics } from '../../hooks/useTelematics';
 
 const TelematicsTab = ({ activeTab, token }) => {
-  const { telemetry } = useTelematics(activeTab, token);
+  const { telemetry, history, status } = useTelematics(activeTab, token);
 
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-loft-50 font-serif">Live Fleet Telematics</h1>
-          <p className="text-sm text-loft-400 mt-1">Real-time IoT data stream from active vehicles.</p>
+          <p className="text-sm text-loft-400 mt-1">
+            {status.simulated ? 'Simulation mode — generated vehicle telemetry for demos and testing.' : 'Real-time telemetry from connected fleet devices.'}
+          </p>
         </div>
         <div className="flex items-center gap-2 bg-moss-500/10 text-moss-500 px-4 py-2 rounded-full border border-moss-500/20">
           <div className="w-2 h-2 rounded-full bg-moss-500 animate-pulse"></div>
-          <span className="text-xs font-bold uppercase tracking-wider">Live Connection Active</span>
+          <span className="text-xs font-bold uppercase tracking-wider">
+            {status.simulated ? 'Simulation Active' : status.connected ? 'Device Stream Active' : 'No Device Stream'}
+          </span>
         </div>
       </div>
 
@@ -22,7 +26,9 @@ const TelematicsTab = ({ activeTab, token }) => {
         <div className="card p-12 bg-loft-900 border-loft-800 text-center flex flex-col items-center justify-center">
           <div className="w-12 h-12 rounded-full border-2 border-copper-500 border-t-transparent animate-spin mb-4"></div>
           <h3 className="text-xl font-bold text-loft-50">Waiting for Telemetry Signal...</h3>
-          <p className="text-loft-400 mt-2">Connecting to vehicle OBD-II interfaces.</p>
+          <p className="text-loft-400 mt-2">
+            {status.simulated ? 'Starting the demo telemetry simulator.' : 'Waiting for a connected vehicle telemetry provider.'}
+          </p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -110,6 +116,17 @@ const TelematicsTab = ({ activeTab, token }) => {
                   transition={{ type: 'spring', bounce: 0 }}
                 />
               </div>
+            </div>
+          </div>
+          <div className="card p-5 bg-loft-900 border-loft-800">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-loft-300 mb-3">Recent Samples</h3>
+            <div className="flex gap-2 overflow-x-auto">
+              {history.slice(-12).map((sample) => (
+                <div key={sample.timestamp} className="min-w-24 rounded-lg bg-loft-950 px-3 py-2 text-xs text-loft-400">
+                  <div className="font-mono text-loft-200">{sample.speed} km/h</div>
+                  <div>{new Date(sample.timestamp).toLocaleTimeString()}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

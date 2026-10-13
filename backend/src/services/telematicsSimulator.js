@@ -1,8 +1,10 @@
 const { getIo } = require('../socket');
+const { isSimulatorEnabled } = require('./telemetryProvider');
 
 // In a real scenario, this state would come from Kafka/Redis streams emitted by physical OBD-II devices.
 // We are simulating this by keeping an in-memory track of active vehicle sessions.
 const activeVehicles = new Map(); // key: vehicleId, value: intervalTimer
+const telemetryHistory = new Map(); // key: vehicleId, value: latest samples
 
 /**
  * Generates a slight random variance to a base value.
@@ -17,6 +19,7 @@ const fluctuate = (base, variance) => {
  * Starts an IoT telemetry simulation for a given vehicle/booking.
  */
 const startTelemetrySimulation = (vehicleId) => {
+  if (!isSimulatorEnabled()) return false;
   if (activeVehicles.has(vehicleId)) return; // Already running
 
   let currentSpeed = 0;
@@ -85,8 +88,14 @@ const startTelemetrySimulation = (vehicleId) => {
         fuelLevel: parseFloat(fuelLevel.toFixed(1)), // %
         rpm: Math.round(rpm),
         healthScore: parseFloat(healthScore.toFixed(1)), // %
-        alert: alertType
+        alert: alertType,
+        provider: 'simulator',
+        simulated: true
       };
+
+      const samples = telemetryHistory.get(vehicleId) || [];
+      samples.push(telemetryData);
+      telemetryHistory.set(vehicleId, samples.slice(-30));
 
       // Broadcast to the admin telemetry room and vehicle telemetry room
       io.to('admin_telemetry').emit('telemetry_update', telemetryData);
@@ -99,6 +108,7 @@ const startTelemetrySimulation = (vehicleId) => {
 
   activeVehicles.set(vehicleId, timer);
   console.log(`[Telematics] Started simulation for vehicle ${vehicleId}`);
+  return true;
 };
 
 /**
@@ -113,7 +123,10 @@ const stopTelemetrySimulation = (vehicleId) => {
   }
 };
 
+const getTelemetryHistory = (vehicleId) => telemetryHistory.get(vehicleId) || [];
+
 module.exports = {
   startTelemetrySimulation,
-  stopTelemetrySimulation
+  stopTelemetrySimulation,
+  getTelemetryHistory
 };

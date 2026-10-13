@@ -37,7 +37,7 @@ export default function TelematicsScreen() {
     alert: null,
   });
   const [connected, setConnected] = useState(false);
-  const [simRunning, setSimRunning] = useState(true);
+  const [simRunning, setSimRunning] = useState(false);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
@@ -54,6 +54,10 @@ export default function TelematicsScreen() {
 
     s.on('telemetry_update', (data: TelemetryUpdate) => {
       setTelemetry(data);
+    });
+
+    s.on('telemetry_status', (status: { simulated?: boolean }) => {
+      setSimRunning(status.simulated === true);
     });
 
     s.on('disconnect', () => {
@@ -106,10 +110,10 @@ export default function TelematicsScreen() {
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <Text style={styles.backBtnText}>← Back</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>IoT Telematics (TC-034)</Text>
+        <Text style={styles.title}>Fleet Telematics (TC-034)</Text>
         <View style={styles.statusPill}>
           <View style={[styles.dot, { backgroundColor: connected ? '#22c55e' : '#eab308' }]} />
-          <Text style={styles.statusPillText}>{connected ? 'LIVE OBD-II' : 'SIMULATOR'}</Text>
+          <Text style={styles.statusPillText}>{simRunning ? 'SIMULATION' : connected ? 'DEVICE STREAM' : 'NO STREAM'}</Text>
         </View>
       </View>
 
@@ -143,7 +147,7 @@ export default function TelematicsScreen() {
         )}
 
         {/* Telemetry Dials Grid */}
-        <Text style={styles.sectionTitle}>Real-Time Sensor Telemetry</Text>
+        <Text style={styles.sectionTitle}>{simRunning ? 'Simulated Sensor Telemetry' : 'Real-Time Sensor Telemetry'}</Text>
 
         <View style={styles.gaugeGrid}>
           {/* Speed Dial */}

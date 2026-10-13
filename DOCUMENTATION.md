@@ -351,7 +351,7 @@ The WebSocket layer is powered by Socket.io with JWT middleware validation at ha
 | Job | Schedule | Description |
 |---|---|---|
 | **Driver Allocation** | Every 30 seconds | Scans unassigned bookings, queries nearest available driver using Haversine formula, auto-assigns |
-| **Telematics Simulator** | Every 2 seconds | Generates mock OBD-II telemetry for vehicles and broadcasts via Socket.io |
+| **Telemetry Provider** | Every 2 seconds in simulator mode | Streams labeled simulated telemetry for demos/tests; production does not generate values unless explicitly enabled |
 | **Health Monitor** | Every 60 seconds | Checks DB latency, emits `HIGH_DB_LATENCY` alert if > 500ms |
 
 ---

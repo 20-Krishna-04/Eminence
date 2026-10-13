@@ -62,7 +62,7 @@
 - **Automated Digital Payslips**: Instant dynamic PDF payslip computation detailing base earnings, incentives, and net payouts.
 
 ### 3. Real-Time Telematics & Predictive Maintenance
-- **Streaming IoT Instrument Dials**: Live WebSocket streaming of operational vehicle telemetry (Speedometer, Tachometer RPM, Coolant Temperature, Fuel Reserve).
+- **Fleet Telemetry**: WebSocket streaming of vehicle telemetry (speed, RPM, coolant temperature, and fuel). Local development uses an explicitly labeled simulator; production waits for a configured real-device provider.
 - **Anomaly Detection**: Anomaly heuristics monitoring asset health degradation, alerting operators to overheating risks and mechanical anomalies.
 - **Role-Gated Background GPS**: Native background location tracking exclusively engaged when an authenticated user is on active driver duty, preventing unnecessary battery drain and protecting customer privacy.
 

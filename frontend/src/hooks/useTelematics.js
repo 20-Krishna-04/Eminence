@@ -6,6 +6,8 @@ const API_BASE_URL = api.defaults.baseURL;
 
 export const useTelematics = (activeTab, token) => {
   const [telemetry, setTelemetry] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [status, setStatus] = useState({ provider: 'unknown', simulated: false, connected: false });
 
   useEffect(() => {
     if (activeTab !== 'telematics') return;
@@ -17,9 +19,13 @@ export const useTelematics = (activeTab, token) => {
     });
     
     telemetrySocket.emit('join_admin_telemetry');
+
+    telemetrySocket.on('telemetry_status', setStatus);
+    telemetrySocket.on('telemetry_history', setHistory);
     
     telemetrySocket.on('telemetry_update', (data) => {
       setTelemetry(data);
+      setHistory((previous) => [...previous, data].slice(-30));
     });
 
     telemetrySocket.on('connect_error', (err) => {
@@ -32,5 +38,5 @@ export const useTelematics = (activeTab, token) => {
     };
   }, [activeTab, token]);
 
-  return { telemetry };
+  return { telemetry, history, status };
 };

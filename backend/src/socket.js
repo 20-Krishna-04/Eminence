@@ -227,10 +227,16 @@ const initSocket = (httpServer) => {
       socket.join('admin_telemetry');
       socket.emit('joined_admin_telemetry');
       console.log(`[Socket] Admin ${socket.id} joined admin_telemetry`);
-      
-      // We start a mock simulation for a dummy vehicle ID when an admin connects
-      const { startTelemetrySimulation } = require('./services/telematicsSimulator');
-      startTelemetrySimulation('VEH-1234');
+
+      const { getTelemetryStatus } = require('./services/telemetryProvider');
+      const telemetryStatus = getTelemetryStatus();
+      socket.emit('telemetry_status', telemetryStatus);
+
+      if (telemetryStatus.simulated) {
+        const { startTelemetrySimulation, getTelemetryHistory } = require('./services/telematicsSimulator');
+        startTelemetrySimulation('VEH-1234');
+        socket.emit('telemetry_history', getTelemetryHistory('VEH-1234'));
+      }
     });
 
     socket.on('leave_admin_telemetry', () => {
