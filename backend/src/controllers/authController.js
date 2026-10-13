@@ -185,7 +185,17 @@ const updateProfile = async (req, res) => {
           message: 'Phone number is verified and cannot be changed.'
         });
       }
-      customer.phone = phone;
+
+      // Validate phone number: strictly reject emails or invalid characters
+      const cleanPhone = String(phone).trim().replace(/^(\+91|91)/, '').replace(/\D/g, '');
+      if (typeof phone === 'string' && (phone.includes('@') || !/^[6-9]\d{9}$/.test(cleanPhone))) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please enter a valid 10-digit Indian mobile number.'
+        });
+      }
+
+      customer.phone = cleanPhone;
       customer.isPhoneVerified = false;
       customer.isProfileComplete = false;
     }
@@ -335,8 +345,17 @@ const phoneLogin = async (req, res) => {
     const { phone, role = 'customer' } = req.body;
     if (!phone) return res.status(400).json({ success: false, message: 'Phone number is required' });
 
+    // Validate phone number: strictly reject emails or invalid characters
+    const cleanPhone = String(phone).trim().replace(/^(\+91|91)/, '').replace(/\D/g, '');
+    if (typeof phone === 'string' && (phone.includes('@') || !/^[6-9]\d{9}$/.test(cleanPhone))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a valid 10-digit Indian mobile number.'
+      });
+    }
+
     // Bypass OTP generation and DB operations for the Demo Login phone
-    const isDevDemo = process.env.NODE_ENV === 'development' && (phone === (process.env.SEED_PHONE || '1234567890') || phone === '9999999999');
+    const isDevDemo = process.env.NODE_ENV === 'development' && (cleanPhone === (process.env.SEED_PHONE || '1234567890') || cleanPhone === '9999999999');
     if (isDevDemo) {
       return res.status(200).json({ success: true, message: 'Demo OTP sent successfully' });
     }
@@ -838,6 +857,14 @@ const register = async (req, res) => {
     
     if (!email || !password || !phone) {
       return res.status(400).json({ success: false, message: 'Email, phone, and password are required' });
+    }
+
+    const cleanPhone = String(phone).trim().replace(/^(\+91|91)/, '').replace(/\D/g, '');
+    if (typeof phone === 'string' && (phone.includes('@') || !/^[6-9]\d{9}$/.test(cleanPhone))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a valid 10-digit Indian mobile number.'
+      });
     }
 
     const salt = await bcryptjs.genSalt(10);

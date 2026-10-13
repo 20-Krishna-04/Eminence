@@ -84,7 +84,23 @@ const CompleteProfile = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await api.post('/api/auth/complete-profile', { name, phone, location });
+      if (phone) {
+        const rawPhone = String(phone).trim();
+        if (rawPhone.includes('@')) {
+          setError('Phone number cannot be an email address.');
+          setLoading(false);
+          return;
+        }
+        const cleanPhone = rawPhone.replace(/^(\+91|91)/, '').replace(/\D/g, '');
+        if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+          setError('Please enter a valid 10-digit Indian mobile number (e.g. 9876543210).');
+          setLoading(false);
+          return;
+        }
+      }
+
+      const cleanPhone = phone ? phone.trim().replace(/^(\+91|91)/, '').replace(/\D/g, '') : phone;
+      const res = await api.post('/api/auth/complete-profile', { name, phone: cleanPhone, location });
       dispatch(updateProfileSuccess(res.data.user));
       setMessage('Profile updated. Please verify email and phone if required.');
       if (res.data.user.isProfileComplete) {
@@ -172,11 +188,14 @@ const CompleteProfile = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700">Phone</label>
             <input
-              type="text"
+              type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(e.target.value.replace(/[^\d+ -]/g, ''))}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-              placeholder="+1234567890"
+              placeholder="e.g. 9876543210"
+              pattern="^[0-9+ -]{10,15}$"
+              title="Enter a valid 10-digit mobile number"
+              maxLength="15"
               required
             />
           </div>

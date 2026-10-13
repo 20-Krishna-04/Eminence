@@ -79,7 +79,14 @@ const CompleteProfileModal = () => {
   if (!user || user.isProfileComplete || isClosed) return null;
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'phone') {
+      // Disallow letters/symbols: only allow digits, spaces, plus sign and hyphens
+      const filtered = value.replace(/[^\d+ -]/g, '');
+      setFormData({ ...formData, phone: filtered });
+      return;
+    }
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
@@ -88,6 +95,21 @@ const CompleteProfileModal = () => {
     setError('');
     setMessage('');
     try {
+      if (formData.phone) {
+        const rawPhone = String(formData.phone).trim();
+        if (rawPhone.includes('@')) {
+          setError('Phone number cannot be an email address.');
+          setLoading(false);
+          return;
+        }
+        const cleanPhone = rawPhone.replace(/^(\+91|91)/, '').replace(/\D/g, '');
+        if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+          setError('Please enter a valid 10-digit Indian mobile number (e.g. 9876543210).');
+          setLoading(false);
+          return;
+        }
+      }
+
       if (termsAccepted && !user?.termsAccepted) {
         try {
           await api.post('/api/auth/accept-terms', { version: 'v1.0' });
@@ -96,7 +118,10 @@ const CompleteProfileModal = () => {
         }
       }
 
-      const res = await api.post('/api/auth/complete-profile', formData);
+      const cleanPhone = formData.phone ? formData.phone.trim().replace(/^(\+91|91)/, '').replace(/\D/g, '') : formData.phone;
+      const payload = { ...formData, phone: cleanPhone };
+
+      const res = await api.post('/api/auth/complete-profile', payload);
       
       const updatedUser = res.data.user;
       dispatch(updateProfileSuccess(updatedUser));
@@ -307,7 +332,10 @@ const CompleteProfileModal = () => {
                       onChange={handleChange}
                       readOnly={isPhoneLocked}
                       disabled={isPhoneLocked}
-                      placeholder="e.g. +1234567890"
+                      placeholder="e.g. 9876543210"
+                      pattern="^[0-9+ -]{10,15}$"
+                      title="Enter a valid 10-digit mobile number"
+                      maxLength="15"
                       className={`w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 transition-all outline-none ${
                         isPhoneLocked 
                           ? 'bg-gray-100/90 text-gray-500 cursor-not-allowed border-gray-300 select-none' 
