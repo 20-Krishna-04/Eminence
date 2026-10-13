@@ -348,11 +348,16 @@ const aiVoiceBooking = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Authentication required: customerId must be provided' });
     }
 
-    const Groq = require('groq-sdk');
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    
+    let extractedData = null;
     const today = new Date().toISOString().split('T')[0];
-    const prompt = `You are a logistics booking assistant. Extract the booking details from this user request: "${transcript}".
+
+    if (process.env.GROQ_API_KEY) {
+      try {
+        const Groq = require('groq-sdk');
+        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+        const groqModel = process.env.GROQ_MODEL || 'openai/gpt-oss-20b';
+        
+        const prompt = `You are a logistics booking assistant. Extract the booking details from this user request: "${transcript}".
 Return exactly a raw JSON object (and nothing else) with these keys: 
 - pickupAddress (string)
 - dropAddress (string)
@@ -363,19 +368,161 @@ Return exactly a raw JSON object (and nothing else) with these keys:
 - weight (number, default to 100 if unknown)
 `;
 
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [{ role: 'user', content: prompt }],
-      model: 'llama3-8b-8192',
-      temperature: 0,
-      response_format: { type: 'json_object' }
-    });
+        const chatCompletion = await groq.chat.completions.create({
+          messages: [{ role: 'user', content: prompt }],
+          model: groqModel,
+          temperature: 0,
+          response_format: { type: 'json_object' }
+        });
 
-    let extractedData;
-    try {
-      extractedData = JSON.parse(chatCompletion.choices[0].message.content);
-    } catch (err) {
-      console.error('JSON Parse Error:', err);
-      return res.status(500).json({ success: false, message: 'Failed to parse AI response' });
+        extractedData = JSON.parse(chatCompletion.choices[0].message.content);
+      } catch (groqErr) {
+        console.warn('Groq AI extraction failed, using resilient NLP fallback:', groqErr.message);
+      }
+    }
+
+    if (!extractedData) {
+      // Deterministic, ReDoS-safe linear NLP extraction fallback (CWE-1333 safe)
+      const cleaned = typeof transcript === 'string' ? transcript.slice(0, 500).trim() : '';
+      const lower = cleaned.toLowerCase();
+
+      let tempoType = 'small';
+      if (lower.includes('large')) tempoType = 'large';
+      else if (lower.includes('medium')) tempoType = 'medium';
+
+      let pickup = 'Unknown Pickup';
+      let drop = 'Unknown Drop';
+
+      let startIdx = -1;
+      const markers = [' from ', ' for '];
+      for (const marker of markers) {
+        const idx = lower.indexOf(marker);
+        if (idx !== -1 && (startIdx === -1 || idx < startIdx)) {
+          startIdx = idx + marker.length;
+        }
+      }
+
+      if (startIdx === -1) {
+        if (lower.startsWith('from ')) {
+          startIdx = 5;
+        } else if (lower.startsWith('for ')) {
+          startIdx = 4;
+        }
+      }
+
+      if (startIdx !== -1) {
+        const toIdx = lower.indexOf(' to ', startIdx);
+        if (toIdx !== -1) {
+          const parsedPickup = cleaned.slice(startIdx, toIdx).trim();
+          let parsedDrop = cleaned.slice(toIdx + 4).trim();
+
+          // Stop at punctuation if present
+          for (let i = 0; i < parsedDrop.length; i++) {
+            if (parsedDrop[i] === ',' || parsedDrop[i] === '.' || parsedDrop[i] === '\n') {
+              parsedDrop = parsedDrop.slice(0, i).trim();
+              break;
+            }
+          }
+
+          // Strip trailing time keywords
+          const timeKeywords = ['tomorrow', 'today', 'morning', 'evening', 'night', 'now', 'afternoon'];
+          const dropWords = parsedDrop.split(/\s+/);
+          while (dropWords.length > 0) {
+            const lastWord = dropWords[dropWords.length - 1].toLowerCase().replace(/[^a-z]/g, '');
+            if (timeKeywords.includes(lastWord)) {
+              dropWords.pop();
+            } else {
+              break;
+            }
+          }
+          parsedDrop = dropWords.join(' ').trim();
+
+          if (parsedPickup) pickup = parsedPickup;
+          if (parsedDrop) drop = parsedDrop;
+        }
+      }
+
+      let date = today;
+      if (lower.includes('tomorrow')) {
+        const d = new Date();
+        d.setDate(d.getDate() + 1);
+        date = d.toISOString().split('T')[0];
+      }
+
+      // Linear, ReDoS-safe time parsing
+      let time = '10:00:00';
+      const words = lower.split(/\s+/);
+      for (let i = 0; i < words.length; i++) {
+        const w = words[i].replace(/[.,]/g, '');
+        const isAm = w.endsWith('am') || (i + 1 < words.length && (words[i + 1] === 'am' || words[i + 1] === 'a.m.'));
+        const isPm = w.endsWith('pm') || (i + 1 < words.length && (words[i + 1] === 'pm' || words[i + 1] === 'p.m.'));
+        const numPart = w.replace(/(am|pm|a\.m\.|p\.m\.)$/, '');
+        if (numPart.includes(':')) {
+          const parts = numPart.split(':');
+          let h = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10);
+          if (!isNaN(h) && h >= 0 && h <= 23 && !isNaN(m) && m >= 0 && m <= 59) {
+            if (isPm && h < 12) h += 12;
+            if (isAm && h === 12) h = 0;
+            time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
+            break;
+          }
+        } else {
+          let h = parseInt(numPart, 10);
+          if (!isNaN(h) && h >= 1 && h <= 12 && (isAm || isPm)) {
+            if (isPm && h < 12) h += 12;
+            if (isAm && h === 12) h = 0;
+            time = `${String(h).padStart(2, '0')}:00:00`;
+            break;
+          }
+        }
+      }
+
+      extractedData = {
+        pickupAddress: pickup,
+        dropAddress: drop,
+        tempoType,
+        date,
+        time,
+        goodsType: 'General Cargo',
+        weight: 100
+      };
+    }
+
+    // Safe normalization of date format without ReDoS regex
+    if (typeof extractedData.date === 'string' && extractedData.date.length === 10) {
+      const parts = extractedData.date.split('-');
+      if (parts.length === 3 && parts[0].length === 4 && parts[1].length === 2 && parts[2].length === 2 &&
+          !isNaN(Number(parts[0])) && !isNaN(Number(parts[1])) && !isNaN(Number(parts[2]))) {
+        // Date is in valid YYYY-MM-DD
+      } else {
+        extractedData.date = today;
+      }
+    } else if (typeof extractedData.date === 'string' && extractedData.date.toLowerCase().includes('tomorrow')) {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      extractedData.date = d.toISOString().split('T')[0];
+    } else {
+      extractedData.date = today;
+    }
+
+    // Safe normalization of time format without ReDoS regex
+    if (typeof extractedData.time === 'string') {
+      const parts = extractedData.time.split(':');
+      if (parts.length >= 2) {
+        const h = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+        const s = parts[2] ? parseInt(parts[2], 10) : 0;
+        if (!isNaN(h) && h >= 0 && h <= 23 && !isNaN(m) && m >= 0 && m <= 59 && !isNaN(s) && s >= 0 && s <= 59) {
+          extractedData.time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        } else {
+          extractedData.time = '10:00:00';
+        }
+      } else {
+        extractedData.time = '10:00:00';
+      }
+    } else {
+      extractedData.time = '10:00:00';
     }
 
     const tempoType = extractedData.tempoType || 'small';
