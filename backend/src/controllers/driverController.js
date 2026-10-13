@@ -50,6 +50,59 @@ const toggleAvailability = async (req, res) => {
   }
 };
 
+const getDriverMetrics = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (req.user.role !== 'admin' && String(req.user.id) !== String(id)) {
+      return res.status(403).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const { Booking, Customer, Vehicle } = require('../models');
+
+    // Completed bookings
+    const completedBookings = await Booking.findAll({
+      where: {
+        driverId: id,
+        status: 'completed'
+      },
+      order: [['updatedAt', 'DESC']]
+    });
+
+    const totalOrdersCompleted = completedBookings.length;
+    const totalEarnings = completedBookings.reduce((sum, b) => {
+      const fare = Number(b.estimatedFare) || 0;
+      return sum + fare;
+    }, 0);
+
+    // Active / Appointed bookings
+    const assignedBookings = await Booking.findAll({
+      where: {
+        driverId: id,
+        status: ['driver_assigned', 'arrived', 'in_transit']
+      },
+      include: [
+        { model: Customer, as: 'customer', attributes: ['id', 'name', 'phone'] },
+        { model: Vehicle, as: 'vehicle', attributes: ['id', 'registrationNumber', 'type'] }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.status(200).json({
+      success: true,
+      metrics: {
+        completedOrders: totalOrdersCompleted,
+        totalEarnings: Math.round(totalEarnings * 100) / 100,
+        activeOrdersCount: assignedBookings.length,
+        assignedBookings,
+        completedBookings
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching driver metrics:', error);
+    res.status(500).json({ success: false, message: 'Server error fetching driver metrics' });
+  }
+};
+
 const generatePayslip = async (req, res) => {
   try {
     const { id } = req.params;
@@ -64,7 +117,6 @@ const generatePayslip = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Driver not found' });
     }
 
-    // Mock Aggregation
     const weeklyEarnings = 15000;
     const platformFee = weeklyEarnings * 0.15;
     const tdsTax = weeklyEarnings * 0.01;
@@ -156,6 +208,7 @@ module.exports = {
   getAllDrivers,
   createDriver,
   toggleAvailability,
+  getDriverMetrics,
   generatePayslip,
   downloadPayslip,
   updateLocation

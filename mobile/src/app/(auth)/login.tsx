@@ -221,7 +221,7 @@ export default function LoginScreen() {
           </Text>
 
           {/* Role selector (Customer vs Driver vs Admin) */}
-          {(step === 'email_login' || step === 'email_register') && (
+          {step === 'email_login' && (
             <View style={styles.roleSelector}>
               <TouchableOpacity
                 style={[styles.roleBtn, role === 'customer' && styles.roleBtnActive]}
@@ -308,24 +308,34 @@ export default function LoginScreen() {
             </View>
           ) : step === 'email_login' ? (
             <View style={styles.inputGroup}>
-              <TouchableOpacity
-                style={[styles.primaryBtn, { backgroundColor: '#ffffff', marginBottom: 20, borderWidth: 1, borderColor: '#d1d5db', flexDirection: 'row', alignItems: 'center' }]}
-                onPress={handleGoogleSignIn}
-                disabled={loading}
-              >
-                <Text style={{ fontSize: 20, marginRight: 10 }}>G</Text>
-                <Text style={[styles.primaryBtnText, { color: '#374151' }]}>Continue with Google</Text>
-              </TouchableOpacity>
+              {role === 'driver' ? (
+                <View style={{ backgroundColor: '#2a1b15', borderColor: '#e86331', borderWidth: 1, padding: 12, borderRadius: 8, marginBottom: 16 }}>
+                  <Text style={{ color: '#fed7aa', fontSize: 12, textAlign: 'center' }}>
+                    🛡️ Fleet Driver Portal: Login with credentials directly provisioned by your Administrator.
+                  </Text>
+                </View>
+              ) : (
+                <>
+                  <TouchableOpacity
+                    style={[styles.primaryBtn, { backgroundColor: '#ffffff', marginBottom: 20, borderWidth: 1, borderColor: '#d1d5db', flexDirection: 'row', alignItems: 'center' }]}
+                    onPress={handleGoogleSignIn}
+                    disabled={loading}
+                  >
+                    <Text style={{ fontSize: 20, marginRight: 10 }}>G</Text>
+                    <Text style={[styles.primaryBtnText, { color: '#374151' }]}>Continue with Google</Text>
+                  </TouchableOpacity>
 
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                <View style={{ flex: 1, height: 1, backgroundColor: '#2f3a4e' }} />
-                <Text style={{ color: '#a2b2c7', paddingHorizontal: 10, fontSize: 12 }}>OR LOGIN WITH EMAIL</Text>
-                <View style={{ flex: 1, height: 1, backgroundColor: '#2f3a4e' }} />
-              </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                    <View style={{ flex: 1, height: 1, backgroundColor: '#2f3a4e' }} />
+                    <Text style={{ color: '#a2b2c7', paddingHorizontal: 10, fontSize: 12 }}>OR LOGIN WITH EMAIL</Text>
+                    <View style={{ flex: 1, height: 1, backgroundColor: '#2f3a4e' }} />
+                  </View>
+                </>
+              )}
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Email / Username / Phone</Text>
-                <TextInput style={styles.input} placeholder="Enter your email, username, or phone" placeholderTextColor="#a2b2c7" keyboardType="default" autoCapitalize="none" value={email} onChangeText={setEmail} />
+                <Text style={styles.label}>{role === 'driver' ? 'Driver Phone or Email' : 'Email / Username / Phone'}</Text>
+                <TextInput style={styles.input} placeholder={role === 'driver' ? '9876543210 or driver@eminence.com' : 'Enter your email, username, or phone'} placeholderTextColor="#a2b2c7" keyboardType="default" autoCapitalize="none" value={email} onChangeText={setEmail} />
               </View>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Password</Text>
@@ -351,11 +361,15 @@ export default function LoginScreen() {
                 {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>Login</Text>}
               </TouchableOpacity>
               
-
-              
-              <TouchableOpacity style={styles.backBtn} onPress={() => setStep('email_register')}>
-                <Text style={styles.backBtnText}>Don't have an account? Sign Up</Text>
-              </TouchableOpacity>
+              {role === 'driver' ? (
+                <Text style={{ color: '#a2b2c7', fontSize: 12, textAlign: 'center', marginTop: 12 }}>
+                  Need driver access? Contact your fleet administrator.
+                </Text>
+              ) : (
+                <TouchableOpacity style={styles.backBtn} onPress={() => setStep('email_register')}>
+                  <Text style={styles.backBtnText}>Don't have an account? Sign Up</Text>
+                </TouchableOpacity>
+              )}
 
               <View style={styles.adminDivider}>
                 <View style={styles.dividerLine} />

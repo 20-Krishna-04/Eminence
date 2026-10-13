@@ -179,9 +179,9 @@ async function main() {
       backendProc = spawn('node', ['src/server.js'], {
         cwd: BACKEND_DIR,
         env: { ...process.env, PORT: '3000', DEMO_SEED: 'true', NODE_ENV: 'development' },
-        stdio: 'ignore'
+        stdio: 'inherit'
       });
-      await waitForServer('http://localhost:3000/api/health', 45000);
+      await waitForServer('http://localhost:3000/api/health', 90000);
       console.log(`${colors.green}[INFO] Backend instance ready on port 3000.${colors.reset}\n`);
     }
 

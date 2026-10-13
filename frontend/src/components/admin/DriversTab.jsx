@@ -10,18 +10,43 @@ const DriversTab = () => {
   const [currentItem, setCurrentItem] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, id: null });
   const [driverForm, setDriverForm] = useState({
-    name: '', phone: '', email: '', licenseNumber: '', status: 'active'
+    name: '', phone: '', email: '', licenseNumber: '', status: 'active', password: ''
   });
+
+  const [pendingBookings, setPendingBookings] = useState([]);
+  const [assigningId, setAssigningId] = useState(null);
 
   const fetchDrivers = async () => {
     setLoading(true);
     try {
       const res = await adminApi.getDrivers();
       if (res.data.success) setDrivers(res.data.drivers);
+
+      const bookingsRes = await adminApi.getBookings();
+      if (bookingsRes.data.success) {
+        setPendingBookings(
+          (bookingsRes.data.bookings || []).filter(b => b.status === 'pending' || !b.driverId)
+        );
+      }
     } catch (err) {
-      console.error('Error fetching drivers:', err);
+      console.error('Error fetching drivers or bookings:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAppointBooking = async (bookingId, driverId) => {
+    if (!driverId) return;
+    setAssigningId(bookingId);
+    try {
+      await adminApi.assignDriverToBooking(bookingId, driverId);
+      alert('Trip successfully assigned to driver!');
+      fetchDrivers();
+    } catch (err) {
+      console.error('Error appointing trip:', err);
+      alert(err.response?.data?.message || 'Failed to appoint trip to driver');
+    } finally {
+      setAssigningId(null);
     }
   };
 
@@ -32,7 +57,7 @@ const DriversTab = () => {
   const handleOpenCreateModal = () => {
     setEditMode(false);
     setCurrentItem(null);
-    setDriverForm({ name: '', phone: '', email: '', licenseNumber: '', status: 'active' });
+    setDriverForm({ name: '', phone: '', email: '', licenseNumber: '', status: 'active', password: '' });
     setIsModalOpen(true);
   };
 
@@ -44,7 +69,8 @@ const DriversTab = () => {
       phone: item.phone || '',
       email: item.email || '',
       licenseNumber: item.licenseNumber || '',
-      status: item.status || 'active'
+      status: item.status || 'active',
+      password: ''
     });
     setIsModalOpen(true);
   };
@@ -149,6 +175,69 @@ const DriversTab = () => {
         )}
       </div>
 
+      {/* Direct Work Appointment Panel */}
+      <div className="card bg-loft-900 border-loft-800 p-6">
+        <h2 className="text-xl font-bold text-loft-50 mb-2 font-serif flex items-center justify-between">
+          <span>Appoint Work to Drivers</span>
+          <span className="text-xs font-sans font-medium px-2.5 py-1 rounded-full bg-copper-500/20 text-copper-400 border border-copper-500/30">
+            {pendingBookings.length} Unassigned / Pending Trips
+          </span>
+        </h2>
+        <p className="text-xs text-loft-400 mb-6">
+          Directly dispatch customer bookings to qualified drivers in your fleet.
+        </p>
+
+        {pendingBookings.length === 0 ? (
+          <div className="p-8 text-center border border-dashed border-loft-800 rounded-xl text-loft-400 text-sm">
+            All customer bookings are currently appointed!
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-loft-300">
+              <thead className="bg-loft-950/50 text-xs uppercase font-medium">
+                <tr>
+                  <th className="px-4 py-3">Booking ID</th>
+                  <th className="px-4 py-3">Route (Pickup → Drop)</th>
+                  <th className="px-4 py-3">Goods / Tempo</th>
+                  <th className="px-4 py-3">Fare</th>
+                  <th className="px-4 py-3">Directly Appoint Driver</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-loft-800">
+                {pendingBookings.map((b) => (
+                  <tr key={b.id} className="hover:bg-loft-800/40 transition-colors">
+                    <td className="px-4 py-3 font-mono text-xs text-loft-400">{b.id.slice(0, 8)}...</td>
+                    <td className="px-4 py-3">
+                      <p className="text-xs text-loft-100 font-medium truncate max-w-xs">{b.pickupAddress}</p>
+                      <p className="text-xs text-copper-400 truncate max-w-xs">→ {b.dropAddress || 'Multi-stop'}</p>
+                    </td>
+                    <td className="px-4 py-3 capitalize text-xs">{b.tempoType} • {b.goodsType}</td>
+                    <td className="px-4 py-3 font-semibold text-loft-100">₹{b.estimatedFare}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <select
+                          defaultValue=""
+                          onChange={(e) => handleAppointBooking(b.id, e.target.value)}
+                          disabled={assigningId === b.id}
+                          className="input-field py-1.5 px-3 text-xs bg-loft-950"
+                        >
+                          <option value="" disabled>Select Driver to Appoint</option>
+                          {drivers.filter(d => d.status === 'active').map((drv) => (
+                            <option key={drv.id} value={drv.id}>
+                              {drv.name} ({drv.phone})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-loft-900 border border-loft-800 rounded-2xl max-w-md w-full p-8 relative z-50 shadow-2xl">
@@ -182,6 +271,18 @@ const DriversTab = () => {
                 <input 
                   type="text" required className="input-field" 
                   value={driverForm.licenseNumber} onChange={(e) => setDriverForm({ ...driverForm, licenseNumber: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-loft-300 uppercase tracking-wider mb-2">
+                  {editMode ? 'Reset Password (optional)' : 'Password (Initial Credentials)'}
+                </label>
+                <input 
+                  type="password" 
+                  placeholder={editMode ? 'Leave blank to keep unchanged' : 'Min 6 characters'}
+                  className="input-field" 
+                  value={driverForm.password} 
+                  onChange={(e) => setDriverForm({ ...driverForm, password: e.target.value })}
                 />
               </div>
               <div>

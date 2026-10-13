@@ -116,22 +116,11 @@ const Register = () => {
           <p className="text-loft-300">Join Eminence for a seamless booking experience</p>
         </div>
 
-        {/* Role Selection Tabs */}
-        <div className="flex bg-loft-950/50 p-1 rounded-xl mb-8 overflow-x-auto">
-          {['customer', 'driver'].map((role) => (
-            <button
-              type="button"
-              key={role}
-              onClick={() => setActiveTab(role)}
-              className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all capitalize whitespace-nowrap ${
-                activeTab === role 
-                  ? 'bg-copper-500/20 text-copper-500 shadow-sm border border-copper-500/30'
-                  : 'text-loft-400 hover:text-loft-200 hover:bg-loft-800/50'
-              }`}
-            >
-              {role.charAt(0).toUpperCase() + role.slice(1)}
-            </button>
-          ))}
+        {/* Notice for Fleet Drivers */}
+        <div className="mb-6 p-3 rounded-xl bg-loft-950/60 border border-loft-800 text-center">
+          <p className="text-xs text-loft-400">
+            Are you a driver? Driver credentials are appointed directly by Fleet Admins. Please log in via the <Link to="/login" className="text-copper-400 font-semibold hover:underline">Sign In</Link> portal.
+          </p>
         </div>
 
         <button 

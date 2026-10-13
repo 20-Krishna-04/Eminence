@@ -54,6 +54,10 @@ const validateDriver = (req, res, next) => {
     return res.status(400).json({ success: false, message: 'Invalid driver status' });
   }
 
+  if (req.body.password && (typeof req.body.password !== 'string' || req.body.password.length < 6)) {
+    return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+  }
+
   // Sanitize fields
   req.body.name = sanitizeString(name);
   req.body.licenseNumber = sanitizeString(licenseNumber);

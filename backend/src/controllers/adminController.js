@@ -1,5 +1,6 @@
 const { Driver, Customer, Vehicle, Booking, AuditLog, PlatformConfig, B2BContract, PromoCode, sequelize } = require('../models');
 const { Op } = require('sequelize');
+const bcrypt = require('bcryptjs');
 const cache = require('../services/cacheService');
 const startTime = Date.now();
 
@@ -25,6 +26,7 @@ const getDrivers = async (req, res) => {
 
     const { count, rows: drivers } = await Driver.findAndCountAll({
       where,
+      attributes: { exclude: ['password'] },
       order: [['createdAt', 'DESC']],
       limit,
       offset
@@ -47,12 +49,30 @@ const getDrivers = async (req, res) => {
 // Create a driver
 const createDriver = async (req, res) => {
   try {
-    const { name, phone, email, licenseNumber, status } = req.body;
+    const { name, phone, email, licenseNumber, status, password } = req.body;
     if (!name || !phone || !licenseNumber) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
-    const driver = await Driver.create({ name, phone, email, licenseNumber, status });
-    res.status(201).json({ success: true, driver });
+
+    let hashedPassword = null;
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      hashedPassword = await bcrypt.hash(password, salt);
+    }
+
+    const driver = await Driver.create({
+      name,
+      phone,
+      email,
+      licenseNumber,
+      status: status || 'active',
+      password: hashedPassword
+    });
+
+    const driverResponse = driver.toJSON();
+    delete driverResponse.password;
+
+    res.status(201).json({ success: true, driver: driverResponse });
   } catch (error) {
     console.error('Error creating driver:', error);
     res.status(500).json({ success: false, message: error.message || 'Server error' });
@@ -63,13 +83,23 @@ const createDriver = async (req, res) => {
 const updateDriver = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, phone, email, licenseNumber, status, rating } = req.body;
+    const { name, phone, email, licenseNumber, status, rating, password } = req.body;
     const driver = await Driver.findByPk(id);
     if (!driver) {
       return res.status(404).json({ success: false, message: 'Driver not found' });
     }
-    await driver.update({ name, phone, email, licenseNumber, status, rating });
-    res.status(200).json({ success: true, driver });
+
+    const updateData = { name, phone, email, licenseNumber, status, rating };
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(password, salt);
+    }
+
+    await driver.update(updateData);
+    const driverResponse = driver.toJSON();
+    delete driverResponse.password;
+
+    res.status(200).json({ success: true, driver: driverResponse });
   } catch (error) {
     console.error('Error updating driver:', error);
     res.status(500).json({ success: false, message: error.message || 'Server error' });

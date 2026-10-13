@@ -156,50 +156,56 @@ const AuthModal = ({ isOpen, onClose, onSuccess, initialMode = 'login', message 
           </div>
 
           {/* Role selector tabs */}
-          <div className="flex bg-loft-950/60 p-1 rounded-xl mb-5">
-            <button
-              type="button"
-              onClick={() => { setRole('customer'); setError(''); }}
-              className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${
-                role === 'customer'
-                  ? 'bg-copper-500/20 text-copper-500 border border-copper-500/30'
-                  : 'text-loft-400 hover:text-loft-200'
-              }`}
-            >
-              Customer
-            </button>
-            <button
-              type="button"
-              onClick={() => { setRole('driver'); setError(''); }}
-              className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${
-                role === 'driver'
-                  ? 'bg-copper-500/20 text-copper-500 border border-copper-500/30'
-                  : 'text-loft-400 hover:text-loft-200'
-              }`}
-            >
-              Driver
-            </button>
-          </div>
-
-          {/* Google Sign-in */}
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            disabled={isLoading}
-            className="w-full flex items-center justify-center px-4 py-3 border border-loft-700 hover:border-loft-600 rounded-xl bg-loft-800/60 hover:bg-loft-800 text-loft-50 font-medium text-sm transition-all mb-4"
-          >
-            <GoogleIcon />
-            Continue with Google
-          </button>
-
-          <div className="relative mb-5">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-loft-800"></div>
+          {mode === 'login' ? (
+            <div className="flex bg-loft-950/60 p-1 rounded-xl mb-5">
+              <button
+                type="button"
+                onClick={() => { setRole('customer'); setError(''); }}
+                className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                  role === 'customer'
+                    ? 'bg-copper-500/20 text-copper-500 border border-copper-500/30'
+                    : 'text-loft-400 hover:text-loft-200'
+                }`}
+              >
+                Customer
+              </button>
+              <button
+                type="button"
+                onClick={() => { setRole('driver'); setError(''); }}
+                className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                  role === 'driver'
+                    ? 'bg-copper-500/20 text-copper-500 border border-copper-500/30'
+                    : 'text-loft-400 hover:text-loft-200'
+                }`}
+              >
+                Driver
+              </button>
             </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="px-3 bg-loft-900 text-loft-400">OR WITH CREDENTIALS</span>
-            </div>
-          </div>
+          ) : null}
+
+          {/* Google Sign-in (only for customers) */}
+          {role !== 'driver' && (
+            <>
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={isLoading}
+                className="w-full flex items-center justify-center px-4 py-3 border border-loft-700 hover:border-loft-600 rounded-xl bg-loft-800/60 hover:bg-loft-800 text-loft-50 font-medium text-sm transition-all mb-4"
+              >
+                <GoogleIcon />
+                Continue with Google
+              </button>
+
+              <div className="relative mb-5">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-loft-800"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-3 bg-loft-900 text-loft-400">OR WITH CREDENTIALS</span>
+                </div>
+              </div>
+            </>
+          )}
 
           {error && (
             <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center">

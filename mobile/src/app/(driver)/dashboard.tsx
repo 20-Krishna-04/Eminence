@@ -132,6 +132,12 @@ export default function DriverDashboard() {
     };
   }, [token]);
 
+  const [driverMetrics, setDriverMetrics] = useState<any>({
+    completedOrders: 0,
+    totalEarnings: 0,
+    activeOrdersCount: 0,
+  });
+
   const fetchDriverData = async () => {
     try {
       if (user?.id) {
@@ -139,9 +145,14 @@ export default function DriverDashboard() {
         if (payslipRes.data?.success && payslipRes.data?.payslip) {
           setPayslip(payslipRes.data.payslip);
         }
+
+        const metricsRes = await api.get(`/api/drivers/${user.id}/metrics`);
+        if (metricsRes.data?.success && metricsRes.data?.metrics) {
+          setDriverMetrics(metricsRes.data.metrics);
+        }
       }
     } catch (e) {
-      console.log('Using default payslip data');
+      console.log('Using default payslip and metrics data');
     }
   };
 
@@ -333,6 +344,20 @@ export default function DriverDashboard() {
             thumbColor={isOnline ? '#22c55e' : '#c9d3df'}
             trackColor={{ false: '#2f3a4e', true: 'rgba(34, 197, 94, 0.4)' }}
           />
+        </View>
+
+        {/* Driver Performance & Earnings Summary */}
+        <View style={styles.metricsRow}>
+          <View style={styles.metricCard}>
+            <Text style={styles.metricLabel}>COMPLETED ORDERS</Text>
+            <Text style={styles.metricValue}>{driverMetrics.completedOrders || 0}</Text>
+            <Text style={styles.metricSub}>Directly Appointed</Text>
+          </View>
+          <View style={[styles.metricCard, styles.metricCardPrimary]}>
+            <Text style={[styles.metricLabel, { color: '#fb923c' }]}>TOTAL EARNED</Text>
+            <Text style={[styles.metricValue, { color: '#fb923c' }]}>₹{(driverMetrics.totalEarnings || 0).toLocaleString()}</Text>
+            <Text style={styles.metricSub}>Life-to-Date Revenue</Text>
+          </View>
         </View>
 
         {/* TC-021: Incoming Booking Request Alert */}
@@ -745,6 +770,40 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     marginTop: 4,
+  },
+  metricsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  metricCard: {
+    flex: 1,
+    backgroundColor: '#293243',
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#2f3a4e',
+  },
+  metricCardPrimary: {
+    backgroundColor: 'rgba(232, 99, 49, 0.1)',
+    borderColor: 'rgba(232, 99, 49, 0.3)',
+  },
+  metricLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#a2b2c7',
+    letterSpacing: 0.5,
+  },
+  metricValue: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#f4f6f8',
+    marginTop: 6,
+    marginBottom: 2,
+  },
+  metricSub: {
+    fontSize: 11,
+    color: '#748bac',
   },
   incomingCard: {
     backgroundColor: '#293243',

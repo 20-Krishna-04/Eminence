@@ -10,22 +10,26 @@ export const adminApi = {
   getVehicles: () => api.get('/api/admin/vehicles'),
   getContracts: () => api.get('/api/admin/contracts'),
   
-  createCustomer: (data) => axios.post('/api/admin/customers', data),
-  updateCustomer: (id, data) => axios.put(`/api/admin/customers/${id}`, data),
+  createCustomer: (data) => api.post('/api/admin/customers', data),
+  updateCustomer: (id, data) => api.put(`/api/admin/customers/${id}`, data),
   deleteCustomer: (id) => api.delete(`/api/admin/customers/${id}`),
   
-  createDriver: (data) => axios.post('/api/admin/drivers', data),
-  updateDriver: (id, data) => axios.put(`/api/admin/drivers/${id}`, data),
+  createDriver: (data) => api.post('/api/admin/drivers', data),
+  updateDriver: (id, data) => api.put(`/api/admin/drivers/${id}`, data),
   deleteDriver: (id) => api.delete(`/api/admin/drivers/${id}`),
   
-  createVehicle: (data) => axios.post('/api/admin/vehicles', data),
-  updateVehicle: (id, data) => axios.put(`/api/admin/vehicles/${id}`, data),
+  createVehicle: (data) => api.post('/api/admin/vehicles', data),
+  updateVehicle: (id, data) => api.put(`/api/admin/vehicles/${id}`, data),
   deleteVehicle: (id) => api.delete(`/api/admin/vehicles/${id}`),
   
-  createContract: (data) => axios.post('/api/admin/contracts', data),
-  updateContract: (id, data) => axios.put(`/api/admin/contracts/${id}`, data),
+  createContract: (data) => api.post('/api/admin/contracts', data),
+  updateContract: (id, data) => api.put(`/api/admin/contracts/${id}`, data),
   
-  createAdmin: (data) => axios.post('/api/admin/admins', data),
-  updateAdmin: (id, data) => axios.put(`/api/admin/admins/${id}`, data),
-  deleteAdmin: (id) => api.delete(`/api/admin/admins/${id}`)
+  createAdmin: (data) => api.post('/api/admin/admins', data),
+  updateAdmin: (id, data) => api.put(`/api/admin/admins/${id}`, data),
+  deleteAdmin: (id) => api.delete(`/api/admin/admins/${id}`),
+
+  // Booking assignment by Admin
+  getBookings: () => api.get('/api/bookings'),
+  assignDriverToBooking: (bookingId, driverId) => api.put(`/api/bookings/${bookingId}/status`, { status: 'driver_assigned', driverId })
 };

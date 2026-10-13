@@ -14,6 +14,8 @@ const getAllBookings = async (req, res) => {
     const whereClause = {};
     if (req.user && req.user.role === 'customer') {
       whereClause.customerId = req.user.id;
+    } else if (req.user && req.user.role === 'driver') {
+      whereClause.driverId = req.user.id;
     }
 
     const { count, rows: bookings } = await Booking.findAndCountAll({

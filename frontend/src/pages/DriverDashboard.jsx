@@ -204,19 +204,33 @@ const DriverDashboard = () => {
       };
       fetchHeatmap();
     }
-    if (activeTab === 'earnings' && user?.id) {
-      const fetchStats = async () => {
+    if (user?.id) {
+      const fetchMetrics = async () => {
         setStatsLoading(true);
         try {
-          const res = await api.get(`/api/drivers/${user.id}/payslip`);
-          if (res.data.success) setDriverStats(res.data.payslip);
+          const res = await api.get(`/api/drivers/${user.id}/metrics`);
+          if (res.data.success) {
+            setDriverStats(res.data.metrics);
+            // If there's an assigned booking appointed by admin and no activeRide set, automatically populate it
+            if (res.data.metrics.assignedBookings && res.data.metrics.assignedBookings.length > 0 && !activeRide) {
+              const topAssigned = res.data.metrics.assignedBookings[0];
+              setActiveRide({
+                bookingId: topAssigned.id,
+                fare: Number(topAssigned.estimatedFare),
+                distance: topAssigned.totalDistance ? `${topAssigned.totalDistance} km` : 'Scheduled',
+                duration: 'Assigned by Admin',
+                pickup: topAssigned.pickupAddress,
+                dropoff: topAssigned.dropAddress || 'Multi-stop drop'
+              });
+            }
+          }
         } catch (err) {
-          console.error('Error fetching driver stats:', err);
+          console.error('Error fetching driver metrics:', err);
         } finally {
           setStatsLoading(false);
         }
       };
-      fetchStats();
+      fetchMetrics();
     }
   }, [activeTab, user?.id]);
 
@@ -266,10 +280,34 @@ const DriverDashboard = () => {
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Today\'s Earnings', value: driverStats ? `₹${driverStats.netPayout.toLocaleString('en-IN')}` : '...' , icon: Wallet, color: 'text-copper-500', bg: 'bg-copper-500/10' },
-            { label: 'Completed Trips', value: user?.totalTrips ?? '—', icon: CheckCircle, color: 'text-moss-500', bg: 'bg-moss-500/10' },
-            { label: 'Online Hours', value: '—', icon: Clock, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-            { label: 'Rating', value: user?.rating ? `${user.rating} ⭐` : '—', icon: Navigation, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
+            { 
+              label: 'Total Money Earned', 
+              value: driverStats?.totalEarnings !== undefined ? `₹${Number(driverStats.totalEarnings).toLocaleString('en-IN')}` : '₹0', 
+              icon: Wallet, 
+              color: 'text-copper-500', 
+              bg: 'bg-copper-500/10' 
+            },
+            { 
+              label: 'Completed Orders', 
+              value: driverStats?.completedOrders !== undefined ? driverStats.completedOrders : (user?.totalTrips ?? 0), 
+              icon: CheckCircle, 
+              color: 'text-moss-500', 
+              bg: 'bg-moss-500/10' 
+            },
+            { 
+              label: 'Assigned Work', 
+              value: driverStats?.activeOrdersCount !== undefined ? `${driverStats.activeOrdersCount} Pending` : '0 Active', 
+              icon: Clock, 
+              color: 'text-blue-500', 
+              bg: 'bg-blue-500/10' 
+            },
+            { 
+              label: 'Driver Rating', 
+              value: user?.rating ? `${user.rating} ⭐` : '5.0 ⭐', 
+              icon: Navigation, 
+              color: 'text-yellow-500', 
+              bg: 'bg-yellow-500/10' 
+            },
           ].map((stat, idx) => (
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
@@ -525,19 +563,19 @@ const DriverDashboard = () => {
               {/* Earnings Summary */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="card p-6 border-l-4 border-l-copper-500">
-                  <p className="text-loft-400 text-sm mb-1 font-medium flex items-center gap-2"><Wallet className="w-4 h-4"/> Weekly Total</p>
-                  <p className="text-3xl font-bold text-loft-50">₹9,650</p>
-                  <p className="text-moss-400 text-sm mt-2 flex items-center gap-1"><TrendingUp className="w-3 h-3"/> +12% vs last week</p>
+                  <p className="text-loft-400 text-sm mb-1 font-medium flex items-center gap-2"><Wallet className="w-4 h-4"/> Total Net Earnings</p>
+                  <p className="text-3xl font-bold text-loft-50">₹{driverStats?.totalEarnings ? Number(driverStats.totalEarnings).toLocaleString('en-IN') : '0'}</p>
+                  <p className="text-moss-400 text-sm mt-2 flex items-center gap-1"><TrendingUp className="w-3 h-3"/> Direct platform payout</p>
                 </div>
                 <div className="card p-6 border-l-4 border-l-moss-500">
-                  <p className="text-loft-400 text-sm mb-1 font-medium flex items-center gap-2"><CheckCircle className="w-4 h-4"/> Trips Completed</p>
-                  <p className="text-3xl font-bold text-loft-50">32</p>
-                  <p className="text-loft-400 text-sm mt-2">Target: 40 trips</p>
+                  <p className="text-loft-400 text-sm mb-1 font-medium flex items-center gap-2"><CheckCircle className="w-4 h-4"/> Orders Completed</p>
+                  <p className="text-3xl font-bold text-loft-50">{driverStats?.completedOrders ?? 0}</p>
+                  <p className="text-loft-400 text-sm mt-2">Verified deliveries</p>
                 </div>
-                <div className="card p-6 border-l-4 border-l-red-500">
-                  <p className="text-loft-400 text-sm mb-1 font-medium flex items-center gap-2"><Fuel className="w-4 h-4"/> Est. Fuel Expense</p>
-                  <p className="text-3xl font-bold text-loft-50">₹2,100</p>
-                  <p className="text-loft-400 text-sm mt-2">~22% of revenue</p>
+                <div className="card p-6 border-l-4 border-l-blue-500">
+                  <p className="text-loft-400 text-sm mb-1 font-medium flex items-center gap-2"><Clock className="w-4 h-4"/> Appointed Work</p>
+                  <p className="text-3xl font-bold text-loft-50">{driverStats?.activeOrdersCount ?? 0}</p>
+                  <p className="text-loft-400 text-sm mt-2">Active dispatched trips</p>
                 </div>
               </div>
 
@@ -564,9 +602,44 @@ const DriverDashboard = () => {
           )}
 
           {activeTab === 'completed' && (
-             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="card p-12 text-center flex flex-col items-center justify-center border-dashed border-loft-800/80">
-              <h3 className="text-xl font-bold text-loft-200 mb-2 capitalize">Trip History</h3>
-              <p className="text-loft-400 max-w-md">Your past completed trips will appear here.</p>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-loft-50 font-serif">Completed Delivery History</h3>
+                <span className="text-xs text-loft-400 font-medium">
+                  Total: {driverStats?.completedOrders ?? 0} Completed
+                </span>
+              </div>
+
+              {!driverStats?.completedBookings || driverStats.completedBookings.length === 0 ? (
+                <div className="card p-12 text-center flex flex-col items-center justify-center border-dashed border-loft-800/80">
+                  <CheckCircle className="w-12 h-12 text-loft-600 mb-3" />
+                  <h4 className="text-lg font-bold text-loft-200 mb-1">No Completed Trips Yet</h4>
+                  <p className="text-loft-400 text-sm max-w-md">Your finished deliveries with cryptographic proof of delivery will be logged here.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {driverStats.completedBookings.map((b) => (
+                    <div key={b.id} className="card p-5 border border-loft-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-loft-700 transition-colors">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="bg-moss-500/20 text-moss-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-moss-500/30">
+                            Delivered
+                          </span>
+                          <span className="text-xs text-loft-400 font-mono">ID: {b.id.slice(0, 8)}...</span>
+                        </div>
+                        <p className="text-sm font-semibold text-loft-100">{b.pickupAddress} → {b.dropAddress || 'Multi-stop drop'}</p>
+                        <p className="text-xs text-loft-400 mt-1 capitalize">{b.tempoType} Tempo • {b.goodsType}</p>
+                      </div>
+                      <div className="text-right flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto">
+                        <span className="text-lg font-bold text-copper-400">+₹{b.estimatedFare}</span>
+                        <span className="text-xs text-loft-500">
+                          {b.updatedAt ? new Date(b.updatedAt).toLocaleDateString() : 'Recent'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
         </div>

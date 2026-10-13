@@ -361,27 +361,39 @@ const Login = () => {
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.2 }}
             >
-              <button 
-                onClick={handleGoogleSignIn}
-                disabled={isLoading}
-                className="w-full flex items-center justify-center px-4 py-3.5 border border-loft-700 hover:border-loft-600 rounded-xl bg-loft-800/50 hover:bg-loft-800 transition-all duration-200 text-loft-50 font-medium mb-6"
-              >
-                <GoogleIcon />
-                Continue with Google
-              </button>
+              {activeTab === 'driver' ? (
+                <div className="mb-6 p-4 rounded-xl bg-copper-500/10 border border-copper-500/20 text-center">
+                  <p className="text-xs text-copper-300 font-medium">
+                    🛡️ Fleet Driver Portal: Login with the registered phone/email and credentials assigned to you by your Administrator.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <button 
+                    onClick={handleGoogleSignIn}
+                    disabled={isLoading}
+                    className="w-full flex items-center justify-center px-4 py-3.5 border border-loft-700 hover:border-loft-600 rounded-xl bg-loft-800/50 hover:bg-loft-800 transition-all duration-200 text-loft-50 font-medium mb-6"
+                  >
+                    <GoogleIcon />
+                    Continue with Google
+                  </button>
 
-              <div className="relative mb-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-loft-800"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-loft-900 text-loft-400">Or login with email, username, or phone</span>
-                </div>
-              </div>
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-loft-800"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-4 bg-loft-900 text-loft-400">Or login with email, username, or phone</span>
+                    </div>
+                  </div>
+                </>
+              )}
 
               <form onSubmit={handleEmailLogin} className="space-y-6">
                 <div>
-                  <label htmlFor="identifier" className="block text-sm font-medium text-loft-200 mb-2">Email / Username / Phone</label>
+                  <label htmlFor="identifier" className="block text-sm font-medium text-loft-200 mb-2">
+                    {activeTab === 'driver' ? 'Driver Phone or Email' : 'Email / Username / Phone'}
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <Mail className="h-5 w-5 text-loft-400" />
@@ -392,7 +404,7 @@ const Login = () => {
                       type="text"
                       required
                       className="input-field pl-12"
-                      placeholder="Enter your email, username, or phone"
+                      placeholder={activeTab === 'driver' ? '9876543210 or driver@eminence.com' : 'Enter your email, username, or phone'}
                       value={identifier}
                       onChange={(e) => setIdentifier(e.target.value)}
                     />
@@ -459,13 +471,18 @@ const Login = () => {
                 </button>
               </form>
 
-              <div className="mt-8 text-center text-sm text-loft-300">
-                Don't have an account?{' '}
-                <Link to="/register" className="font-medium text-copper-500 hover:text-copper-400 transition-colors">
-                  Sign up
-                </Link>
-              </div>
-
+              {activeTab === 'driver' ? (
+                <div className="mt-8 text-center text-xs text-loft-400">
+                  Need driver access? Contact your Eminence fleet administrator to assign your account.
+                </div>
+              ) : (
+                <div className="mt-8 text-center text-sm text-loft-300">
+                  Don't have an account?{' '}
+                  <Link to="/register" className="font-medium text-copper-500 hover:text-copper-400 transition-colors">
+                    Sign up
+                  </Link>
+                </div>
+              )}
 
             </motion.div>
           )}
