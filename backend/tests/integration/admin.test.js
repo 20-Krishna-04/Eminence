@@ -11,15 +11,20 @@ describe('Admin & Analytics Integration Tests', () => {
   beforeAll(async () => {
     await syncDatabase();
 
-    // Ensure test admin exists
-    const hashedPassword = await bcrypt.hash('adminpassword123', 10);
-    const [adminUser] = await Admin.findOrCreate({
+    const testPassword = process.env.SEED_PASSWORD || 'password123';
+    const hashedPassword = await bcrypt.hash(testPassword, 10);
+    const [adminUser, created] = await Admin.findOrCreate({
       where: { email: 'admin@eminence.com' },
       defaults: {
         name: 'Test Admin',
         password: hashedPassword
       }
     });
+
+    if (!created) {
+      adminUser.password = hashedPassword;
+      await adminUser.save();
+    }
 
     // Create admin token
     adminToken = jwt.sign(
@@ -37,9 +42,10 @@ describe('Admin & Analytics Integration Tests', () => {
 
   describe('POST /api/admin/login', () => {
     it('should authenticate admin with valid credentials', async () => {
+      const testPassword = process.env.SEED_PASSWORD || 'password123';
       const res = await request(app)
         .post('/api/admin/login')
-        .send({ email: 'admin@eminence.com', password: 'adminpassword123' });
+        .send({ email: 'admin@eminence.com', password: testPassword });
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
