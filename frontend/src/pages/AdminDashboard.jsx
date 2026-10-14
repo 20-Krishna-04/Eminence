@@ -3,20 +3,20 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { 
   BarChart3, Users, Truck, FileText, Settings, 
-  ShieldAlert, Activity, MessageSquare
+  ShieldAlert, Activity, MessageSquare, UserCheck, Tag
 } from 'lucide-react';
 
 import OverviewTab from '../components/admin/OverviewTab';
 import TelematicsTab from '../components/admin/TelematicsTab';
 import UsersTab from '../components/admin/UsersTab';
 import DriversTab from '../components/admin/DriversTab';
+import AppointWorkTab from '../components/admin/AppointWorkTab';
 import VehiclesTab from '../components/admin/VehiclesTab';
 import ContractsTab from '../components/admin/ContractsTab';
 import AnalyticsTab from '../components/admin/AnalyticsTab';
 import ChatInbox from '../components/admin/ChatInbox';
 import SettingsTab from '../components/admin/SettingsTab';
 import PromoCodesTab from '../components/admin/PromoCodesTab';
-import { Tag } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -40,6 +40,7 @@ const AdminDashboard = () => {
                 { id: 'telematics', label: 'Fleet Telematics', icon: Activity },
                 { id: 'users', label: 'Manage Users', icon: Users },
                 { id: 'drivers', label: 'Manage Drivers', icon: ShieldAlert },
+                { id: 'dispatch', label: 'Appoint Work', icon: UserCheck },
                 { id: 'vehicles', label: 'Manage Vehicles', icon: Truck },
                 { id: 'contracts', label: 'Contracts', icon: FileText },
                 { id: 'promocodes', label: 'Promo Codes', icon: Tag },
@@ -70,6 +71,7 @@ const AdminDashboard = () => {
           {activeTab === 'telematics' && <TelematicsTab activeTab={activeTab} token={token} />}
           {activeTab === 'users' && <UsersTab />}
           {activeTab === 'drivers' && <DriversTab />}
+          {activeTab === 'dispatch' && <AppointWorkTab />}
           {activeTab === 'vehicles' && <VehiclesTab />}
           {activeTab === 'contracts' && <ContractsTab />}
           {activeTab === 'promocodes' && <PromoCodesTab />}
