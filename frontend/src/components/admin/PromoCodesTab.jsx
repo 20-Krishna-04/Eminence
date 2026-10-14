@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Tag, Plus, Trash2, Edit3, CheckCircle, XCircle, Clock, AlertCircle, RefreshCw } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Tag, Plus, Trash2, Edit3, CheckCircle, XCircle, Clock, AlertCircle, RefreshCw, X } from 'lucide-react';
 import api from '../../services/api';
 
 const PromoCodesTab = () => {
@@ -243,17 +244,26 @@ const PromoCodesTab = () => {
       </div>
 
       {/* Modal for Create / Edit */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-loft-950/80 backdrop-blur-sm">
-          <div className="card w-full max-w-lg bg-loft-900 border border-loft-800 p-6 sm:p-8 rounded-2xl shadow-2xl relative">
-            <h3 className="text-xl font-bold text-loft-50 mb-2 font-serif">
-              {editingId ? 'Edit Promo Code' : 'Create New Promo Code'}
-            </h3>
-            <p className="text-loft-400 text-xs mb-6">
+      {isModalOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/75 backdrop-blur-md overflow-y-auto">
+          <div className="card w-full max-w-lg bg-loft-900 border border-loft-800 p-6 sm:p-8 rounded-2xl shadow-2xl relative max-h-[85vh] flex flex-col my-auto">
+            <div className="flex justify-between items-center mb-2 shrink-0">
+              <h3 className="text-xl font-bold text-loft-50 font-serif">
+                {editingId ? 'Edit Promo Code' : 'Create New Promo Code'}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="text-loft-400 hover:text-loft-100 p-1.5 rounded-lg hover:bg-loft-800 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-loft-400 text-xs mb-6 shrink-0">
               Configure promo discount values, usage limits, and expiration cutoff.
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto pr-1 flex-1">
               <div>
                 <label className="block text-xs font-medium text-loft-300 mb-1">Code</label>
                 <input
@@ -340,7 +350,7 @@ const PromoCodesTab = () => {
                 </label>
               </div>
 
-              <div className="flex gap-4 pt-6">
+              <div className="flex gap-4 pt-6 border-t border-loft-800 shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
@@ -357,7 +367,8 @@ const PromoCodesTab = () => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

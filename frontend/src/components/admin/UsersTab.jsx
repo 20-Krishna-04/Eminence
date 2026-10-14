@@ -1,4 +1,5 @@
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Plus, Edit2, Trash2, X } from 'lucide-react';
 import { useAdminUsers } from '../../hooks/useAdminUsers';
 
 const UsersTab = () => {
@@ -67,12 +68,21 @@ const UsersTab = () => {
       </div>
 
       {/* CRUD Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-loft-900 border border-loft-800 rounded-2xl max-w-md w-full p-6 sm:p-8 relative z-50 shadow-2xl max-h-[90vh] flex flex-col my-auto">
-            <h2 className="text-2xl font-bold text-loft-50 mb-4 font-serif capitalize shrink-0">
-              {editMode ? 'Edit' : 'Add'} Customer
-            </h2>
+      {isModalOpen && createPortal(
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          <div className="bg-loft-900 border border-loft-800 rounded-2xl max-w-md w-full p-6 sm:p-8 relative shadow-2xl max-h-[85vh] flex flex-col my-auto">
+            <div className="flex justify-between items-center mb-4 shrink-0">
+              <h2 className="text-2xl font-bold text-loft-50 font-serif capitalize">
+                {editMode ? 'Edit' : 'Add'} Customer
+              </h2>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="text-loft-400 hover:text-loft-100 p-1.5 rounded-lg hover:bg-loft-800 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
             <form onSubmit={handleSubmitForm} className="space-y-4 overflow-y-auto pr-1 flex-1">
               <div>
                 <label className="block text-xs font-semibold text-loft-300 uppercase tracking-wider mb-2">Name</label>
@@ -141,13 +151,14 @@ const UsersTab = () => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Delete Confirm */}
-      {deleteConfirm.isOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-loft-900 border border-loft-800 rounded-2xl max-w-sm w-full p-6 relative z-50 shadow-2xl text-center">
+      {deleteConfirm.isOpen && createPortal(
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+          <div className="bg-loft-900 border border-loft-800 rounded-2xl max-w-sm w-full p-6 relative shadow-2xl text-center my-auto">
             <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <Trash2 className="w-8 h-8" />
             </div>
@@ -172,7 +183,8 @@ const UsersTab = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

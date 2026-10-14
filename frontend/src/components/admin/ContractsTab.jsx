@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Edit2 } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Edit2, X } from 'lucide-react';
 import { adminApi } from '../../services/adminApi';
 
 const ContractsTab = () => {
@@ -110,13 +111,22 @@ const ContractsTab = () => {
         </div>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-loft-900 border border-loft-800 rounded-2xl max-w-md w-full p-8 relative z-50 shadow-2xl">
-            <h2 className="text-2xl font-bold text-loft-50 mb-6 font-serif capitalize">
-              Edit Contract
-            </h2>
-            <form onSubmit={handleSubmitForm} className="space-y-4">
+      {isModalOpen && createPortal(
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          <div className="bg-loft-900 border border-loft-800 rounded-2xl max-w-md w-full p-6 sm:p-8 relative shadow-2xl max-h-[85vh] flex flex-col my-auto">
+            <div className="flex justify-between items-center mb-6 shrink-0">
+              <h2 className="text-2xl font-bold text-loft-50 font-serif capitalize">
+                Edit Contract
+              </h2>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="text-loft-400 hover:text-loft-100 p-1.5 rounded-lg hover:bg-loft-800 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleSubmitForm} className="space-y-4 overflow-y-auto pr-1 flex-1">
               <div>
                 <label className="block text-xs font-semibold text-loft-300 uppercase tracking-wider mb-2">Status</label>
                 <select 
@@ -161,7 +171,8 @@ const ContractsTab = () => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

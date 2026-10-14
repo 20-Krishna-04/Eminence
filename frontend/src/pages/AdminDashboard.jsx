@@ -24,7 +24,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="w-full pt-12 pb-24 relative min-h-screen bg-loft-950">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-8">
         
         {/* Sidebar */}
         <div className="w-full md:w-64 flex-shrink-0">
