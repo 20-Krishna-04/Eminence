@@ -255,9 +255,11 @@ const syncDatabase = async () => {
 
     // Ensure default admin exists in development / test environments
     if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test' || !process.env.NODE_ENV) {
-      const adminCount = await Admin.count();
-      if (adminCount === 0) {
-        const bcrypt = require('bcrypt');
+      const bcrypt = require('bcrypt');
+      
+      // Standard system admin for tests & test cases
+      const defaultAdmin = await Admin.findOne({ where: { email: 'admin@eminence.com' } });
+      if (!defaultAdmin) {
         const hashedPassword = await bcrypt.hash('adminpassword123', 10);
         await Admin.create({
           name: 'System Admin',
@@ -265,6 +267,26 @@ const syncDatabase = async () => {
           password: hashedPassword
         });
         console.log('Seeded default admin: admin@eminence.com');
+      }
+
+      // Configured seed admin from .env (e.g. SEED_EMAIL=admin@example.com, SEED_PASSWORD=password123)
+      const seedEmail = process.env.SEED_EMAIL;
+      const seedPassword = process.env.SEED_PASSWORD;
+      if (seedEmail && seedPassword && seedEmail !== 'admin@eminence.com') {
+        const envAdmin = await Admin.findOne({ where: { email: seedEmail } });
+        const hashedSeedPassword = await bcrypt.hash(seedPassword, 10);
+        if (!envAdmin) {
+          await Admin.create({
+            name: 'Super Admin',
+            email: seedEmail,
+            password: hashedSeedPassword
+          });
+          console.log(`Seeded environment admin: ${seedEmail}`);
+        } else {
+          // Keep password synchronized with .env
+          envAdmin.password = hashedSeedPassword;
+          await envAdmin.save();
+        }
       }
     }
   } catch (error) {

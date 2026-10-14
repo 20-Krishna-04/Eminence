@@ -13,7 +13,8 @@ const ContractsTab = () => {
   const fetchContracts = async () => {
     try {
       const res = await adminApi.getContracts();
-      if (res.data.success) setContracts(res.data.contracts);
+      const list = Array.isArray(res.data) ? res.data : (res.data?.contracts || []);
+      setContracts(list);
     } catch (err) {
       console.error('Error fetching contracts:', err);
     }

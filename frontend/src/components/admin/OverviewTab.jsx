@@ -124,21 +124,29 @@ const OverviewTab = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-loft-800">
-              {stats.activities.map((row, idx) => (
-                <tr key={idx} className="hover:bg-loft-800/50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">{row.time}</td>
-                  <td className="px-6 py-4">{row.event}</td>
-                  <td className="px-6 py-4 font-medium text-loft-200">{row.user}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded text-xs font-bold ${
-                      row.status === 'Success' || row.status === 'Completed' ? 'bg-moss-500/10 text-moss-500' :
-                      row.status === 'Pending' ? 'bg-red-500/10 text-red-500' : 'bg-copper-500/10 text-copper-500'
-                    }`}>
-                      {row.status}
-                    </span>
+              {stats.activities && stats.activities.length > 0 ? (
+                stats.activities.map((row, idx) => (
+                  <tr key={idx} className="hover:bg-loft-800/50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">{row.time}</td>
+                    <td className="px-6 py-4">{row.event}</td>
+                    <td className="px-6 py-4 font-medium text-loft-200">{row.user}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2 py-1 rounded text-xs font-bold ${
+                        row.status === 'Success' || row.status === 'Completed' ? 'bg-moss-500/10 text-moss-500' :
+                        row.status === 'Pending' ? 'bg-red-500/10 text-red-500' : 'bg-copper-500/10 text-copper-500'
+                      }`}>
+                        {row.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="px-6 py-8 text-center text-loft-500">
+                    No recent live activity recorded yet.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

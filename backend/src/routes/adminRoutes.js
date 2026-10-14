@@ -49,4 +49,10 @@ router.post('/promocodes', adminController.createPromoCode);
 router.put('/promocodes/:id', adminController.updatePromoCode);
 router.delete('/promocodes/:id', adminController.deletePromoCode);
 
+// Admin Management routes
+router.get('/admins', adminController.getAdmins);
+router.post('/admins', adminController.createAdmin);
+router.put('/admins/:id', adminController.updateAdmin);
+router.delete('/admins/:id', adminController.deleteAdmin);
+
 module.exports = router;

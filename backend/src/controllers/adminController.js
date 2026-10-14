@@ -1,4 +1,4 @@
-const { Driver, Customer, Vehicle, Booking, AuditLog, PlatformConfig, B2BContract, PromoCode, sequelize } = require('../models');
+const { Driver, Customer, Vehicle, Booking, AuditLog, PlatformConfig, B2BContract, PromoCode, Admin, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
 const cache = require('../services/cacheService');
@@ -332,12 +332,39 @@ const deleteVehicle = async (req, res) => {
 // Get Overview Stats
 const getOverviewStats = async (req, res) => {
   try {
-    const [totalRevenue, activeDrivers, totalVehicles, totalCustomers] = await Promise.all([
+    const [totalRevenue, activeDrivers, totalVehicles, totalCustomers, recentBookings] = await Promise.all([
       Booking.sum('estimatedFare', { where: { status: 'completed' } }),
       Driver.count({ where: { status: 'active' } }),
       Vehicle.count(),
-      Customer.count()
+      Customer.count(),
+      Booking.findAll({
+        include: [{ model: Customer, as: 'customer', attributes: ['name', 'phone'] }],
+        order: [['createdAt', 'DESC']],
+        limit: 6
+      })
     ]);
+
+    const activities = recentBookings.map((b) => {
+      const timeStr = b.createdAt ? new Date(b.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now';
+      let eventTitle = 'Booking Created';
+      if (b.status === 'completed') eventTitle = 'Trip Completed';
+      else if (b.status === 'driver_assigned' || b.status === 'arrived') eventTitle = 'Driver Dispatched';
+      else if (b.status === 'in_transit') eventTitle = 'Goods in Transit';
+      else if (b.status === 'cancelled') eventTitle = 'Trip Cancelled';
+
+      let displayStatus = 'Processing';
+      if (b.status === 'completed') displayStatus = 'Success';
+      else if (b.status === 'cancelled') displayStatus = 'Cancelled';
+      else if (b.status === 'pending') displayStatus = 'Pending';
+
+      return {
+        id: b.id,
+        time: timeStr,
+        event: `${eventTitle} (#${b.id.slice(0, 8)})`,
+        user: b.customer?.name || b.customer?.phone || 'Customer',
+        status: displayStatus
+      };
+    });
 
     res.status(200).json({
       success: true,
@@ -349,7 +376,8 @@ const getOverviewStats = async (req, res) => {
         totalCustomers: totalCustomers.toString(),
         rawActiveDrivers: activeDrivers,
         rawTotalVehicles: totalVehicles,
-        rawTotalCustomers: totalCustomers
+        rawTotalCustomers: totalCustomers,
+        activities
       }
     });
   } catch (error) {
@@ -383,26 +411,6 @@ const getRevenueAnalytics = async (req, res) => {
       date: b.date,
       revenue: parseFloat(b.getDataValue('dailyRevenue')) || 0
     }));
-
-    if (revenueData.length === 0) {
-      // In production, return empty array rather than mock data unless mock is explicitly enabled
-      if (process.env.NODE_ENV === 'production' && process.env.ENABLE_MOCK_ANALYTICS !== 'true') {
-        return res.status(200).json({ success: true, revenueData: [] });
-      }
-
-      // Fallback mock data for development demonstration
-      const today = new Date();
-      const mockData = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date();
-        d.setDate(today.getDate() - (6 - i));
-        const dateStr = d.toISOString().split('T')[0];
-        return {
-          date: dateStr,
-          revenue: [12000, 15000, 18000, 14000, 22000, 25000, 30000][i]
-        };
-      });
-      return res.status(200).json({ success: true, revenueData: mockData, isMock: true });
-    }
 
     res.status(200).json({ success: true, revenueData });
   } catch (error) {
@@ -442,23 +450,6 @@ const getRouteAnalytics = async (req, res) => {
       route: `${r.pickupAddress.split(',')[0]} ➔ ${r.dropAddress.split(',')[0]}`,
       trips: parseInt(r.getDataValue('count')) || 0
     }));
-
-    if (routeData.length === 0) {
-      // In production, return empty array rather than mock data unless mock is explicitly enabled
-      if (process.env.NODE_ENV === 'production' && process.env.ENABLE_MOCK_ANALYTICS !== 'true') {
-        return res.status(200).json({ success: true, routeData: [] });
-      }
-
-      // Fallback mock data for development demonstration
-      const mockRoutes = [
-        { route: 'Koregaon Park ➔ Kalyani Nagar', trips: 45 },
-        { route: 'Viman Nagar ➔ Baner', trips: 32 },
-        { route: 'Hinjewadi Phase 1 ➔ Wakad', trips: 28 },
-        { route: 'Hadapsar ➔ Magarpatta City', trips: 22 },
-        { route: 'Kothrud ➔ Swargate', trips: 15 }
-      ];
-      return res.status(200).json({ success: true, routeData: mockRoutes, isMock: true });
-    }
 
     res.status(200).json({ success: true, routeData });
   } catch (error) {
@@ -840,6 +831,89 @@ const deletePromoCode = async (req, res) => {
   }
 };
 
+// --- ADMIN USERS CRUD ---
+const getAdmins = async (req, res) => {
+  try {
+    const admins = await Admin.findAll({
+      attributes: { exclude: ['password'] },
+      order: [['createdAt', 'DESC']]
+    });
+    res.status(200).json({ success: true, admins });
+  } catch (error) {
+    console.error('Error fetching admins:', error);
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
+  }
+};
+
+const createAdmin = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Email and password are required' });
+    }
+    const existing = await Admin.findOne({ where: { email } });
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'Admin with this email already exists' });
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const admin = await Admin.create({
+      name: name || 'Administrator',
+      email,
+      password: hashedPassword
+    });
+    const adminResponse = admin.toJSON();
+    delete adminResponse.password;
+    res.status(201).json({ success: true, admin: adminResponse });
+  } catch (error) {
+    console.error('Error creating admin:', error);
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
+  }
+};
+
+const updateAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, password } = req.body;
+    const admin = await Admin.findByPk(id);
+    if (!admin) {
+      return res.status(404).json({ success: false, message: 'Admin not found' });
+    }
+    if (name) admin.name = name;
+    if (email) admin.email = email;
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      admin.password = await bcrypt.hash(password, salt);
+    }
+    await admin.save();
+    const adminResponse = admin.toJSON();
+    delete adminResponse.password;
+    res.status(200).json({ success: true, admin: adminResponse });
+  } catch (error) {
+    console.error('Error updating admin:', error);
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
+  }
+};
+
+const deleteAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const adminCount = await Admin.count();
+    if (adminCount <= 1) {
+      return res.status(400).json({ success: false, message: 'Cannot delete the only existing administrator' });
+    }
+    const admin = await Admin.findByPk(id);
+    if (!admin) {
+      return res.status(404).json({ success: false, message: 'Admin not found' });
+    }
+    await admin.destroy();
+    res.status(200).json({ success: true, message: 'Admin deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting admin:', error);
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
+  }
+};
+
 module.exports = {
   getDrivers,
   createDriver,
@@ -869,5 +943,9 @@ module.exports = {
   getPromoCodes,
   createPromoCode,
   updatePromoCode,
-  deletePromoCode
+  deletePromoCode,
+  getAdmins,
+  createAdmin,
+  updateAdmin,
+  deleteAdmin
 };

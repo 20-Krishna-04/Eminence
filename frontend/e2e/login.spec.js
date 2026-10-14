@@ -88,4 +88,23 @@ test.describe('Login Flow', () => {
     await page.click('button:has(svg.lucide-eye-off)');
     await expect(passwordInput).toHaveAttribute('type', 'password');
   });
+
+  test('should render Google Sign-in button for Customer role and omit it for Driver role', async ({ page }) => {
+    // Under customer tab (default)
+    const googleButton = page.locator('button:has-text("Continue with Google")');
+    await expect(googleButton).toBeVisible();
+    await expect(googleButton).toBeEnabled();
+
+    // Switch to driver role
+    await page.click('button:has-text("Driver")');
+
+    // Google Sign-In must not be available for drivers
+    await expect(googleButton).not.toBeVisible();
+    await expect(page.locator('text=Fleet Driver Portal')).toBeVisible();
+
+    // Switch back to customer role
+    await page.click('button:has-text("Customer")');
+    await expect(googleButton).toBeVisible();
+  });
 });
+

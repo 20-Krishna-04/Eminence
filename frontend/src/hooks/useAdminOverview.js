@@ -24,12 +24,7 @@ export const useAdminOverview = () => {
           activeDrivers: statsRes.data.stats.activeDrivers,
           totalVehicles: statsRes.data.stats.totalVehicles,
           totalCustomers: statsRes.data.stats.totalCustomers,
-          activities: [
-            { time: '10:42 AM', event: 'New Booking Created', user: 'Rahul D.', status: 'Processing' },
-            { time: '10:39 AM', event: 'Driver Offline (MH 12)', status: 'Completed', user: 'System' },
-            { time: '10:30 AM', event: 'B2B Contract Signed', user: 'DMart', status: 'Success' },
-            { time: '10:15 AM', event: 'Support Ticket Raised', user: 'Sneha K.', status: 'Pending' }
-          ]
+          activities: statsRes.data.stats.activities || []
         }));
       }
       

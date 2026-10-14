@@ -24,6 +24,7 @@ export const adminApi = {
   createContract: (data) => api.post('/api/admin/contracts', data),
   updateContract: (id, data) => api.put(`/api/admin/contracts/${id}`, data),
   
+  getAdmins: () => api.get('/api/admin/admins'),
   createAdmin: (data) => api.post('/api/admin/admins', data),
   updateAdmin: (id, data) => api.put(`/api/admin/admins/${id}`, data),
   deleteAdmin: (id) => api.delete(`/api/admin/admins/${id}`),

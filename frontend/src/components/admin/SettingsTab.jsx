@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, ShieldAlert, DollarSign, MessageSquare } from 'lucide-react';
 import { adminApi } from '../../services/adminApi';
 
 const SettingsTab = () => {
+  const [admins, setAdmins] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
@@ -10,11 +12,54 @@ const SettingsTab = () => {
     name: '', email: '', password: '', role: 'Superadmin'
   });
 
+  const fetchAdmins = async () => {
+    setLoading(true);
+    try {
+      const res = await adminApi.getAdmins();
+      if (res.data?.success && Array.isArray(res.data.admins)) {
+        setAdmins(res.data.admins);
+      }
+    } catch (err) {
+      console.error('Error fetching admins:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
+
   const handleOpenCreateModal = () => {
     setEditMode(false);
     setCurrentItem(null);
     setAdminForm({ name: '', email: '', password: '', role: 'Superadmin' });
     setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (admin) => {
+    setEditMode(true);
+    setCurrentItem(admin);
+    setAdminForm({
+      name: admin.name || '',
+      email: admin.email || '',
+      password: '',
+      role: 'Superadmin'
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteAdmin = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this administrator?')) return;
+    try {
+      const res = await adminApi.deleteAdmin(id);
+      if (res.data?.success) {
+        fetchAdmins();
+      }
+    } catch (err) {
+      console.error('Delete admin error:', err);
+      alert(err.response?.data?.message || 'Delete operation failed');
+    }
   };
 
   const handleSubmitForm = async (e) => {
@@ -26,7 +71,7 @@ const SettingsTab = () => {
         await adminApi.createAdmin(adminForm);
       }
       setIsModalOpen(false);
-      // fetchAdmins() if there was a list
+      fetchAdmins();
     } catch (err) {
       console.error('Form submit error:', err);
       alert(err.response?.data?.message || 'Save operation failed');
@@ -51,52 +96,66 @@ const SettingsTab = () => {
           <p className="text-sm text-loft-400">Manage dashboard access and role-based permissions.</p>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-loft-300">
-            <thead className="bg-loft-950/50 text-xs uppercase font-medium">
-              <tr>
-                <th className="px-6 py-4">Name</th>
-                <th className="px-6 py-4">Email</th>
-                <th className="px-6 py-4">Role</th>
-                <th className="px-6 py-4">Last Login</th>
-                <th className="px-6 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-loft-800">
-              {[
-                { name: 'Super Admin', email: 'admin@eminence.com', role: 'Superadmin', login: 'Just now' },
-                { name: 'Priya Sharma', email: 'priya.s@eminence.com', role: 'Finance Admin', login: '2 hrs ago' },
-                { name: 'Rohan Gupta', email: 'rohan.g@eminence.com', role: 'Support Admin', login: '1 day ago' },
-              ].map((admin, idx) => (
-                <tr key={idx} className="hover:bg-loft-800/50 transition-colors">
-                  <td className="px-6 py-4 font-medium text-loft-100 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-copper-500/20 text-copper-500 flex items-center justify-center font-bold">
-                      {admin.name.charAt(0)}
-                    </div>
-                    {admin.name}
-                  </td>
-                  <td className="px-6 py-4">{admin.email}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-block whitespace-nowrap px-3 py-1 rounded-full text-xs font-bold ${
-                      admin.role === 'Superadmin' ? 'bg-moss-500/20 text-moss-500 border border-moss-500/30' :
-                      admin.role === 'Finance Admin' ? 'bg-blue-500/20 text-blue-500 border border-blue-500/30' :
-                      'bg-copper-500/20 text-copper-500 border border-copper-500/30'
-                    }`}>
-                      {admin.role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">{admin.login}</td>
-                  <td className="px-6 py-4 text-right flex justify-end gap-2">
-                    <button className="p-2 text-loft-400 hover:text-copper-500 rounded-lg hover:bg-loft-800 transition-colors">
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 text-loft-400 hover:text-red-500 rounded-lg hover:bg-loft-800 transition-colors" disabled={admin.role === 'Superadmin'}>
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
+          {loading ? (
+            <div className="p-12 text-center text-loft-400">Loading administrators...</div>
+          ) : (
+            <table className="w-full text-left text-sm text-loft-300">
+              <thead className="bg-loft-950/50 text-xs uppercase font-medium">
+                <tr>
+                  <th className="px-6 py-4">Name</th>
+                  <th className="px-6 py-4">Email</th>
+                  <th className="px-6 py-4">Role</th>
+                  <th className="px-6 py-4">Created</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-loft-800">
+                {admins.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-8 text-center text-loft-500">
+                      No administrators found.
+                    </td>
+                  </tr>
+                ) : (
+                  admins.map((admin) => (
+                    <tr key={admin.id} className="hover:bg-loft-800/50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-loft-100 flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-copper-500/20 text-copper-500 flex items-center justify-center font-bold">
+                          {(admin.name || 'A').charAt(0).toUpperCase()}
+                        </div>
+                        {admin.name || 'Administrator'}
+                      </td>
+                      <td className="px-6 py-4">{admin.email}</td>
+                      <td className="px-6 py-4">
+                        <span className="inline-block whitespace-nowrap px-3 py-1 rounded-full text-xs font-bold bg-moss-500/20 text-moss-500 border border-moss-500/30">
+                          Superadmin
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        {admin.createdAt ? new Date(admin.createdAt).toLocaleDateString() : 'Active'}
+                      </td>
+                      <td className="px-6 py-4 text-right flex justify-end gap-2">
+                        <button 
+                          onClick={() => handleOpenEditModal(admin)}
+                          className="p-2 text-loft-400 hover:text-copper-500 rounded-lg hover:bg-loft-800 transition-colors cursor-pointer"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteAdmin(admin.id)}
+                          className="p-2 text-loft-400 hover:text-red-500 rounded-lg hover:bg-loft-800 transition-colors cursor-pointer"
+                          disabled={admins.length <= 1}
+                          title={admins.length <= 1 ? "Cannot delete the sole admin" : "Delete Admin"}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
@@ -145,17 +204,6 @@ const SettingsTab = () => {
                   value={adminForm.password} onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
                   placeholder={editMode ? 'Leave blank to keep current' : 'Enter temporary password'}
                 />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-loft-300 uppercase tracking-wider mb-2">Role</label>
-                <select 
-                  className="input-field py-3 bg-loft-950" 
-                  value={adminForm.role} onChange={(e) => setAdminForm({ ...adminForm, role: e.target.value })}
-                >
-                  <option value="Superadmin">Superadmin</option>
-                  <option value="Finance Admin">Finance Admin</option>
-                  <option value="Support Admin">Support Admin</option>
-                </select>
               </div>
               <div className="flex justify-end gap-3 pt-6 border-t border-loft-800">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 bg-transparent border border-loft-700 hover:bg-loft-800 text-loft-300 rounded-xl text-sm font-semibold transition-all cursor-pointer">
