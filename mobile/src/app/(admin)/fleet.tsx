@@ -291,37 +291,44 @@ export default function FleetManagementScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add New Driver (TC-032)</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.modalTitle}>Add New Driver (TC-032)</Text>
+              <TouchableOpacity onPress={() => setIsDriverModalOpen(false)}>
+                <Text style={{ color: '#a2b2c7', fontSize: 18, fontWeight: '700', padding: 4 }}>✕</Text>
+              </TouchableOpacity>
+            </View>
             <Text style={styles.modalSubtitle}>Enroll a driver into the active logistics fleet.</Text>
 
-            <Text style={styles.inputLabel}>Full Name</Text>
-            <TextInput
-              style={styles.modalInput}
-              value={driverName}
-              onChangeText={setDriverName}
-              placeholder="e.g. Test Driver"
-              placeholderTextColor="#748bac"
-            />
+            <ScrollView style={{ maxHeight: 320 }} keyboardShouldPersistTaps="handled">
+              <Text style={styles.inputLabel}>Full Name</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={driverName}
+                onChangeText={setDriverName}
+                placeholder="e.g. Test Driver"
+                placeholderTextColor="#748bac"
+              />
 
-            <Text style={styles.inputLabel}>Phone Number</Text>
-            <TextInput
-              style={styles.modalInput}
-              value={driverPhone}
-              onChangeText={setDriverPhone}
-              placeholder="e.g. 9999999999"
-              placeholderTextColor="#748bac"
-              keyboardType="phone-pad"
-            />
+              <Text style={styles.inputLabel}>Phone Number</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={driverPhone}
+                onChangeText={setDriverPhone}
+                placeholder="e.g. 9999999999"
+                placeholderTextColor="#748bac"
+                keyboardType="phone-pad"
+              />
 
-            <Text style={styles.inputLabel}>License Number</Text>
-            <TextInput
-              style={styles.modalInput}
-              value={driverLicense}
-              onChangeText={setDriverLicense}
-              placeholder="e.g. MH12XY9999"
-              placeholderTextColor="#748bac"
-              autoCapitalize="characters"
-            />
+              <Text style={styles.inputLabel}>License Number</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={driverLicense}
+                onChangeText={setDriverLicense}
+                placeholder="e.g. MH12XY9999"
+                placeholderTextColor="#748bac"
+                autoCapitalize="characters"
+              />
+            </ScrollView>
 
             <View style={styles.modalActions}>
               <TouchableOpacity
@@ -355,37 +362,44 @@ export default function FleetManagementScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add New Vehicle (TC-033)</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.modalTitle}>Add New Vehicle (TC-033)</Text>
+              <TouchableOpacity onPress={() => setIsVehicleModalOpen(false)}>
+                <Text style={{ color: '#a2b2c7', fontSize: 18, fontWeight: '700', padding: 4 }}>✕</Text>
+              </TouchableOpacity>
+            </View>
             <Text style={styles.modalSubtitle}>Register a commercial vehicle into the dispatch network.</Text>
 
-            <Text style={styles.inputLabel}>Registration Number</Text>
-            <TextInput
-              style={styles.modalInput}
-              value={vehicleReg}
-              onChangeText={setVehicleReg}
-              placeholder="e.g. MH-01-AA-1111"
-              placeholderTextColor="#748bac"
-              autoCapitalize="characters"
-            />
+            <ScrollView style={{ maxHeight: 320 }} keyboardShouldPersistTaps="handled">
+              <Text style={styles.inputLabel}>Registration Number</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={vehicleReg}
+                onChangeText={setVehicleReg}
+                placeholder="e.g. MH-01-AA-1111"
+                placeholderTextColor="#748bac"
+                autoCapitalize="characters"
+              />
 
-            <Text style={styles.inputLabel}>Vehicle Type (Small, Medium, Large)</Text>
-            <TextInput
-              style={styles.modalInput}
-              value={vehicleType}
-              onChangeText={setVehicleType}
-              placeholder="e.g. Large"
-              placeholderTextColor="#748bac"
-            />
+              <Text style={styles.inputLabel}>Vehicle Type (Small, Medium, Large)</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={vehicleType}
+                onChangeText={setVehicleType}
+                placeholder="e.g. Large"
+                placeholderTextColor="#748bac"
+              />
 
-            <Text style={styles.inputLabel}>Payload Capacity (kg)</Text>
-            <TextInput
-              style={styles.modalInput}
-              value={vehicleCapacity}
-              onChangeText={setVehicleCapacity}
-              placeholder="e.g. 2000"
-              placeholderTextColor="#748bac"
-              keyboardType="numeric"
-            />
+              <Text style={styles.inputLabel}>Payload Capacity (kg)</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={vehicleCapacity}
+                onChangeText={setVehicleCapacity}
+                placeholder="e.g. 2000"
+                placeholderTextColor="#748bac"
+                keyboardType="numeric"
+              />
+            </ScrollView>
 
             <View style={styles.modalActions}>
               <TouchableOpacity
@@ -550,6 +564,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderColor: '#2f3a4e',
+    maxHeight: '85%',
   },
   modalTitle: {
     color: '#f4f6f8',

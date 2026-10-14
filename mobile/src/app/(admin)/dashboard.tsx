@@ -260,7 +260,22 @@ export default function AdminDashboard() {
             <Text style={styles.actionIcon}>🚚</Text>
             <View>
               <Text style={styles.actionTitle}>Drivers & Fleet Vehicles</Text>
-              <Text style={styles.actionSub}>Add, assign, and manage drivers & tempos (TC-032, TC-033)</Text>
+              <Text style={styles.actionSub}>Add, manage, and verify drivers & tempos (TC-032, TC-033)</Text>
+            </View>
+          </View>
+          <Text style={styles.chevron}>›</Text>
+        </TouchableOpacity>
+
+        {/* Appoint Work to Drivers (Dispatch Trips) */}
+        <TouchableOpacity
+          style={styles.actionCard}
+          onPress={() => router.push('/(admin)/dispatch' as any)}
+        >
+          <View style={styles.actionLeft}>
+            <Text style={styles.actionIcon}>📋</Text>
+            <View>
+              <Text style={styles.actionTitle}>Appoint Work to Drivers</Text>
+              <Text style={styles.actionSub}>Dispatch pending customer bookings to fleet drivers</Text>
             </View>
           </View>
           <Text style={styles.chevron}>›</Text>
